@@ -322,7 +322,7 @@ For each ProjectSubcontractor:
 1. **General Liability (GL)**
    - Each Occurrence
    - General Aggregate
-   - Per Project Aggregate (minimum $5M)
+   - Per Project Aggregate (cap: $5M)
    - Products/Completed Operations Aggregate
    - Personal & Advertising Injury
    - Damage to Rented Premises
@@ -359,19 +359,19 @@ For each ProjectSubcontractor:
 Projects can specify different requirement tiers for different risk levels:
 
 ### Standard Tier
-- General Liability: $1M / $2M (Per Project Aggregate: $5M)
+- General Liability: $1M / $2M (Per Project Aggregate Cap: $5M)
 - Workers Comp: $1M / $1M / $1M
 - Auto Liability: $1M CSL
 - Umbrella: Optional or $5M
 
 ### Elevated Tier
-- General Liability: $2M / $4M (Per Project Aggregate: $5M)
+- General Liability: $2M / $4M (Per Project Aggregate Cap: $5M)
 - Workers Comp: $1M / $1M / $1M
 - Auto Liability: $1M CSL
 - Umbrella: Required $5M
 
 ### High Risk Tier
-- General Liability: $5M / $5M (Per Project Aggregate: $5M)
+- General Liability: $5M / $5M (Per Project Aggregate Cap: $5M)
 - Workers Comp: $1M / $1M / $1M
 - Auto Liability: $2M CSL
 - Umbrella: Required $10M
