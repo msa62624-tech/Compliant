@@ -25,6 +25,7 @@ Every project requires these base requirements regardless of trade:
 - CG2037 (Primary & Non-Contributory)
 - Blanket basis endorsements
 - Minimum $1M each occurrence / $2M aggregate
+- **Minimum $5M per project aggregate** (applies to all work on the project)
 - Minimum $1M products/completed operations
 - Waiver of Subrogation required
 - All additional insureds named (from project setup)
