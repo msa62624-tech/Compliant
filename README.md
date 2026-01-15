@@ -61,6 +61,7 @@ For production deployment, see [docs/DEPLOY.md](docs/DEPLOY.md) for complete ins
 
 ## 📚 Documentation
 
+- [docs/COMPLETE_CONFIGURATION_GUIDE.md](docs/COMPLETE_CONFIGURATION_GUIDE.md) - **🔧 Complete guide to remove ALL mocking**
 - [docs/BACKEND_CONNECTION_SETUP.md](docs/BACKEND_CONNECTION_SETUP.md) - **🔧 Fix "Backend is Mocked" issue**
 - [docs/SECURITY_CREDENTIAL_ROTATION.md](docs/SECURITY_CREDENTIAL_ROTATION.md) - **⚠️ CRITICAL: Post-merge credential rotation required**
 - [docs/QUICKSTART.md](docs/QUICKSTART.md) - Quick start guide
@@ -259,12 +260,13 @@ For production deployments, see [docs/DEPLOY.md](docs/DEPLOY.md).
 ### Email Configuration
 
 If emails appear to send but don't arrive:
-- Development mode without SMTP uses "mock mode" (logged but not sent)
-- Configure SMTP in `backend/.env` - see [docs/EMAIL_SETUP.md](docs/EMAIL_SETUP.md)
+- Development mode without SMTP configured will log emails instead of sending them
+- To send real emails, configure SMTP in `backend/.env` - see [docs/EMAIL_SETUP.md](docs/EMAIL_SETUP.md) or [docs/COMPLETE_CONFIGURATION_GUIDE.md](docs/COMPLETE_CONFIGURATION_GUIDE.md)
 - Check backend console for email delivery status
 
 ## ⚠️ Important Notes
 
 - **In-Memory Storage:** Data resets on server restart (development only)
-- **Mock Integrations:** Email, file storage, and Adobe Sign use mock data when not configured
-- **Environment Files:** Required for proper operation. Run `npm run setup` for interactive configuration
+- **Optional Services:** Email (SMTP), Adobe PDF Services, and AI Analysis are optional - the app works without them but uses mock data for those features
+- **Configuration:** See [docs/COMPLETE_CONFIGURATION_GUIDE.md](docs/COMPLETE_CONFIGURATION_GUIDE.md) to configure all services and eliminate mocking
+- **Environment Files:** Required for backend connection. Files are included for local development
