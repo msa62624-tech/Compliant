@@ -27,13 +27,15 @@ Full-stack insurance tracking application for General Contractors and their subc
 
 ## Quick Start
 
+### 🚨 "Backend is Mocked" Issue?
+
+If you see warnings about **"Backend not configured"** or **"MOCK MODE"**, the `.env` files are now included in this repository for local development. See [docs/BACKEND_CONNECTION_SETUP.md](docs/BACKEND_CONNECTION_SETUP.md) for the fix.
+
 ### Frontend Setup
 
 ```bash
 npm install
-# Copy .env.example to .env and configure your backend URL
-cp .env.example .env
-# Edit .env to set VITE_API_BASE_URL to your backend URL
+# .env file already configured for local development
 npm run dev
 ```
 
@@ -44,8 +46,7 @@ npm run dev
 ```bash
 cd backend
 npm install
-cp .env.example .env
-# Edit backend/.env to configure SMTP for email notifications
+# .env file already configured with defaults
 npm run dev
 ```
 
@@ -60,6 +61,7 @@ For production deployment, see [docs/DEPLOY.md](docs/DEPLOY.md) for complete ins
 
 ## 📚 Documentation
 
+- [docs/BACKEND_CONNECTION_SETUP.md](docs/BACKEND_CONNECTION_SETUP.md) - **🔧 Fix "Backend is Mocked" issue**
 - [docs/SECURITY_CREDENTIAL_ROTATION.md](docs/SECURITY_CREDENTIAL_ROTATION.md) - **⚠️ CRITICAL: Post-merge credential rotation required**
 - [docs/QUICKSTART.md](docs/QUICKSTART.md) - Quick start guide
 - [docs/EMAIL_SETUP.md](docs/EMAIL_SETUP.md) - Email configuration guide
@@ -216,27 +218,41 @@ curl -X POST http://localhost:3001/entities/Contractor \
 
 ## 🐛 Troubleshooting
 
+### "Backend is Mocked" / "Backend not configured" Error
+
+**⚠️ This is the most common issue!**
+
+If you see console warnings about "MOCK MODE" or data not persisting:
+
+1. **Quick Fix:** The `.env` files are now included in the repository
+2. **Verify:** Check that `.env` exists in the root directory with `VITE_API_BASE_URL=http://localhost:3001`
+3. **Start backend:**
+   ```bash
+   cd backend
+   npm install
+   npm run dev
+   ```
+4. **Start frontend:**
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+**📖 Complete guide:** [docs/BACKEND_CONNECTION_SETUP.md](docs/BACKEND_CONNECTION_SETUP.md)
+
 ### Backend Connection Issues
 
 If data isn't persisting or emails aren't sending:
 
-1. Create the frontend `.env` file:
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Set the backend URL in `.env`:
-   ```bash
-   VITE_API_BASE_URL=http://localhost:3001
-   ```
-
-3. Ensure the backend is running:
+1. Ensure the backend is running:
    ```bash
    cd backend
    npm run dev
    ```
 
-4. Restart the frontend and verify browser console shows API calls to `http://localhost:3001`
+2. Verify browser console shows API calls to `http://localhost:3001` (not mock mode warnings)
+
+3. Restart the frontend if needed
 
 For production deployments, see [docs/DEPLOY.md](docs/DEPLOY.md).
 
