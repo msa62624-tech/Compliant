@@ -519,7 +519,7 @@ const entities = {
       is_required: true,
       gl_each_occurrence: 1000000,
       gl_general_aggregate: 2000000,
-      gl_per_project_aggregate: 5000000, // Cap (maximum) for all work on this specific project
+      gl_per_project_aggregate: 5000000, // Minimum required cap: contractors must have at least $5M per-project cap
       gl_products_completed_ops: 2000000,
       gl_personal_adv_injury: 1000000,
       gl_damage_rented_premises: 300000,
@@ -1129,7 +1129,7 @@ function parseTierBasedRequirements(text) {
           insurance_type: 'general_liability',
           gl_each_occurrence: limits.gl_each_occurrence || 1000000,
           gl_general_aggregate: limits.gl_general_aggregate || 2000000,
-          gl_per_project_aggregate: limits.gl_per_project_aggregate || 5000000, // Cap: max coverage for this project
+          gl_per_project_aggregate: limits.gl_per_project_aggregate || 5000000, // Minimum $5M cap required
           gl_products_completed_ops: limits.gl_products_completed_ops || limits.gl_general_aggregate || 2000000,
           umbrella_each_occurrence: limits.umbrella_each_occurrence,
           umbrella_aggregate: limits.umbrella_aggregate,
@@ -1172,7 +1172,7 @@ function buildProgramFromText(text, pdfName = 'Program') {
         is_required: true,
         gl_each_occurrence: 1000000,
         gl_general_aggregate: 2000000,
-        gl_per_project_aggregate: 5000000, // Cap: maximum coverage for this project
+        gl_per_project_aggregate: 5000000, // Minimum $5M cap required
         gl_products_completed_ops: 2000000,
         scope: 'General construction trades',
         created_date: new Date().toISOString(),

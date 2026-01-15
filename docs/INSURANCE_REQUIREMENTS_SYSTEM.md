@@ -25,7 +25,7 @@ Every project requires these base requirements regardless of trade:
 - CG2037 (Primary & Non-Contributory)
 - Blanket basis endorsements
 - Minimum $1M each occurrence / $2M aggregate
-- **$5M per project aggregate cap** (maximum coverage for all work on the project)
+- **$5M minimum per-project aggregate cap** (contractors must have at least $5M cap for project-specific work)
 - Minimum $1M products/completed operations
 - Waiver of Subrogation required
 - All additional insureds named (from project setup)
