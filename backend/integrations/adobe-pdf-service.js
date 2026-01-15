@@ -32,7 +32,11 @@ export default class AdobePDFService {
     try {
       console.log(`📄 Adobe: Extracting text from ${fileUrl}`);
       
-      // Call Adobe PDF Extract API
+      // NOTE: Adobe PDF Extract API endpoint and authentication
+      // This implementation should be verified against Adobe's official documentation:
+      // https://developer.adobe.com/document-services/docs/overview/pdf-services-api/
+      // The endpoint path, authentication method, and request format may vary
+      // based on your Adobe account type and API version.
       const response = await fetch(`${this.baseURL}/operation/extractpdf`, {
         method: 'POST',
         headers: {
@@ -126,7 +130,12 @@ export default class AdobePDFService {
     try {
       console.log(`🔐 Adobe: Signing PDF at ${fileUrl}`);
       
-      // Call Adobe Sign API
+      // NOTE: Adobe Sign API endpoint and authentication
+      // Adobe Sign typically requires separate authentication from PDF Services
+      // and uses different endpoints. Verify against Adobe's official documentation:
+      // https://developer.adobe.com/document-services/docs/overview/pdf-electronic-seal-api/
+      // The endpoint, authentication method, and request format should be
+      // adjusted based on your Adobe Sign account configuration.
       const response = await fetch(`${this.baseURL}/operation/eseal`, {
         method: 'POST',
         headers: {
@@ -169,7 +178,9 @@ export default class AdobePDFService {
     try {
       console.log(`📑 Adobe: Merging ${fileUrls.length} PDFs`);
       
-      // Call Adobe PDF Combine API
+      // NOTE: Adobe PDF Combine API endpoint
+      // Verify the correct endpoint and request format against Adobe's documentation:
+      // https://developer.adobe.com/document-services/docs/overview/pdf-services-api/
       const response = await fetch(`${this.baseURL}/operation/combinepdf`, {
         method: 'POST',
         headers: {

@@ -74,14 +74,20 @@ Adobe PDF Services are used for:
 
 **Setup:**
 1. Create an account at https://developer.adobe.com/document-services/
-2. Create a new project
-3. Get your API credentials
+2. Create a new project and choose "PDF Services API"
+3. Get your API credentials (Client ID and Client Secret)
 4. Add to `.env`:
 
 ```bash
 ADOBE_API_KEY=your-adobe-api-key
 ADOBE_CLIENT_ID=your-adobe-client-id
 ```
+
+**Important Notes:**
+- The Adobe PDF Services integration uses standard REST API endpoints
+- API endpoint paths and authentication methods should be verified against Adobe's official documentation
+- Adobe Sign (for digital signatures) may require separate authentication from PDF Services
+- See Adobe's documentation: https://developer.adobe.com/document-services/docs/
 
 **Without configuration:** Endpoints will return error: `Adobe PDF Services not configured. Set ADOBE_API_KEY and ADOBE_CLIENT_ID environment variables.`
 
@@ -195,6 +201,7 @@ AZURE_STORAGE_CONTAINER=uploads
 | Compliance Analysis | ✅ | ✅ | ✅ | All services needed |
 | Digital Signatures | ✅ | ✅ | ❌ | PDF signing needed |
 | Risk Assessment | ❌ | ❌ | ✅ | AI analysis needed |
+
 
 ## Error Messages
 
