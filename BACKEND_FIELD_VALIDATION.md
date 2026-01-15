@@ -177,6 +177,11 @@ app.patch('/entities/:entityName/:id', authenticateToken, (req, res) => {
 - Must be present (not null/undefined)
 - Example: `project_id`, `gc_id`, `subcontractor_id`
 
+### Numeric and Boolean Fields
+- Values `0` and `false` are considered valid (not missing)
+- Only `null` or `undefined` are considered missing
+- Example: `budget: 0` is valid, `status: false` is valid
+
 ## Testing the Validation
 
 ### Valid Request (Success)

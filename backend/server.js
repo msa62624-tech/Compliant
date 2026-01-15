@@ -262,7 +262,8 @@ function validateRequiredFields(entityName, data) {
   const missingFields = requiredFields.filter(field => {
     const value = data[field];
     // Check if field is missing, null, undefined, or empty string/array
-    if (value === null || value === undefined) return true;
+    // Note: 0 and false are valid values and should not be considered missing
+    if (value == null) return true; // Covers both null and undefined
     if (typeof value === 'string' && value.trim() === '') return true;
     if (Array.isArray(value) && value.length === 0) return true;
     return false;
