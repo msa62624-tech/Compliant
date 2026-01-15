@@ -26,53 +26,45 @@ export default class AdobePDFService {
    */
   async extractText(fileUrl) {
     if (!this.enabled) {
-      return this.mockExtractText(fileUrl);
+      throw new Error('Adobe PDF Services not configured. Set ADOBE_API_KEY and ADOBE_CLIENT_ID environment variables.');
     }
 
     try {
       console.log(`📄 Adobe: Extracting text from ${fileUrl}`);
-      // In production, call Adobe PDF Extract API
-      // For now, return mock data
-      return this.mockExtractText(fileUrl);
+      
+      // Call Adobe PDF Extract API
+      const response = await fetch(`${this.baseURL}/operation/extractpdf`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'x-api-key': this.clientId,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          assetID: fileUrl,
+          elementsToExtract: ['text']
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Adobe API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      return {
+        text: data.elements?.map(el => el.Text).join('\n') || '',
+        pages: data.pages || 1,
+        metadata: {
+          source: fileUrl,
+          extractedAt: new Date().toISOString(),
+          confidence: 0.95
+        }
+      };
     } catch (error) {
       console.error('❌ Adobe PDF extraction error:', error.message);
       throw error;
     }
-  }
-
-  /**
-   * Mock extraction for development
-   * @param {string} fileUrl
-   * @returns {Promise}
-   */
-  async mockExtractText(fileUrl) {
-    return {
-      text: `CERTIFICATE OF INSURANCE
-      
-Date (MM/DD/YYYY)
-01/15/2026
-
-PRODUCER: Acme Insurance Brokers
-      Email: broker@acmeins.com
-      Phone: (555) 123-4567
-      
-INSURER A: National Insurance Company
-  POLICY #: POL-GL-2026-0001
-  General Liability: $2,000,000 Each Occurrence
-  
-INSURER B: State Workers Compensation Fund
-  POLICY #: WC-NJ-2026-0001
-  Workers Compensation: Statutory Limits
-  
-INSURED: MPI Plumbing Corp
-  Address: 123 Main St, Newark, NJ 07102`,
-      pages: 1,
-      metadata: {
-        source: fileUrl,
-        extractedAt: new Date().toISOString(),
-        confidence: 0.95
-      }
-    };
   }
 
   /**
@@ -126,17 +118,38 @@ INSURED: MPI Plumbing Corp
    * @param {object} signatureData - Signature image or data
    * @returns {Promise<string>} URL of signed PDF
    */
-  async signPDF(fileUrl, _signatureData) {
+  async signPDF(fileUrl, signatureData) {
     if (!this.enabled) {
-      console.log('⚠️  Adobe: Using mock signature (service not configured)');
-      return `${fileUrl}?signed=true&timestamp=${Date.now()}`;
+      throw new Error('Adobe PDF Services not configured. Set ADOBE_API_KEY and ADOBE_CLIENT_ID environment variables.');
     }
 
     try {
       console.log(`🔐 Adobe: Signing PDF at ${fileUrl}`);
-      // In production, call Adobe Sign API
-      // For now, return mock signed URL
-      return `${fileUrl}?signed=true&timestamp=${Date.now()}`;
+      
+      // Call Adobe Sign API
+      const response = await fetch(`${this.baseURL}/operation/eseal`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'x-api-key': this.clientId,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          inputDocumentAssetID: fileUrl,
+          sealImageAssetID: signatureData.signature_url,
+          sealOptions: {
+            signatureFormat: 'PKCS7',
+            cscCredentialOptions: signatureData.credentials || {}
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Adobe Sign API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.assetID || `${fileUrl}?signed=true&timestamp=${Date.now()}`;
     } catch (error) {
       console.error('❌ Adobe PDF signing error:', error.message);
       throw error;
@@ -149,11 +162,32 @@ INSURED: MPI Plumbing Corp
    * @returns {Promise<string>} URL of merged PDF
    */
   async mergePDFs(fileUrls) {
+    if (!this.enabled) {
+      throw new Error('Adobe PDF Services not configured. Set ADOBE_API_KEY and ADOBE_CLIENT_ID environment variables.');
+    }
+
     try {
       console.log(`📑 Adobe: Merging ${fileUrls.length} PDFs`);
-      // In production, call Adobe PDF Combine API
-      // For now, return mock merged URL
-      return `https://storage.example.com/merged-${Date.now()}.pdf`;
+      
+      // Call Adobe PDF Combine API
+      const response = await fetch(`${this.baseURL}/operation/combinepdf`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'x-api-key': this.clientId,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          assets: fileUrls.map(url => ({ assetID: url }))
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Adobe Combine API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.assetID || `https://storage.example.com/merged-${Date.now()}.pdf`;
     } catch (error) {
       console.error('❌ PDF merge error:', error.message);
       throw error;

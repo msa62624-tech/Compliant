@@ -26,6 +26,10 @@ export default class AIAnalysisService {
    * @returns {Promise<{analysis: object, deficiencies: array, recommendations: array}>}
    */
   async analyzeCOICompliance(coiData, requirements = {}) {
+    if (!this.enabled) {
+      throw new Error('AI Analysis Service not configured. Set AI_API_KEY environment variable.');
+    }
+
     try {
       console.log('🤖 AI: Analyzing COI for compliance...');
 
@@ -35,7 +39,7 @@ export default class AIAnalysisService {
       return this.parseComplianceResponse(response, coiData);
     } catch (error) {
       console.error('❌ COI compliance analysis error:', error.message);
-      return this.getMockComplianceAnalysis(coiData);
+      throw error;
     }
   }
 
@@ -46,6 +50,10 @@ export default class AIAnalysisService {
    * @returns {Promise<object>} Structured policy data
    */
   async extractPolicyData(policyText, policyType = 'gl') {
+    if (!this.enabled) {
+      throw new Error('AI Analysis Service not configured. Set AI_API_KEY environment variable.');
+    }
+
     try {
       console.log(`🤖 AI: Extracting ${policyType} policy data...`);
 
@@ -77,7 +85,7 @@ ${policyText.substring(0, 2000)}`;
       return this.parseJSON(response);
     } catch (error) {
       console.error(`❌ Policy data extraction error:`, error.message);
-      return this.getMockPolicyData(policyType);
+      throw error;
     }
   }
 
@@ -88,6 +96,10 @@ ${policyText.substring(0, 2000)}`;
    * @returns {Promise<array>} Recommendations for admin reviewer
    */
   async generateRecommendations(coiData, deficiencies = []) {
+    if (!this.enabled) {
+      throw new Error('AI Analysis Service not configured. Set AI_API_KEY environment variable.');
+    }
+
     try {
       console.log('🤖 AI: Generating review recommendations...');
 
@@ -113,7 +125,7 @@ Provide 3-5 specific, actionable recommendations for the reviewer.`;
       return this.parseRecommendations(response);
     } catch (error) {
       console.error('❌ Recommendations generation error:', error.message);
-      return this.getMockRecommendations();
+      throw error;
     }
   }
 
@@ -124,6 +136,10 @@ Provide 3-5 specific, actionable recommendations for the reviewer.`;
    * @returns {Promise<{level: string, score: number, factors: array}>}
    */
   async assessRisk(coiData, _requirements = {}) {
+    if (!this.enabled) {
+      throw new Error('AI Analysis Service not configured. Set AI_API_KEY environment variable.');
+    }
+
     try {
       console.log('🤖 AI: Assessing COI risk level...');
 
@@ -140,7 +156,7 @@ Provide JSON: {"level": "HIGH", "score": 7, "factors": ["reason1", "reason2"]}`;
       return this.parseJSON(response);
     } catch (error) {
       console.error('❌ Risk assessment error:', error.message);
-      return this.getMockRiskAssessment();
+      throw error;
     }
   }
 
@@ -189,7 +205,7 @@ Identify all deficiencies and compliance gaps. Return JSON array with objects: {
         summary: `Found ${deficiencies.length} issues (${deficiencies.filter(d => d.severity === 'critical').length} critical)`
       };
     } catch (error) {
-      return this.getMockComplianceAnalysis(coiData);
+      throw new Error(`Failed to parse AI compliance response: ${error.message}`);
     }
   }
 
@@ -199,8 +215,7 @@ Identify all deficiencies and compliance gaps. Return JSON array with objects: {
    */
   async callAI(prompt) {
     if (!this.enabled) {
-      console.log('⚠️  AI: Using mock response (service not configured)');
-      return JSON.stringify({ mock: true, message: 'Mock AI response' });
+      throw new Error('AI Analysis Service not configured. Set AI_API_KEY environment variable.');
     }
 
     try {
@@ -295,7 +310,7 @@ Identify all deficiencies and compliance gaps. Return JSON array with objects: {
         .map(line => line.replace(/^\d+\.|^-|^•/, '').trim())
         .filter(line => line.length > 0);
     } catch (error) {
-      return this.getMockRecommendations();
+      throw new Error(`Failed to parse AI recommendations: ${error.message}`);
     }
   }
 
@@ -313,78 +328,5 @@ Identify all deficiencies and compliance gaps. Return JSON array with objects: {
     if (daysUntilExpiry < 30) return 'CRITICAL (< 30 days)';
     if (daysUntilExpiry < 90) return 'HIGH (< 90 days)';
     return 'LOW';
-  }
-
-  // Mock responses for development
-  getMockComplianceAnalysis(_coiData) {
-    return {
-      analysis: {
-        compliant: true,
-        deficiency_count: 2,
-        critical_count: 0,
-        timestamp: new Date().toISOString()
-      },
-      deficiencies: [
-        {
-          severity: 'medium',
-          category: 'coverage',
-          title: 'Umbrella Policy Limit Lower Than Requested',
-          description: 'Umbrella coverage requested at $5M, but only $2M provided',
-          required_action: 'Request additional umbrella coverage or waiver from project manager'
-        },
-        {
-          severity: 'low',
-          category: 'documentation',
-          title: 'Additional Insured Endorsement Not Confirmed',
-          description: 'Certificate does not show AI endorsement; need form 30 confirmation',
-          required_action: 'Request ACORD Form 25 Part B or separate endorsement letter'
-        }
-      ],
-      summary: 'COI is mostly compliant with minor gaps'
-    };
-  }
-
-  getMockPolicyData(policyType) {
-    return {
-      policy_number: `POL-${policyType.toUpperCase()}-2026-001`,
-      effective_date: '2026-01-01',
-      expiration_date: '2027-01-01',
-      insurer_name: 'National Insurance Company',
-      coverage_type: policyType.toUpperCase(),
-      limits: {
-        each_occurrence: '$1,000,000',
-        aggregate: '$2,000,000',
-        per_claim: '$500,000'
-      },
-      deductibles: {
-        standard: '$1,000',
-        medical_only: '$500'
-      },
-      additional_insureds: true,
-      waiver_of_subrogation: true,
-      endorsements: ['ACORD 20', 'ACORD 30']
-    };
-  }
-
-  getMockRecommendations() {
-    return [
-      'Request endorsement letter confirming project as Additional Insured',
-      'Verify workers compensation coverage includes all job classifications',
-      'Confirm waiver of subrogation is included on all policies',
-      'Request renewal certificate 30 days before expiration',
-      'Document any gaps and discuss with broker for amendments'
-    ];
-  }
-
-  getMockRiskAssessment() {
-    return {
-      level: 'LOW',
-      score: 3,
-      factors: [
-        'All required coverages present',
-        'Coverage limits meet project requirements',
-        'Policies current and not expiring soon'
-      ]
-    };
   }
 }
