@@ -30,7 +30,3 @@ backend/data/entities.json
 
 # Backend uploads (user-uploaded files)
 backend/uploads/
-
-# Extracted source folder and zip
-INsuretrack1234-main/
-INsuretrack1234-main.zip

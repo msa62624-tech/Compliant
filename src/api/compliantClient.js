@@ -237,7 +237,10 @@ const shim = {
 
   auth: {
     me: async () => {
-      if (!baseUrl) return { id: 'local-user', email: 'local@localhost', name: 'Local User' };
+      if (!baseUrl) {
+        console.error(BACKEND_NOT_CONFIGURED_CONSOLE_MSG);
+        throw new Error(BACKEND_NOT_CONFIGURED_ERROR);
+      }
       const headers = { ...getAuthHeader() };
       const res = await fetch(`${baseUrl}/auth/me`, { credentials: 'include', headers });
       if (res.status === 401) {
@@ -252,7 +255,10 @@ const shim = {
   integrations: {
     Core: {
       InvokeLLM: async (payload) => {
-        if (!baseUrl) return { text: 'shim response' };
+        if (!baseUrl) {
+          console.error(BACKEND_NOT_CONFIGURED_CONSOLE_MSG);
+          throw new Error(BACKEND_NOT_CONFIGURED_ERROR);
+        }
         const headers = { 'Content-Type': 'application/json', ...getAuthHeader() };
         const res = await fetch(`${baseUrl}/integrations/invoke-llm`, {
           method: 'POST',
@@ -299,7 +305,10 @@ const shim = {
 
       // Helper function for file upload
       _uploadFileHelper: async (endpoint, payload, { timeout = 60000, retries = 1 } = {}) => {
-        if (!baseUrl) return { url: '' };
+        if (!baseUrl) {
+          console.error(BACKEND_NOT_CONFIGURED_CONSOLE_MSG);
+          throw new Error(BACKEND_NOT_CONFIGURED_ERROR);
+        }
         
         // Determine the body to send
         let body;
@@ -390,7 +399,10 @@ const shim = {
       },
 
       GenerateImage: async (payload) => {
-        if (!baseUrl) return { url: '' };
+        if (!baseUrl) {
+          console.error(BACKEND_NOT_CONFIGURED_CONSOLE_MSG);
+          throw new Error(BACKEND_NOT_CONFIGURED_ERROR);
+        }
         const headers = { 'Content-Type': 'application/json', ...getAuthHeader() };
         const res = await fetch(`${baseUrl}/integrations/generate-image`, {
           method: 'POST',
@@ -403,7 +415,10 @@ const shim = {
       },
 
       ExtractDataFromUploadedFile: async (payload) => {
-        if (!baseUrl) return { data: {} };
+        if (!baseUrl) {
+          console.error(BACKEND_NOT_CONFIGURED_CONSOLE_MSG);
+          throw new Error(BACKEND_NOT_CONFIGURED_ERROR);
+        }
         const headers = { 
           'Content-Type': 'application/json',
           ...getAuthHeader() 
@@ -419,7 +434,10 @@ const shim = {
       },
 
       ParseProgramPDF: async (payload) => {
-        if (!baseUrl) return { program: {}, requirements: [], rawText: '' };
+        if (!baseUrl) {
+          console.error(BACKEND_NOT_CONFIGURED_CONSOLE_MSG);
+          throw new Error(BACKEND_NOT_CONFIGURED_ERROR);
+        }
         const headers = { 'Content-Type': 'application/json', ...getAuthHeader() };
         const res = await fetch(`${baseUrl}/integrations/parse-program-pdf`, {
           method: 'POST',
@@ -432,7 +450,10 @@ const shim = {
       },
 
       CreateFileSignedUrl: async (payload) => {
-        if (!baseUrl) return { url: '' };
+        if (!baseUrl) {
+          console.error(BACKEND_NOT_CONFIGURED_CONSOLE_MSG);
+          throw new Error(BACKEND_NOT_CONFIGURED_ERROR);
+        }
         const headers = { 'Content-Type': 'application/json', ...getAuthHeader() };
         const res = await fetch(`${baseUrl}/integrations/create-signed-url`, {
           method: 'POST',
@@ -452,7 +473,10 @@ const shim = {
       Adobe: {
         // Upload a transient document to Adobe (returns transientDocumentId)
         CreateTransientDocument: async (payload) => {
-          if (!baseUrl) return { transientDocumentId: `transient-${Date.now()}` };
+          if (!baseUrl) {
+            console.error(BACKEND_NOT_CONFIGURED_CONSOLE_MSG);
+            throw new Error(BACKEND_NOT_CONFIGURED_ERROR);
+          }
           const headers = { ...getAuthHeader() };
           const res = await fetch(`${baseUrl}/integrations/adobe/transientDocument`, {
             method: 'POST',
@@ -466,7 +490,10 @@ const shim = {
 
         // Create an agreement using a transientDocumentId
         CreateAgreement: async (payload) => {
-          if (!baseUrl) return { agreementId: `agr-${Date.now()}`, status: 'DRAFT' };
+          if (!baseUrl) {
+            console.error(BACKEND_NOT_CONFIGURED_CONSOLE_MSG);
+            throw new Error(BACKEND_NOT_CONFIGURED_ERROR);
+          }
           const headers = { 'Content-Type': 'application/json', ...getAuthHeader() };
           const res = await fetch(`${baseUrl}/integrations/adobe/agreement`, {
             method: 'POST',
@@ -480,7 +507,10 @@ const shim = {
 
         // Get a signing URL for an agreement
         GetSigningUrl: async (agreementId) => {
-          if (!baseUrl) return { url: `https://adobe.mock/sign/${agreementId}` };
+          if (!baseUrl) {
+            console.error(BACKEND_NOT_CONFIGURED_CONSOLE_MSG);
+            throw new Error(BACKEND_NOT_CONFIGURED_ERROR);
+          }
           const headers = { ...getAuthHeader() };
           const res = await fetch(`${baseUrl}/integrations/adobe/agreement/${agreementId}/url`, {
             method: 'GET',

@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
-      # npm test removed - no test script defined in package.json
+      - run: npm test
 
   publish-gpr:
     needs: build
