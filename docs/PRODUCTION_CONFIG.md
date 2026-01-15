@@ -2,6 +2,8 @@
 
 This guide explains how to configure the backend for production deployment with real integrations (no mocks).
 
+**Note:** This guide is platform-agnostic. Your developer can choose any hosting platform (AWS, Azure, Google Cloud, DigitalOcean, self-hosted, etc.). The configuration steps remain the same regardless of platform.
+
 ## ⚠️ Important: No Mock Data in Production
 
 The backend has been configured to **fail fast** when services are not properly configured. This means:
@@ -129,6 +131,8 @@ AI_MODEL=claude-3-opus-20240229
 
 For production deployment, configure cloud storage:
 
+**Note:** Your developer can choose the cloud storage provider that best fits your infrastructure.
+
 **Option A: AWS S3**
 ```bash
 S3_BUCKET=your-bucket-name
@@ -144,7 +148,14 @@ AZURE_STORAGE_KEY=your-storage-key
 AZURE_STORAGE_CONTAINER=uploads
 ```
 
-**Without configuration:** Files are stored locally in `/backend/uploads/` directory. This works but files will be lost on server restart in ephemeral environments like Heroku, Vercel, or Render.
+**Option C: Google Cloud Storage**
+```bash
+GCS_BUCKET=your-bucket-name
+GCS_PROJECT_ID=your-project-id
+GCS_KEY_FILE=path/to/service-account-key.json
+```
+
+**Without configuration:** Files are stored locally in `/backend/uploads/` directory. This works but files may be lost on server restart in ephemeral environments. Set `IS_EPHEMERAL_STORAGE=true` environment variable if using ephemeral storage to enable appropriate warnings.
 
 ## Deployment Checklist
 

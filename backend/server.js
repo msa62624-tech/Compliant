@@ -639,7 +639,7 @@ function loadEntities() {
  * Note: Uses synchronous file operations for simplicity. For high-traffic production
  * environments, consider using fs.promises.writeFile with async/await for better performance.
  * 
- * IMPORTANT: On cloud platforms like Render, Vercel, or Heroku with ephemeral storage,
+ * IMPORTANT: On cloud platforms with ephemeral storage (many serverless/PaaS providers),
  * data saved to disk will be lost on restart/redeploy. For production, use a database.
  */
 function saveEntities() {
@@ -653,7 +653,7 @@ function saveEntities() {
     fs.writeFileSync(DATA_FILE, JSON.stringify(entities, null, 2), 'utf8');
     
     // More informative logging based on environment
-    const isEphemeralPlatform = !!process.env.RENDER || !!process.env.VERCEL || !!process.env.DYNO;
+    const isEphemeralPlatform = !!process.env.IS_EPHEMERAL_STORAGE;
     if (isEphemeralPlatform) {
       console.log('💾 Data saved (ephemeral - will reset on restart/redeploy)');
     } else {
@@ -4146,8 +4146,8 @@ app.use((err, req, res, _next) => {
   sendError(res, 500, 'Internal server error');
 });
 
-// Start server (skip if running in serverless environment like Vercel)
-if (!process.env.VERCEL) {
+// Start server (skip if running in serverless environment)
+if (!process.env.IS_SERVERLESS) {
   const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`compliant.team Backend running on http://localhost:${PORT}`);
     console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
@@ -4174,5 +4174,5 @@ if (!process.env.VERCEL) {
   });
 }
 
-// Export for Vercel serverless
+// Export for serverless environments (if needed)
 export default app;
