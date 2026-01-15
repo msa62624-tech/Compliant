@@ -253,23 +253,36 @@ export async function validateCOICompliance(coi, project, subTrades) {
   if (allRequirements.gl) {
     const glReq = allRequirements.gl;
 
-    // Check limits
-    if (coi.gl_each_occurrence < glReq.minimumLimits.eachOccurrence) {
+    // Check limits - Combined GL + Umbrella
+    // Liability limits mean GL and umbrella combined, so we check the total
+    const glEachOccurrence = coi.gl_each_occurrence || 0;
+    const umbrellaEachOccurrence = coi.umbrella_each_occurrence || 0;
+    const totalEachOccurrence = glEachOccurrence + umbrellaEachOccurrence;
+
+    const glAggregate = coi.gl_general_aggregate || 0;
+    const umbrellaAggregate = coi.umbrella_aggregate || 0;
+    const totalAggregate = glAggregate + umbrellaAggregate;
+
+    if (totalEachOccurrence < glReq.minimumLimits.eachOccurrence) {
       issues.push({
         type: 'GL_LIMIT_INSUFFICIENT',
-        field: 'Each Occurrence',
+        field: 'Each Occurrence (GL + Umbrella Combined)',
         required: glReq.minimumLimits.eachOccurrence,
-        provided: coi.gl_each_occurrence,
+        provided: totalEachOccurrence,
+        gl_provided: glEachOccurrence,
+        umbrella_provided: umbrellaEachOccurrence,
         severity: 'error',
       });
     }
 
-    if (coi.gl_general_aggregate < glReq.minimumLimits.generalAggregate) {
+    if (totalAggregate < glReq.minimumLimits.generalAggregate) {
       issues.push({
         type: 'GL_AGGREGATE_INSUFFICIENT',
-        field: 'General Aggregate',
+        field: 'General Aggregate (GL + Umbrella Combined)',
         required: glReq.minimumLimits.generalAggregate,
-        provided: coi.gl_general_aggregate,
+        provided: totalAggregate,
+        gl_provided: glAggregate,
+        umbrella_provided: umbrellaAggregate,
         severity: 'error',
       });
     }
@@ -367,26 +380,8 @@ export async function validateCOICompliance(coi, project, subTrades) {
   if (allRequirements.umbrella) {
     const umbrellaReq = allRequirements.umbrella;
 
-    // Check limits
-    if (coi.umbrella_each_occurrence < umbrellaReq.minimumLimits.eachOccurrence) {
-      issues.push({
-        type: 'UMBRELLA_LIMIT_INSUFFICIENT',
-        field: 'Umbrella Each Occurrence',
-        required: umbrellaReq.minimumLimits.eachOccurrence,
-        provided: coi.umbrella_each_occurrence,
-        severity: 'error',
-      });
-    }
-
-    if (coi.umbrella_aggregate < umbrellaReq.minimumLimits.aggregate) {
-      issues.push({
-        type: 'UMBRELLA_AGGREGATE_INSUFFICIENT',
-        field: 'Umbrella Aggregate',
-        required: umbrellaReq.minimumLimits.aggregate,
-        provided: coi.umbrella_aggregate,
-        severity: 'error',
-      });
-    }
+    // NOTE: Umbrella limits are checked as part of combined GL + Umbrella validation above
+    // This section only validates umbrella-specific requirements like follow form and endorsements
 
     // Check follow form
     if (umbrellaReq.followForm && !coi.umbrella_follow_form) {
