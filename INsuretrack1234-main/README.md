@@ -60,6 +60,7 @@ For production deployment, see [docs/DEPLOY.md](docs/DEPLOY.md) for complete ins
 
 ## 📚 Documentation
 
+- [docs/DASHBOARD_SCREENSHOTS.md](docs/DASHBOARD_SCREENSHOTS.md) - **📸 Visual guide to all dashboards**
 - [docs/SECURITY_CREDENTIAL_ROTATION.md](docs/SECURITY_CREDENTIAL_ROTATION.md) - **⚠️ CRITICAL: Post-merge credential rotation required**
 - [docs/QUICKSTART.md](docs/QUICKSTART.md) - Quick start guide
 - [docs/EMAIL_SETUP.md](docs/EMAIL_SETUP.md) - Email configuration guide
