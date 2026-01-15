@@ -344,11 +344,17 @@ export default function Contractors() {
               crypto.getRandomValues(contactTokenBytes);
               const contactToken = Array.from(contactTokenBytes, byte => byte.toString(16).padStart(2, '0')).join('');
               
-              // Create username from email (before @ sign)
-              const username = contact.email.split('@')[0];
+              // Create username from email with timestamp to prevent collisions
+              // When contacts from different GCs share email prefixes, adding a unique suffix prevents username conflicts
+              const emailPrefix = contact.email.split('@')[0];
+              const uniqueSuffix = Date.now().toString(36).slice(-4); // Last 4 chars of timestamp in base36
+              const username = `${emailPrefix}_${uniqueSuffix}`;
               
-              // Generate temporary password
-              const tempPassword = Math.random().toString(36).slice(-10) + 'A1!';
+              // Generate cryptographically secure temporary password
+              // Using crypto.getRandomValues() instead of Math.random() for security
+              const passwordBytes = new Uint8Array(12);
+              crypto.getRandomValues(passwordBytes);
+              const tempPassword = Array.from(passwordBytes, byte => byte.toString(16).padStart(2, '0')).join('').slice(0, 12) + 'A1!';
               
               // Create user account for additional contact
               const contactUser = await compliant.entities.User.create({
