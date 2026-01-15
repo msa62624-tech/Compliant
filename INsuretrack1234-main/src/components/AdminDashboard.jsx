@@ -150,6 +150,8 @@ export default function AdminDashboard() {
           });
         } else if (currentUser?.role === 'admin') {
           // Assistant admins only see their own messages
+        } else if (currentUser?.role === 'admin' || currentUser?.role === 'regular_admin') {
+          // Assistant admins and regular admins only see their own messages
           return allMessages.filter(msg => 
             msg.recipient_id === currentUser.email || msg.sender_id === currentUser.email ||
             msg.recipient_id === currentUser.id || msg.sender_id === currentUser.id
