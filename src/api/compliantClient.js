@@ -61,6 +61,40 @@ if (typeof window !== 'undefined') {
 ❌ For Vercel/Netlify/Render: Add VITE_API_BASE_URL environment variable in your deployment dashboard and redeploy.
 ❌ For local development: Configure VITE_API_BASE_URL in .env file.
 ❌ Example: VITE_API_BASE_URL=https://your-backend.vercel.app`);
+    
+    // Add visual warning banner to the page
+    const addWarningBanner = () => {
+      const existingBanner = document.getElementById('backend-not-configured-warning');
+      if (existingBanner) return; // Already added
+      
+      const banner = document.createElement('div');
+      banner.id = 'backend-not-configured-warning';
+      banner.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: #dc2626;
+        color: white;
+        padding: 12px 20px;
+        text-align: center;
+        font-weight: bold;
+        z-index: 999999;
+        font-size: 14px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      `;
+      banner.innerHTML = `⚠️ WARNING: MOCK MODE ACTIVE - Backend not configured. Data will NOT be saved! Configure VITE_API_BASE_URL in .env file.`;
+      document.body.prepend(banner);
+    };
+    
+    // Add banner when DOM is ready
+    if (document.body) {
+      addWarningBanner();
+    } else {
+      document.addEventListener('DOMContentLoaded', addWarningBanner);
+    }
+  } else {
+    console.log(`✅ Backend configured: ${baseUrl}`);
   }
 }
 
