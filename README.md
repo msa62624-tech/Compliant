@@ -4,6 +4,21 @@ Full-stack insurance tracking application for General Contractors and their subc
 
 ---
 
+## 🏗️ ARCHITECTURE STATUS
+
+**Current Architecture:** React + Vite + Express.js + In-memory storage
+
+This is a functional proof-of-concept with known architectural limitations. For production deployment and long-term sustainability, professional refactoring is recommended.
+
+### 📋 Planning Documentation
+- **[ARCHITECTURE_RECOMMENDATION.md](./ARCHITECTURE_RECOMMENDATION.md)** - Professional architecture proposal (NestJS + Next.js + PostgreSQL + AWS)
+- **[TECHNICAL_DEBT.md](./TECHNICAL_DEBT.md)** - Honest assessment of current limitations and technical debt
+- **[REFACTORING_PLAN.md](./REFACTORING_PLAN.md)** - Detailed timeline and budget breakdown for professional refactor (14 weeks, $225K)
+
+These documents provide transparency about the current state and a clear path forward for enterprise-grade deployment.
+
+---
+
 ## ⚠️ SECURITY NOTICE - CRITICAL ACTION REQUIRED
 
 **CRITICAL:** The `backend/.env` file with sensitive credentials (JWT_SECRET, SMTP credentials) was previously committed to the repository.

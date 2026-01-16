@@ -1,0 +1,33 @@
+{
+  "name": "compliant-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Professional monorepo for Compliant Platform - NestJS + Next.js + Prisma",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "db:studio": "cd packages/backend && pnpm db:studio",
+    "db:migrate": "cd packages/backend && pnpm db:migrate",
+    "db:push": "cd packages/backend && pnpm db:push",
+    "backend": "cd packages/backend && pnpm dev",
+    "frontend": "cd packages/frontend && pnpm dev"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "prettier": "^3.1.1",
+    "turbo": "^1.11.3",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}
