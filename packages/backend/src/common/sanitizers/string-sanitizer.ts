@@ -1,14 +1,19 @@
 import { Transform } from 'class-transformer';
 
 /**
- * Sanitize string input to prevent XSS attacks
- * Removes or encodes potentially dangerous characters and HTML tags
+ * Sanitize string input with light XSS protection
+ * 
+ * WARNING: This provides BASIC protection only. For user-facing fields like names, 
+ * addresses, phone numbers, etc., USE @SanitizeHtml() INSTEAD, which provides
+ * comprehensive protection by removing all HTML tags and dangerous characters.
+ * 
+ * This decorator is kept for backward compatibility and specific use cases where
+ * you want to preserve some formatting but still block obvious XSS vectors.
  * 
  * @example
  * ```typescript
- * export class CreateContractorDto {
- *   @SanitizeString()
- *   @IsString()
+ * export class SomeDto {
+ *   @SanitizeHtml()  // Recommended - use this for most text fields
  *   name: string;
  * }
  * ```
@@ -19,48 +24,45 @@ export function SanitizeString() {
       return value;
     }
 
-    // Trim whitespace
-    let sanitized = value.trim();
+    // Trim whitespace and remove null bytes
+    let sanitized = value.trim().replace(/\0/g, '');
 
-    // Remove or encode common XSS patterns
+    // Basic XSS protection - remove obvious vectors
+    // Note: This is not comprehensive. Use @SanitizeHtml() for better protection.
     sanitized = sanitized
-      // Remove script tags and their content
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-      // Remove iframe tags
       .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-      // Remove object/embed tags
-      .replace(/<(object|embed)[^>]*>/gi, '')
-      // Remove on* event handlers (onclick, onerror, etc.)
-      .replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '')
-      .replace(/\s*on\w+\s*=\s*[^\s>]*/gi, '')
-      // Remove javascript: protocol
       .replace(/javascript:/gi, '')
-      // Remove data: protocol (can be used for XSS)
-      .replace(/data:text\/html/gi, '')
-      // Replace HTML entities that could be used for encoding attacks
-      .replace(/&lt;script/gi, '')
-      .replace(/&lt;iframe/gi, '');
-
-    // Remove null bytes
-    sanitized = sanitized.replace(/\0/g, '');
+      .replace(/vbscript:/gi, '');
 
     return sanitized;
   });
 }
 
 /**
- * Sanitize HTML content more aggressively
- * Strips all HTML tags, leaving only plain text
- * Use this for fields that should never contain HTML
+ * Sanitize HTML content - COMPREHENSIVE XSS Protection
  * 
- * Note: This uses a simple regex-based approach suitable for basic protection.
- * For production environments with complex HTML handling needs, consider using
- * a dedicated library like DOMPurify or sanitize-html for more robust XSS protection.
+ * Strips ALL HTML tags and dangerous characters, leaving only plain text.
+ * This is the RECOMMENDED sanitizer for all user-facing text fields like:
+ * - Names (broker names, user names, contractor names)
+ * - Phone numbers
+ * - Addresses
+ * - Any other plain text field
+ * 
+ * Security approach:
+ * 1. Removes all HTML tags including malformed ones
+ * 2. Strips angle brackets to prevent tag injection
+ * 3. Removes event handlers (onclick, etc.)
+ * 4. Removes dangerous protocols (javascript:, vbscript:, data:)
+ * 5. Encodes remaining special characters
+ * 6. Removes null bytes
+ * 
+ * This provides defense-in-depth protection against XSS attacks.
  * 
  * @example
  * ```typescript
  * export class UpdateBrokerInfoDto {
- *   @SanitizeHtml()
+ *   @SanitizeHtml()  // Recommended for all plain text fields
  *   @IsString()
  *   brokerName?: string;
  * }
@@ -75,28 +77,31 @@ export function SanitizeHtml() {
     // Trim whitespace
     let sanitized = value.trim();
 
-    // Strip all HTML tags (basic protection)
-    // Note: For more sophisticated attacks, consider using a library like DOMPurify
-    sanitized = sanitized.replace(/<[^>]*>/g, '');
+    // Remove null bytes first
+    sanitized = sanitized.replace(/\0/g, '');
 
-    // Decode common HTML entities to prevent double-encoding issues
-    sanitized = sanitized
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'")
-      .replace(/&amp;/g, '&');
+    // For fields that should only contain plain text (names, phone numbers, etc.),
+    // we take an aggressive approach and strip everything that looks like HTML/scripts
+    
+    // Remove all HTML tags (handles malformed tags and variations)
+    // This regex handles: <tag>, <tag >, <tag/>, <tag attr="value">, etc.
+    sanitized = sanitized.replace(/<[^>]*>/gi, '');
+    
+    // Remove any remaining angle brackets that could be used for tags
+    sanitized = sanitized.replace(/</g, '');
+    sanitized = sanitized.replace(/>/g, '');
+    
+    // Remove event handlers and javascript: protocol if they somehow remain
+    sanitized = sanitized.replace(/on\w+\s*=/gi, '');
+    sanitized = sanitized.replace(/javascript:/gi, '');
+    sanitized = sanitized.replace(/vbscript:/gi, '');
+    sanitized = sanitized.replace(/data:text\/html/gi, '');
 
-    // Re-encode special characters for safety
+    // Final cleanup - encode any remaining special characters
     sanitized = sanitized
       .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
-
-    // Remove null bytes
-    sanitized = sanitized.replace(/\0/g, '');
 
     return sanitized;
   });
