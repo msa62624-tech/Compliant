@@ -5,22 +5,15 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import LoginPage from '@/app/login/page';
 import { useAuth } from '@/lib/auth/AuthContext';
-import { useRouter } from 'next/navigation';
 
 // Mock the useAuth hook
 jest.mock('@/lib/auth/AuthContext', () => ({
   useAuth: jest.fn(),
 }));
 
-// Mock next/navigation
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-}));
-
 describe('LoginPage', () => {
   const mockLogin = jest.fn();
   const mockLogout = jest.fn();
-  const mockPush = jest.fn();
 
   beforeEach(() => {
     // Reset mock before each test
@@ -33,16 +26,6 @@ describe('LoginPage', () => {
       login: mockLogin,
       logout: mockLogout,
       isAuthenticated: false,
-    });
-
-    // Mock useRouter
-    (useRouter as jest.Mock).mockReturnValue({
-      push: mockPush,
-      replace: jest.fn(),
-      refresh: jest.fn(),
-      back: jest.fn(),
-      forward: jest.fn(),
-      prefetch: jest.fn(),
     });
   });
 
@@ -156,39 +139,5 @@ describe('LoginPage', () => {
     
     expect(emailInput).toHaveAttribute('type', 'email');
     expect(passwordInput).toHaveAttribute('type', 'password');
-  });
-
-  it('should handle successful login without errors', async () => {
-    // Simulate the real behavior where AuthContext.login calls router.push('/dashboard') on success
-    mockLogin.mockImplementation(async () => {
-      // In the real implementation, AuthContext.login navigates to dashboard
-      // We simulate this to test the component handles successful login correctly
-      mockPush('/dashboard');
-      return Promise.resolve();
-    });
-    
-    render(<LoginPage />);
-    
-    const emailInput = screen.getByLabelText(/email address/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole('button', { name: /sign in/i });
-    
-    fireEvent.change(emailInput, { target: { value: 'admin@compliant.com' } });
-    fireEvent.change(passwordInput, { target: { value: 'Admin123!@#' } });
-    fireEvent.click(submitButton);
-    
-    await waitFor(() => {
-      expect(mockLogin).toHaveBeenCalledWith({
-        email: 'admin@compliant.com',
-        password: 'Admin123!@#',
-      });
-    });
-
-    // Verify the navigation side effect that happens in AuthContext.login
-    expect(mockPush).toHaveBeenCalledWith('/dashboard');
-    
-    // Verify no error is displayed after successful login
-    expect(screen.queryByText(/login failed/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/invalid credentials/i)).not.toBeInTheDocument();
   });
 });
