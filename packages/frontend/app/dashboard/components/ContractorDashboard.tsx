@@ -36,20 +36,38 @@ export default function ContractorDashboard({ user, onLogout }: ContractorDashbo
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Contractor Dashboard</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">General Contractor Dashboard</h2>
+          
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-blue-700">
+                  As a General Contractor, you add subcontractors to your projects and monitor their insurance compliance.
+                </p>
+              </div>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-gray-700">My Projects</h3>
               <p className="text-3xl font-bold text-blue-600 mt-2">5</p>
+              <p className="text-sm text-gray-500 mt-1">Active jobs</p>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-700">Insurance Status</h3>
-              <p className="text-3xl font-bold text-green-600 mt-2">✓ Active</p>
+              <h3 className="text-lg font-semibold text-gray-700">My Subcontractors</h3>
+              <p className="text-3xl font-bold text-green-600 mt-2">18</p>
+              <p className="text-sm text-gray-500 mt-1">Across all projects</p>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-700">Documents Due</h3>
+              <h3 className="text-lg font-semibold text-gray-700">Compliance Issues</h3>
               <p className="text-3xl font-bold text-orange-600 mt-2">2</p>
+              <p className="text-sm text-gray-500 mt-1">Need attention</p>
             </div>
           </div>
 
@@ -57,36 +75,36 @@ export default function ContractorDashboard({ user, onLogout }: ContractorDashbo
             <h3 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <a
-                href="/projects"
+                href="/gc/projects"
                 className="block p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow transition"
               >
                 <h4 className="font-semibold text-gray-900">My Projects</h4>
                 <p className="text-sm text-gray-600 mt-1">
-                  View projects you're assigned to
+                  View and manage your construction projects
                 </p>
               </a>
               <a
-                href="/insurance"
+                href="/gc/subcontractors"
                 className="block p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow transition"
               >
-                <h4 className="font-semibold text-gray-900">Insurance Documents</h4>
+                <h4 className="font-semibold text-gray-900">Add Subcontractors</h4>
                 <p className="text-sm text-gray-600 mt-1">
-                  Upload and manage your insurance certificates
+                  Add subcontractors to your projects
                 </p>
               </a>
               <a
-                href="/compliance"
+                href="/gc/compliance"
                 className="block p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow transition"
               >
                 <h4 className="font-semibold text-gray-900">Compliance Status</h4>
-                <p className="text-sm text-gray-600 mt-1">View your compliance requirements</p>
+                <p className="text-sm text-gray-600 mt-1">Monitor subcontractor insurance compliance</p>
               </a>
               <a
-                href="/profile"
+                href="/gc/reports"
                 className="block p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow transition"
               >
-                <h4 className="font-semibold text-gray-900">Company Profile</h4>
-                <p className="text-sm text-gray-600 mt-1">Update your company information</p>
+                <h4 className="font-semibold text-gray-900">Project Reports</h4>
+                <p className="text-sm text-gray-600 mt-1">Generate project compliance reports</p>
               </a>
             </div>
           </div>
