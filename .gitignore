@@ -8,6 +8,9 @@ dist-ssr
 .turbo
 *.tsbuildinfo
 
+# Test coverage
+coverage
+
 # Logs
 logs
 *.log
