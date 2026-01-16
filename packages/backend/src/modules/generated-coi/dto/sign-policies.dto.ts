@@ -1,19 +1,24 @@
-import { IsString, IsOptional, IsUrl } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
+import { IsSafeUrl } from '../../../common/validators/safe-url.validator';
 
 export class SignPoliciesDto {
   @IsOptional()
-  @IsUrl()
+  @IsString()
+  @IsSafeUrl()
   glBrokerSignatureUrl?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
+  @IsSafeUrl()
   umbrellaBrokerSignatureUrl?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
+  @IsSafeUrl()
   autoBrokerSignatureUrl?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
+  @IsSafeUrl()
   wcBrokerSignatureUrl?: string;
 }

@@ -1,4 +1,5 @@
 import { IsString, IsOptional, IsEmail, IsEnum } from 'class-validator';
+import { SanitizeHtml } from '../../../common/sanitizers/string-sanitizer';
 
 export enum BrokerType {
   GLOBAL = 'GLOBAL',
@@ -11,6 +12,7 @@ export class UpdateBrokerInfoDto {
 
   // Global broker fields
   @IsOptional()
+  @SanitizeHtml()
   @IsString()
   brokerName?: string;
 
@@ -19,11 +21,13 @@ export class UpdateBrokerInfoDto {
   brokerEmail?: string;
 
   @IsOptional()
+  @SanitizeHtml()
   @IsString()
   brokerPhone?: string;
 
   // Per-policy broker fields - GL
   @IsOptional()
+  @SanitizeHtml()
   @IsString()
   brokerGlName?: string;
 
@@ -32,11 +36,13 @@ export class UpdateBrokerInfoDto {
   brokerGlEmail?: string;
 
   @IsOptional()
+  @SanitizeHtml()
   @IsString()
   brokerGlPhone?: string;
 
   // Per-policy broker fields - Umbrella
   @IsOptional()
+  @SanitizeHtml()
   @IsString()
   brokerUmbrellaName?: string;
 
@@ -45,11 +51,13 @@ export class UpdateBrokerInfoDto {
   brokerUmbrellaEmail?: string;
 
   @IsOptional()
+  @SanitizeHtml()
   @IsString()
   brokerUmbrellaPhone?: string;
 
   // Per-policy broker fields - Auto
   @IsOptional()
+  @SanitizeHtml()
   @IsString()
   brokerAutoName?: string;
 
@@ -58,11 +66,13 @@ export class UpdateBrokerInfoDto {
   brokerAutoEmail?: string;
 
   @IsOptional()
+  @SanitizeHtml()
   @IsString()
   brokerAutoPhone?: string;
 
   // Per-policy broker fields - WC
   @IsOptional()
+  @SanitizeHtml()
   @IsString()
   brokerWcName?: string;
 
@@ -71,6 +81,7 @@ export class UpdateBrokerInfoDto {
   brokerWcEmail?: string;
 
   @IsOptional()
+  @SanitizeHtml()
   @IsString()
   brokerWcPhone?: string;
 }

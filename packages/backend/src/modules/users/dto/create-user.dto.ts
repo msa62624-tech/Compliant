@@ -1,6 +1,7 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength, IsEnum, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
+import { SanitizeHtml } from '../../../common/sanitizers/string-sanitizer';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'user@example.com' })
@@ -15,11 +16,13 @@ export class CreateUserDto {
   password: string;
 
   @ApiProperty({ example: 'John' })
+  @SanitizeHtml()
   @IsString()
   @IsNotEmpty()
   firstName: string;
 
   @ApiProperty({ example: 'Doe' })
+  @SanitizeHtml()
   @IsString()
   @IsNotEmpty()
   lastName: string;
