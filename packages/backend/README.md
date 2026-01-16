@@ -66,10 +66,10 @@ The API supports header-based versioning. Include the `X-API-Version` header in 
 
 ```bash
 # Example with version 1 (default)
-curl -H "X-API-Version: 1" http://localhost:3001/api/v1/users
+curl -H "X-API-Version: 1" http://localhost:3001/api/users
 
 # If no header is provided, version 1 is used by default
-curl http://localhost:3001/api/v1/users
+curl http://localhost:3001/api/users
 ```
 
 To version a controller or endpoint, use the `@Version()` decorator:
