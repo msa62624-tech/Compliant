@@ -40,6 +40,57 @@ async function main() {
 
   console.log('✓ Created manager user:', manager.email);
 
+  // Create contractor user (GC role)
+  const contractorPassword = await bcrypt.hash('Contractor123!@#', 10);
+  const contractorUser = await prisma.user.upsert({
+    where: { email: 'contractor@compliant.com' },
+    update: {},
+    create: {
+      email: 'contractor@compliant.com',
+      password: contractorPassword,
+      firstName: 'General',
+      lastName: 'Contractor',
+      role: 'CONTRACTOR',
+      isActive: true,
+    },
+  });
+
+  console.log('✓ Created contractor user:', contractorUser.email);
+
+  // Create subcontractor user
+  const subcontractorPassword = await bcrypt.hash('Subcontractor123!@#', 10);
+  const subcontractorUser = await prisma.user.upsert({
+    where: { email: 'subcontractor@compliant.com' },
+    update: {},
+    create: {
+      email: 'subcontractor@compliant.com',
+      password: subcontractorPassword,
+      firstName: 'Sub',
+      lastName: 'Contractor',
+      role: 'SUBCONTRACTOR',
+      isActive: true,
+    },
+  });
+
+  console.log('✓ Created subcontractor user:', subcontractorUser.email);
+
+  // Create broker user
+  const brokerPassword = await bcrypt.hash('Broker123!@#', 10);
+  const brokerUser = await prisma.user.upsert({
+    where: { email: 'broker@compliant.com' },
+    update: {},
+    create: {
+      email: 'broker@compliant.com',
+      password: brokerPassword,
+      firstName: 'Insurance',
+      lastName: 'Broker',
+      role: 'BROKER',
+      isActive: true,
+    },
+  });
+
+  console.log('✓ Created broker user:', brokerUser.email);
+
   // Create sample contractors
   const contractor1 = await prisma.contractor.create({
     data: {
@@ -147,6 +198,9 @@ async function main() {
   console.log('📧 Login credentials:');
   console.log('   Admin: admin@compliant.com / Admin123!@#');
   console.log('   Manager: manager@compliant.com / Manager123!@#');
+  console.log('   Contractor: contractor@compliant.com / Contractor123!@#');
+  console.log('   Subcontractor: subcontractor@compliant.com / Subcontractor123!@#');
+  console.log('   Broker: broker@compliant.com / Broker123!@#');
 }
 
 main()
