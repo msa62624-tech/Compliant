@@ -27,9 +27,12 @@ export function isValidFileUrl(url: string | undefined): boolean {
     const hasValidExtension = validExtensions.some(ext => pathname.endsWith(ext));
     
     // Validate trusted cloud storage domains (exact match or proper subdomain)
+    // Only specific S3 services, not all AWS services
     const trustedDomains = [
       '.s3.amazonaws.com',
-      '.amazonaws.com',
+      '.s3-website.amazonaws.com',
+      '.s3-website-us-east-1.amazonaws.com',
+      '.s3-website-us-west-2.amazonaws.com',
       '.blob.core.windows.net',
       '.storage.googleapis.com',
     ];

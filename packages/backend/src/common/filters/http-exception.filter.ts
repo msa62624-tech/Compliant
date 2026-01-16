@@ -14,12 +14,27 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // Environment-based error handling
     const isDev = process.env.NODE_ENV === 'development';
     
-    const message =
-      exception instanceof HttpException
-        ? (isDev ? exception.getResponse() : 'Internal server error')
-        : (isDev && exception instanceof Error 
-            ? { message: 'Internal server error', error: exception.message, name: exception.name } 
-            : { message: 'Internal server error' });
+    let message: any;
+    if (exception instanceof HttpException) {
+      const exceptionResponse = exception.getResponse();
+      // Sanitize HttpException response to only include safe properties
+      if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+        const safeResponse: any = {};
+        // Only include known safe properties
+        if ('message' in exceptionResponse) safeResponse.message = exceptionResponse.message;
+        if ('error' in exceptionResponse) safeResponse.error = exceptionResponse.error;
+        if ('statusCode' in exceptionResponse) safeResponse.statusCode = exceptionResponse.statusCode;
+        message = isDev ? safeResponse : 'Internal server error';
+      } else {
+        message = isDev ? exceptionResponse : 'Internal server error';
+      }
+    } else if (exception instanceof Error) {
+      message = isDev 
+        ? { message: 'Internal server error', error: exception.message, name: exception.name } 
+        : { message: 'Internal server error' };
+    } else {
+      message = { message: 'Internal server error' };
+    }
 
     response.status(status).json({
       statusCode: status,
