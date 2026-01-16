@@ -11,6 +11,9 @@ import { PrismaService } from '../../config/prisma.service';
 // Refresh token expiration in days
 const REFRESH_TOKEN_EXPIRATION_DAYS = 7;
 
+// Salt rounds for bcrypt hashing of refresh tokens
+const REFRESH_TOKEN_SALT_ROUNDS = 10;
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -55,15 +58,18 @@ export class AuthService {
     // Generate refresh token
     const refreshTokenString = crypto.randomBytes(32).toString('hex');
     
+    // Hash the refresh token before storing
+    const refreshTokenHash = await bcrypt.hash(refreshTokenString, REFRESH_TOKEN_SALT_ROUNDS);
+    
     // Set refresh token expiration to 7 days from now
     const refreshTokenExpiresAt = new Date();
     refreshTokenExpiresAt.setDate(refreshTokenExpiresAt.getDate() + REFRESH_TOKEN_EXPIRATION_DAYS);
 
-    // Store refresh token in User model with expiration
+    // Store hashed refresh token in User model with expiration
     await this.prisma.user.update({
       where: { id: user.id },
       data: { 
-        refreshToken: refreshTokenString,
+        refreshTokenHash: refreshTokenHash,
         refreshTokenExpiresAt: refreshTokenExpiresAt,
       },
     });
@@ -85,37 +91,45 @@ export class AuthService {
 
   async refresh(refreshTokenString: string) {
     try {
-      // Find user with this refresh token
-      const user = await this.prisma.user.findFirst({
-        where: { refreshToken: refreshTokenString },
+      // Find all users with non-null, non-expired refresh tokens
+      // This prevents timing attacks by always performing the same database query
+      const users = await this.prisma.user.findMany({
+        where: {
+          refreshTokenHash: { not: null },
+          refreshTokenExpiresAt: { gte: new Date() },
+        },
       });
 
-      if (!user) {
+      // Find the user with a matching refresh token hash using constant-time comparison
+      let validUser = null;
+      for (const user of users) {
+        if (user.refreshTokenHash) {
+          // Use bcrypt.compare which includes constant-time comparison
+          const isValid = await bcrypt.compare(refreshTokenString, user.refreshTokenHash);
+          if (isValid) {
+            validUser = user;
+            break;
+          }
+        }
+      }
+
+      if (!validUser) {
         throw new UnauthorizedException('Invalid refresh token');
       }
 
-      // Validate refresh token expiration
-      if (!user.refreshTokenExpiresAt || user.refreshTokenExpiresAt < new Date()) {
-        // Clear expired token
-        await this.prisma.user.update({
-          where: { id: user.id },
-          data: { refreshToken: null, refreshTokenExpiresAt: null },
-        });
-        throw new UnauthorizedException('Refresh token expired');
-      }
-
-      const newPayload = { email: user.email, sub: user.id, role: user.role };
+      const newPayload = { email: validUser.email, sub: validUser.id, role: validUser.role };
       const accessToken = this.jwtService.sign(newPayload);
 
       // Rotate refresh token - generate new one with new expiration
       const newRefreshTokenString = crypto.randomBytes(32).toString('hex');
+      const newRefreshTokenHash = await bcrypt.hash(newRefreshTokenString, REFRESH_TOKEN_SALT_ROUNDS);
       const newRefreshTokenExpiresAt = new Date();
       newRefreshTokenExpiresAt.setDate(newRefreshTokenExpiresAt.getDate() + REFRESH_TOKEN_EXPIRATION_DAYS);
       
       await this.prisma.user.update({
-        where: { id: user.id },
+        where: { id: validUser.id },
         data: { 
-          refreshToken: newRefreshTokenString,
+          refreshTokenHash: newRefreshTokenHash,
           refreshTokenExpiresAt: newRefreshTokenExpiresAt,
         },
       });
@@ -124,7 +138,7 @@ export class AuthService {
       this.logger.log({
         message: 'Token refreshed successfully',
         context: 'Auth',
-        userId: user.id,
+        userId: validUser.id,
       });
 
       return {
@@ -143,11 +157,11 @@ export class AuthService {
   }
 
   async logout(userId: string) {
-    // Clear refresh token and expiration for user
+    // Clear refresh token hash and expiration for user
     await this.prisma.user.update({
       where: { id: userId },
       data: { 
-        refreshToken: null,
+        refreshTokenHash: null,
         refreshTokenExpiresAt: null,
       },
     });
