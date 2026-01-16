@@ -73,9 +73,10 @@ export default function(data) {
   sleep(1);
 
   // Test 2: Create contractor
+  // Using k6 built-in variables (__VU, __ITER) for uniqueness in concurrent scenarios
   const newContractor = {
-    name: `Test Contractor ${Date.now()}`,
-    email: `contractor${Date.now()}@test.com`,
+    name: `Test Contractor VU${__VU}-${__ITER}-${Date.now()}`,
+    email: `contractor-vu${__VU}-${__ITER}-${Date.now()}@test.com`,
     phone: '555-0100',
     address: '123 Test St',
     city: 'New York',
