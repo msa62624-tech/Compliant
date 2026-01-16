@@ -68,6 +68,7 @@ model Contractor {
   contractorType  ContractorType   @default(SUBCONTRACTOR)
   status          ContractorStatus @default(PENDING)
   insuranceStatus InsuranceStatus  @default(PENDING)
+  trades          String[]         @default([]) // Array of trade specialties (e.g., "Electrical", "Plumbing", "HVAC")
 
   // Broker information
   brokerName    String?
