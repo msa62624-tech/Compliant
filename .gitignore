@@ -1,3 +1,14 @@
+# Dependencies
+node_modules
+pnpm-lock.yaml
+
+# Build outputs
+dist
+dist-ssr
+.next
+.turbo
+*.tsbuildinfo
+
 # Logs
 logs
 *.log
@@ -7,9 +18,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Environment
+.env
+.env.local
+.env.production
 *.local
 
 # Editor directories and files
@@ -23,10 +35,10 @@ dist-ssr
 *.sln
 *.sw?
 
-.env
+# Prisma
+prisma/*.db
+prisma/*.db-journal
 
-# Backend data (persistent storage)
-backend/data/entities.json
-
-# Backend uploads (user-uploaded files)
-backend/uploads/
+# Uploads
+uploads/
+*.upload
