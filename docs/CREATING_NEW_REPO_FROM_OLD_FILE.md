@@ -1,6 +1,6 @@
 # Creating a New Repository and Bringing in Old Files
 
-This guide explains how to create a new repository and bring in files from an existing repository. There are several methods depending on your needs.
+This guide explains how to create a new repository and bringing in files from an existing repository. There are several methods depending on your needs.
 
 ---
 
@@ -245,7 +245,9 @@ pip install git-filter-repo
 1. **Decide what you need:**
    - Just the latest files? → Use Method 1 (Manual Copy)
    - Everything with fresh history? → Use Method 2 (Clone & Remove History)
+   - Preserve directory with history? → Use Method 3 (Git Subtree)
    - Preserve history for specific files? → Use Method 4 (Git Filter-Repo)
+   - Keep separate but linked? → Use Method 5 (Git Submodule)
 
 2. **Check for sensitive data:**
    ```bash
