@@ -3,6 +3,7 @@
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { getApiUrl } from '@/lib/api/config';
 
 export default function NewProjectPage() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -50,7 +51,7 @@ export default function NewProjectPage() {
         endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
       };
 
-      const response = await fetch('http://localhost:3001/api/v1/projects', {
+      const response = await fetch(`${getApiUrl()}/projects`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

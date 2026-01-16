@@ -15,16 +15,17 @@ datasource db {
 // ============================================
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  password     String
-  firstName    String
-  lastName     String
-  role         UserRole @default(USER)
-  isActive     Boolean  @default(true)
-  refreshToken String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                     String    @id @default(uuid())
+  email                  String    @unique
+  password               String
+  firstName              String
+  lastName               String
+  role                   UserRole  @default(USER)
+  isActive               Boolean   @default(true)
+  refreshToken           String?
+  refreshTokenExpiresAt  DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
   contractorsCreated    Contractor[]   @relation("ContractorCreator")
   projects              Project[]
@@ -124,6 +125,18 @@ model Project {
   status      ProjectStatus @default(PLANNING)
   gcName      String?
   location    String?
+
+  // ACRIS Data Fields
+  borough             String?
+  block               String?
+  lot                 String?
+  buildingHeight      String?
+  structureType       String?
+  entity              String?
+  additionalInsureds  String?
+  contactPerson       String?
+  contactEmail        String?
+  contactPhone        String?
 
   // Admin assignment (for assistant admin filtering)
   assignedAdminEmail String?
