@@ -93,6 +93,7 @@ export class UsersController {
     return this.usersService.findAllWithNewFeatures();
   }
 }
+```
 
 ## Default Credentials
 

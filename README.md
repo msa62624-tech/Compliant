@@ -33,7 +33,7 @@ pnpm dev
 ### Access Points
 
 - **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:3001/api/v1
+- **Backend API**: http://localhost:3001/api
 - **API Docs**: http://localhost:3001/api/docs
 - **Database GUI**: Run `pnpm db:studio` then visit http://localhost:5555
 
@@ -119,7 +119,7 @@ PORT=3001
 Edit `packages/frontend/.env.local`:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
 ```
 
 ## 🧪 Testing
