@@ -60,14 +60,14 @@ model Contractor {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
-  insuranceDocuments InsuranceDocument[]
-  projectContractors ProjectContractor[]
-  coiReviews         COIReview[]
-  dobRecords         DOBRecord[]
-  placeVerifications PlaceVerification[]
-  generatedCOIs      GeneratedCOI[]
-  policyAlerts       ExpiringPolicyAlert[]
-  gcPortalAccess     GCPortalAccess?
+  insuranceDocuments     InsuranceDocument[]
+  projectContractors     ProjectContractor[]
+  coiReviews             COIReview[]
+  dobRecords             DOBRecord[]
+  placeVerifications     PlaceVerification[]
+  policyAlerts           ExpiringPolicyAlert[]
+  gcPortalAccess         GCPortalAccess?
+  subcontractorPortalAccess SubcontractorPortalAccess?
 
   @@index([createdById])
   @@index([email])
@@ -130,20 +130,30 @@ model ProjectContractor {
 
 // Insurance Document Model
 model InsuranceDocument {
-  id             String         @id @default(uuid())
-  contractorId   String
-  contractor     Contractor     @relation(fields: [contractorId], references: [id], onDelete: Cascade)
-  type           InsuranceType
-  provider       String
-  policyNumber   String
-  coverageAmount Float
-  effectiveDate  DateTime
-  expirationDate DateTime
-  status         DocumentStatus @default(PENDING)
-  fileUrl        String?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  id                      String         @id @default(uuid())
+  contractorId            String
+  contractor              Contractor     @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  type                    InsuranceType
+  provider                String
+  policyNumber            String
+  coverageAmount          Float
+  effectiveDate           DateTime
+  expirationDate          DateTime
+  status                  DocumentStatus @default(PENDING)
+  fileUrl                 String?
+  // COI Certificate fields
+  certificateNumber       String?        @unique
+  certificateFileId       String?
+  certificateGeneratedAt  DateTime?
+  certificateHolder       String?
+  additionalInsured       String?
+  description             String?        @db.Text
+  createdAt               DateTime       @default(now())
+  updatedAt               DateTime       @updatedAt
 
+  @@index([contractorId])
+  @@index([status])
+  @@index([expirationDate])
   @@map("insurance_documents")
 }
 
