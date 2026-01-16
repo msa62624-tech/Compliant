@@ -45,8 +45,8 @@ export interface LoginDto {
 
 export interface AuthResponse {
   user: Omit<User, 'password'>;
-  accessToken: string;
-  refreshToken: string;
+  accessToken?: string; // Optional for backward compatibility
+  refreshToken?: string; // Optional for backward compatibility
 }
 
 export interface RefreshTokenDto {

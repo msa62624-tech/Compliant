@@ -3,7 +3,7 @@
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getApiUrl } from '@/lib/api/config';
+import apiClient from '@/lib/api/client';
 
 interface Contractor {
   id: string;
@@ -57,19 +57,8 @@ export default function NewProjectForGCPage() {
 
   const fetchContractorDetails = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${getApiUrl()}/contractors/${contractorId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setContractor(data);
-      } else {
-        setError('Failed to load contractor details');
-      }
+      const response = await apiClient.get(`/contractors/${contractorId}`);
+      setContractor(response.data);
     } catch (err) {
       setError('Error connecting to server');
       console.error('Error fetching contractor:', err);
@@ -89,8 +78,6 @@ export default function NewProjectForGCPage() {
     setError(null);
 
     try {
-      const token = localStorage.getItem('accessToken');
-      
       const projectData = {
         ...formData,
         gcId: contractorId,
@@ -99,24 +86,11 @@ export default function NewProjectForGCPage() {
         endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
       };
 
-      const response = await fetch(`${getApiUrl()}/projects`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(projectData),
-      });
-
-      if (response.ok) {
-        setSuccess(true);
-        setTimeout(() => {
-          router.push(`/admin/general-contractors/${contractorId}`);
-        }, 2000);
-      } else {
-        const data = await response.json();
-        setError(data.message || 'Failed to create project');
-      }
+      await apiClient.post('/projects', projectData);
+      setSuccess(true);
+      setTimeout(() => {
+        router.push(`/admin/general-contractors/${contractorId}`);
+      }, 2000);
     } catch (err) {
       setError('Error connecting to server');
       console.error('Error creating project:', err);

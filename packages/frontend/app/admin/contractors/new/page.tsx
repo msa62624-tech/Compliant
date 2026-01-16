@@ -3,7 +3,7 @@
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getApiUrl } from '@/lib/api/config';
+import apiClient from '@/lib/api/client';
 
 export default function NewContractorPage() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -40,25 +40,11 @@ export default function NewContractorPage() {
     setError(null);
 
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${getApiUrl()}/contractors`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        setSuccess(true);
-        setTimeout(() => {
-          router.push('/admin/general-contractors');
-        }, 2000);
-      } else {
-        const data = await response.json();
-        setError(data.message || 'Failed to create contractor');
-      }
+      await apiClient.post('/contractors', formData);
+      setSuccess(true);
+      setTimeout(() => {
+        router.push('/admin/general-contractors');
+      }, 2000);
     } catch (err) {
       setError('Error connecting to server');
       console.error('Error creating contractor:', err);

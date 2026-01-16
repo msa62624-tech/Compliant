@@ -3,7 +3,7 @@
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getApiUrl } from '@/lib/api/config';
+import apiClient from '@/lib/api/client';
 
 export default function NewProjectPage() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -42,8 +42,6 @@ export default function NewProjectPage() {
     setError(null);
 
     try {
-      const token = localStorage.getItem('accessToken');
-      
       // Prepare data for API
       const projectData = {
         ...formData,
@@ -51,24 +49,11 @@ export default function NewProjectPage() {
         endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
       };
 
-      const response = await fetch(`${getApiUrl()}/projects`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(projectData),
-      });
-
-      if (response.ok) {
-        setSuccess(true);
-        setTimeout(() => {
-          router.push('/admin/projects');
-        }, 2000);
-      } else {
-        const data = await response.json();
-        setError(data.message || 'Failed to create project');
-      }
+      await apiClient.post('/projects', projectData);
+      setSuccess(true);
+      setTimeout(() => {
+        router.push('/admin/projects');
+      }, 2000);
     } catch (err) {
       setError('Error connecting to server');
       console.error('Error creating project:', err);
