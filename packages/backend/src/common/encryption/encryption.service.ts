@@ -41,7 +41,7 @@ export class EncryptionService {
       this.encryptionKey = scryptSync(secret, salt, this.keyLength);
       this.logger.log('Encryption key initialized successfully');
     } catch (error) {
-      this.logger.error(`Failed to initialize encryption key: ${error.message}`);
+      this.logger.error(`Failed to initialize encryption key: ${error instanceof Error ? error.message : 'Unknown error'}`);
       throw error;
     }
   }
@@ -77,7 +77,7 @@ export class EncryptionService {
       // Return iv:authTag:encrypted (all in hex)
       return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
     } catch (error) {
-      this.logger.error(`Encryption error: ${error.message}`);
+      this.logger.error(`Encryption error: ${error instanceof Error ? error.message : 'Unknown error'}`);
       return null;
     }
   }
@@ -121,7 +121,7 @@ export class EncryptionService {
       
       return decrypted.toString('utf8');
     } catch (error) {
-      this.logger.error(`Decryption error: ${error.message}`);
+      this.logger.error(`Decryption error: ${error instanceof Error ? error.message : 'Unknown error'}`);
       return null;
     }
   }
@@ -147,7 +147,7 @@ export class EncryptionService {
       if (result[field] && typeof result[field] === 'string') {
         const encrypted = this.encrypt(result[field]);
         if (encrypted) {
-          result[field] = encrypted;
+          (result as any)[field] = encrypted;
         }
       }
     }
@@ -167,7 +167,7 @@ export class EncryptionService {
       if (result[field] && typeof result[field] === 'string' && this.isEncrypted(result[field])) {
         const decrypted = this.decrypt(result[field]);
         if (decrypted) {
-          result[field] = decrypted;
+          (result as any)[field] = decrypted;
         }
       }
     }

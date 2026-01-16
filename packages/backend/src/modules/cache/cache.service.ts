@@ -43,7 +43,7 @@ export class CacheService implements OnModuleInit {
         this.logger.warn('REDIS_URL not configured, using in-memory cache');
       }
     } catch (error) {
-      this.logger.error(`Failed to initialize Redis: ${error.message}`);
+      this.logger.error(`Failed to initialize Redis: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -59,7 +59,7 @@ export class CacheService implements OnModuleInit {
         return this.getFromMemory(key);
       }
     } catch (error) {
-      this.logger.error(`Cache get error for key ${key}: ${error.message}`);
+      this.logger.error(`Cache get error for key ${key}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       return null;
     }
   }
@@ -77,7 +77,7 @@ export class CacheService implements OnModuleInit {
         this.setInMemory(key, value, ttlSeconds);
       }
     } catch (error) {
-      this.logger.error(`Cache set error for key ${key}: ${error.message}`);
+      this.logger.error(`Cache set error for key ${key}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -92,7 +92,7 @@ export class CacheService implements OnModuleInit {
         this.memoryCache.delete(key);
       }
     } catch (error) {
-      this.logger.error(`Cache delete error for key ${key}: ${error.message}`);
+      this.logger.error(`Cache delete error for key ${key}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -141,7 +141,7 @@ export class CacheService implements OnModuleInit {
         }
       }
     } catch (error) {
-      this.logger.error(`Cache delete pattern error for ${pattern}: ${error.message}`);
+      this.logger.error(`Cache delete pattern error for ${pattern}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -157,7 +157,7 @@ export class CacheService implements OnModuleInit {
         return this.memoryCache.has(key) && this.memoryCache.get(key)!.expiry > Date.now();
       }
     } catch (error) {
-      this.logger.error(`Cache exists error for key ${key}: ${error.message}`);
+      this.logger.error(`Cache exists error for key ${key}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       return false;
     }
   }
@@ -173,7 +173,7 @@ export class CacheService implements OnModuleInit {
         this.memoryCache.clear();
       }
     } catch (error) {
-      this.logger.error(`Cache clear error: ${error.message}`);
+      this.logger.error(`Cache clear error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 

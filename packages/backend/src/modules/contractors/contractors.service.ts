@@ -182,12 +182,13 @@ export class ContractorsService {
   async getInsuranceStatus(id: string) {
     const contractor = await this.findOne(id);
     
-    const insuranceDocs = contractor.insuranceDocuments;
+    // Type assertion since we know findOne returns a contractor with insuranceDocuments
+    const insuranceDocs = (contractor as any).insuranceDocuments || [];
     const now = new Date();
 
-    const hasExpired = insuranceDocs.some(doc => new Date(doc.expirationDate) < now);
-    const hasNonCompliant = insuranceDocs.some(doc => doc.status === 'REJECTED');
-    const hasPending = insuranceDocs.some(doc => doc.status === 'PENDING');
+    const hasExpired = insuranceDocs.some((doc: any) => new Date(doc.expirationDate) < now);
+    const hasNonCompliant = insuranceDocs.some((doc: any) => doc.status === 'REJECTED');
+    const hasPending = insuranceDocs.some((doc: any) => doc.status === 'PENDING');
 
     let insuranceStatus = InsuranceStatus.COMPLIANT;
     if (hasExpired) {
@@ -199,7 +200,7 @@ export class ContractorsService {
     }
 
     // Update contractor insurance status if changed
-    if (insuranceStatus !== contractor.insuranceStatus) {
+    if (insuranceStatus !== (contractor as any).insuranceStatus) {
       await this.prisma.contractor.update({
         where: { id },
         data: { insuranceStatus: insuranceStatus as any },
