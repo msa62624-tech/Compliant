@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
@@ -20,6 +20,13 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  // Header-based versioning
+  app.enableVersioning({
+    type: VersioningType.HEADER,
+    header: 'X-API-Version',
+    defaultVersion: '1',
+  });
 
   // API prefix
   app.setGlobalPrefix('api/v1');
