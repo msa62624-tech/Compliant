@@ -62,6 +62,7 @@ export interface Contractor {
   company?: string;
   status: ContractorStatus;
   insuranceStatus: InsuranceStatus;
+  brokerId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -85,6 +86,7 @@ export interface CreateContractorDto {
   email: string;
   phone?: string;
   company?: string;
+  brokerId?: string;
 }
 
 export interface UpdateContractorDto {

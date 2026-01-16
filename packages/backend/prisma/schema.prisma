@@ -23,8 +23,9 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  contractors Contractor[]
-  projects    Project[]
+  contractorsCreated Contractor[]  @relation("ContractorCreator")
+  contractorsManaged Contractor[]  @relation("ContractorBroker")
+  projects           Project[]
 
   @@map("users")
 }
@@ -47,8 +48,10 @@ model Contractor {
   company         String?
   status          ContractorStatus @default(PENDING)
   insuranceStatus InsuranceStatus  @default(PENDING)
+  brokerId        String?
+  broker          User?            @relation("ContractorBroker", fields: [brokerId], references: [id], onDelete: SetNull)
   createdById     String
-  createdBy       User             @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdBy       User             @relation("ContractorCreator", fields: [createdById], references: [id], onDelete: Cascade)
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
