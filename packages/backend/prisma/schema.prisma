@@ -11,24 +11,24 @@ datasource db {
 }
 
 // ============================================
-// CORE MODELS (Original Architecture)
+// ORIGINAL ARCHITECTURE (from commit c1e9958)
 // ============================================
 
-// User Model
 model User {
-  id           String    @id @default(uuid())
-  email        String    @unique
-  password     String
-  firstName    String
-  lastName     String
-  role         UserRole  @default(USER)
-  isActive     Boolean   @default(true)
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true)
   refreshToken String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  contractors  Contractor[]
-  projects     Project[]
+  contractors Contractor[]
+  projects    Project[]
+  generatedCOIsAssigned GeneratedCOI[] @relation("AssignedAdmin")
 
   @@map("users")
 }
@@ -37,26 +37,63 @@ enum UserRole {
   ADMIN
   MANAGER
   USER
+  CONTRACTOR
+  SUBCONTRACTOR
+  BROKER
 }
 
-// Contractor Model
 model Contractor {
-  id              String           @id @default(uuid())
-  name            String
-  email           String           @unique
-  phone           String?
-  company         String?
-  status          ContractorStatus @default(PENDING)
-  insuranceStatus InsuranceStatus  @default(PENDING)
-  createdById     String
-  createdBy       User             @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  id             String           @id @default(uuid())
+  name           String
+  email          String           @unique
+  phone          String?
+  company        String?
+  contractorType ContractorType   @default(SUBCONTRACTOR)
+  status         ContractorStatus @default(PENDING)
+  insuranceStatus InsuranceStatus @default(PENDING)
+  
+  // Broker information
+  brokerName      String?
+  brokerEmail     String?
+  brokerPhone     String?
+  brokerCompany   String?
+  brokerType      BrokerType?
+  
+  // Per-policy broker fields
+  brokerGlName    String?
+  brokerGlEmail   String?
+  brokerGlPhone   String?
+  brokerAutoName  String?
+  brokerAutoEmail String?
+  brokerAutoPhone String?
+  brokerUmbrellaName  String?
+  brokerUmbrellaEmail String?
+  brokerUmbrellaPhone String?
+  brokerWcName    String?
+  brokerWcEmail   String?
+  brokerWcPhone   String?
+  
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  insuranceDocuments InsuranceDocument[]
-  projectContractors ProjectContractor[]
+  insuranceDocuments    InsuranceDocument[]
+  projectContractors    ProjectContractor[]
+  generatedCOIs         GeneratedCOI[]
+  projectSubcontractors ProjectSubcontractor[]
 
   @@map("contractors")
+}
+
+enum ContractorType {
+  GENERAL_CONTRACTOR
+  SUBCONTRACTOR
+}
+
+enum BrokerType {
+  GLOBAL
+  PER_POLICY
 }
 
 enum ContractorStatus {
@@ -73,7 +110,6 @@ enum InsuranceStatus {
   EXPIRED
 }
 
-// Project Model
 model Project {
   id          String        @id @default(uuid())
   name        String
@@ -81,12 +117,16 @@ model Project {
   startDate   DateTime
   endDate     DateTime?
   status      ProjectStatus @default(PLANNING)
+  gcName      String?
+  location    String?
   createdById String
   createdBy   User          @relation(fields: [createdById], references: [id], onDelete: Cascade)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
-  projectContractors ProjectContractor[]
+  projectContractors    ProjectContractor[]
+  projectSubcontractors ProjectSubcontractor[]
+  generatedCOIs         GeneratedCOI[]
 
   @@map("projects")
 }
@@ -99,7 +139,6 @@ enum ProjectStatus {
   CANCELLED
 }
 
-// Junction table for Project <-> Contractor (many-to-many)
 model ProjectContractor {
   id           String     @id @default(uuid())
   projectId    String
@@ -113,28 +152,118 @@ model ProjectContractor {
   @@map("project_contractors")
 }
 
-// Insurance Document Model (Enhanced with certificate generation)
+model ProjectSubcontractor {
+  id              String     @id @default(uuid())
+  projectId       String
+  project         Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  subcontractorId String
+  subcontractor   Contractor @relation(fields: [subcontractorId], references: [id], onDelete: Cascade)
+  role            String?
+  assignedAt      DateTime   @default(now())
+
+  @@unique([projectId, subcontractorId])
+  @@map("project_subcontractors")
+}
+
+// Generated COI (Certificate of Insurance) - Core of the workflow
+model GeneratedCOI {
+  id                String    @id @default(uuid())
+  projectId         String
+  project           Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  subcontractorId   String
+  subcontractor     Contractor @relation(fields: [subcontractorId], references: [id], onDelete: Cascade)
+  
+  projectName       String?
+  gcName            String?
+  subcontractorName String?
+  
+  status            COIStatus @default(AWAITING_BROKER_INFO)
+  
+  // Broker information
+  brokerName        String?
+  brokerEmail       String?
+  brokerPhone       String?
+  brokerCompany     String?
+  
+  // Per-policy broker info
+  brokerGlName      String?
+  brokerGlEmail     String?
+  brokerGlPhone     String?
+  brokerAutoName    String?
+  brokerAutoEmail   String?
+  brokerAutoPhone   String?
+  brokerUmbrellaName   String?
+  brokerUmbrellaEmail  String?
+  brokerUmbrellaPhone  String?
+  brokerWcName      String?
+  brokerWcEmail     String?
+  brokerWcPhone     String?
+  
+  // Policy documents
+  glPolicyUrl       String?
+  umbrellaPolicyUrl String?
+  autoPolicyUrl     String?
+  wcPolicyUrl       String?
+  
+  // Broker signatures
+  glBrokerSignatureUrl       String?
+  umbrellaBrokerSignatureUrl String?
+  autoBrokerSignatureUrl     String?
+  wcBrokerSignatureUrl       String?
+  
+  // Policy details
+  glExpirationDate       DateTime?
+  umbrellaExpirationDate DateTime?
+  autoExpirationDate     DateTime?
+  wcExpirationDate       DateTime?
+  
+  // First COI tracking
+  firstCOIUploaded Boolean   @default(false)
+  firstCOIUrl      String?
+  
+  // Admin review
+  assignedAdminEmail String?
+  assignedAdmin      User?   @relation("AssignedAdmin", fields: [assignedAdminEmail], references: [email], onDelete: SetNull)
+  deficiencyNotes    String?
+  rejectionReason    String?
+  
+  // Timestamps
+  uploadedForReviewDate DateTime?
+  brokerVerifiedAtRenewal Boolean @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([subcontractorId])
+  @@index([status])
+  @@index([assignedAdminEmail])
+  @@map("generated_cois")
+}
+
+enum COIStatus {
+  AWAITING_BROKER_INFO
+  AWAITING_BROKER_UPLOAD
+  AWAITING_BROKER_SIGNATURE
+  AWAITING_ADMIN_REVIEW
+  ACTIVE
+  DEFICIENCY_PENDING
+  EXPIRED
+}
+
 model InsuranceDocument {
-  id                     String         @id @default(uuid())
-  contractorId           String
-  contractor             Contractor     @relation(fields: [contractorId], references: [id], onDelete: Cascade)
-  type                   InsuranceType
-  provider               String
-  policyNumber           String
-  coverageAmount         Float
-  effectiveDate          DateTime
-  expirationDate         DateTime
-  status                 DocumentStatus @default(PENDING)
-  fileUrl                String?
-  // Certificate generation fields
-  certificateNumber      String?        @unique
-  certificateFileUrl     String?
-  certificateGeneratedAt DateTime?
-  certificateHolder      String?
-  additionalInsured      String?
-  description            String?        @db.Text
-  createdAt              DateTime       @default(now())
-  updatedAt              DateTime       @updatedAt
+  id             String         @id @default(uuid())
+  contractorId   String
+  contractor     Contractor     @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  type           InsuranceType
+  provider       String
+  policyNumber   String
+  coverageAmount Float
+  effectiveDate  DateTime
+  expirationDate DateTime
+  status         DocumentStatus @default(PENDING)
+  fileUrl        String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
   @@index([contractorId])
   @@index([status])
