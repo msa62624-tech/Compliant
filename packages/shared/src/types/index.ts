@@ -60,11 +60,38 @@ export interface Contractor {
   email: string;
   phone?: string;
   company?: string;
+  contractorType: ContractorType;
   status: ContractorStatus;
   insuranceStatus: InsuranceStatus;
-  brokerId?: string;
+  brokerName?: string;
+  brokerEmail?: string;
+  brokerPhone?: string;
+  brokerCompany?: string;
+  brokerType?: BrokerType;
+  brokerGlName?: string;
+  brokerGlEmail?: string;
+  brokerGlPhone?: string;
+  brokerAutoName?: string;
+  brokerAutoEmail?: string;
+  brokerAutoPhone?: string;
+  brokerUmbrellaName?: string;
+  brokerUmbrellaEmail?: string;
+  brokerUmbrellaPhone?: string;
+  brokerWcName?: string;
+  brokerWcEmail?: string;
+  brokerWcPhone?: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export enum ContractorType {
+  GENERAL_CONTRACTOR = 'GENERAL_CONTRACTOR',
+  SUBCONTRACTOR = 'SUBCONTRACTOR',
+}
+
+export enum BrokerType {
+  GLOBAL = 'GLOBAL',
+  PER_POLICY = 'PER_POLICY',
 }
 
 export enum ContractorStatus {
@@ -86,7 +113,12 @@ export interface CreateContractorDto {
   email: string;
   phone?: string;
   company?: string;
-  brokerId?: string;
+  contractorType?: ContractorType;
+  brokerName?: string;
+  brokerEmail?: string;
+  brokerPhone?: string;
+  brokerCompany?: string;
+  brokerType?: BrokerType;
 }
 
 export interface UpdateContractorDto {
@@ -172,6 +204,110 @@ export interface CreateInsuranceDocumentDto {
   effectiveDate: Date;
   expirationDate: Date;
   fileUrl?: string;
+}
+
+// Generated COI Types
+export interface GeneratedCOI {
+  id: string;
+  projectId: string;
+  subcontractorId: string;
+  projectName?: string;
+  gcName?: string;
+  subcontractorName?: string;
+  status: COIStatus;
+  brokerName?: string;
+  brokerEmail?: string;
+  brokerPhone?: string;
+  brokerCompany?: string;
+  brokerGlName?: string;
+  brokerGlEmail?: string;
+  brokerGlPhone?: string;
+  brokerAutoName?: string;
+  brokerAutoEmail?: string;
+  brokerAutoPhone?: string;
+  brokerUmbrellaName?: string;
+  brokerUmbrellaEmail?: string;
+  brokerUmbrellaPhone?: string;
+  brokerWcName?: string;
+  brokerWcEmail?: string;
+  brokerWcPhone?: string;
+  glPolicyUrl?: string;
+  umbrellaPolicyUrl?: string;
+  autoPolicyUrl?: string;
+  wcPolicyUrl?: string;
+  glBrokerSignatureUrl?: string;
+  umbrellaBrokerSignatureUrl?: string;
+  autoBrokerSignatureUrl?: string;
+  wcBrokerSignatureUrl?: string;
+  glExpirationDate?: Date;
+  umbrellaExpirationDate?: Date;
+  autoExpirationDate?: Date;
+  wcExpirationDate?: Date;
+  firstCOIUploaded: boolean;
+  firstCOIUrl?: string;
+  assignedAdminEmail?: string;
+  deficiencyNotes?: string;
+  rejectionReason?: string;
+  uploadedForReviewDate?: Date;
+  brokerVerifiedAtRenewal: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export enum COIStatus {
+  AWAITING_BROKER_INFO = 'AWAITING_BROKER_INFO',
+  AWAITING_BROKER_UPLOAD = 'AWAITING_BROKER_UPLOAD',
+  AWAITING_BROKER_SIGNATURE = 'AWAITING_BROKER_SIGNATURE',
+  AWAITING_ADMIN_REVIEW = 'AWAITING_ADMIN_REVIEW',
+  ACTIVE = 'ACTIVE',
+  DEFICIENCY_PENDING = 'DEFICIENCY_PENDING',
+  EXPIRED = 'EXPIRED',
+}
+
+export interface CreateGeneratedCOIDto {
+  projectId: string;
+  subcontractorId: string;
+  projectName?: string;
+  gcName?: string;
+  subcontractorName?: string;
+}
+
+export interface UpdateGeneratedCOIDto {
+  status?: COIStatus;
+  brokerName?: string;
+  brokerEmail?: string;
+  brokerPhone?: string;
+  brokerCompany?: string;
+  glPolicyUrl?: string;
+  umbrellaPolicyUrl?: string;
+  autoPolicyUrl?: string;
+  wcPolicyUrl?: string;
+  glBrokerSignatureUrl?: string;
+  umbrellaBrokerSignatureUrl?: string;
+  autoBrokerSignatureUrl?: string;
+  wcBrokerSignatureUrl?: string;
+  glExpirationDate?: Date;
+  umbrellaExpirationDate?: Date;
+  autoExpirationDate?: Date;
+  wcExpirationDate?: Date;
+  assignedAdminEmail?: string;
+  deficiencyNotes?: string;
+  rejectionReason?: string;
+}
+
+// Project Subcontractor Types
+export interface ProjectSubcontractor {
+  id: string;
+  projectId: string;
+  subcontractorId: string;
+  role?: string;
+  assignedAt: Date;
+}
+
+export interface CreateProjectSubcontractorDto {
+  projectId: string;
+  subcontractorId: string;
+  role?: string;
 }
 
 // API Response Types

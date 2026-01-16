@@ -2,6 +2,135 @@
 
 ## Complete Workflow (from commit 114ffb1)
 
+### Adobe PDF Services & eSign Integration
+
+**YES - The original app has Adobe PDF Services integration** (`backend/integrations/adobe-pdf-service.js`)
+
+#### Features:
+1. **PDF Text Extraction**: Extract text from uploaded COI PDFs
+2. **COI Field Extraction**: Parse policy numbers, coverage limits, dates, carriers from COIs
+3. **Digital Signatures**: Apply electronic seals/signatures using Adobe Electronic Seal API
+4. **PDF Merging**: Combine multiple PDF documents
+
+#### Environment Variables Required:
+- `ADOBE_API_KEY` - Adobe API key
+- `ADOBE_CLIENT_ID` - Adobe client ID
+
+#### Broker Signature Workflow:
+- Brokers can **draw** signatures on canvas OR **type** text signatures
+- Signature stored as image URL (e.g., `broker_signature_url`)
+- Supports:
+  - **Single signature** for all policies broker manages
+  - **Per-policy signatures** (GL, Umbrella, Auto, WC each get separate signatures)
+- Signature triggers status change: `AWAITING_BROKER_SIGNATURE` → `AWAITING_ADMIN_REVIEW`
+
+### Automated Email Notifications & Links
+
+**YES - Complete email notification system with automated links**
+
+#### Email Configuration:
+- Uses **Nodemailer** with SMTP
+- Environment variables:
+  - `SMTP_HOST` (default: smtp.office365.com)
+  - `SMTP_PORT` (default: 587)
+  - `SMTP_USER` - Email address
+  - `SMTP_PASS` - Email password
+  - `ADMIN_EMAILS` - Comma-separated admin emails
+
+#### Automated Emails Sent:
+
+1. **Broker Assignment Email** (to Broker)
+   - Triggered when: Subcontractor assigns/changes broker
+   - Contains:
+     - Auto-generated login credentials (username + secure password)
+     - Link to Broker Dashboard: `/broker-dashboard?email={email}&name={name}`
+     - Subcontractor details (company, contact, trade types)
+     - First-time vs. returning subcontractor instructions
+     - For per-policy: List of assigned policies (GL, WC, Auto, Umbrella)
+   
+2. **Broker Reassignment Email** (to Old Broker)
+   - Triggered when: Broker is changed
+   - Notifies them they've been removed
+   - Shows new broker information
+
+3. **Broker Assignment Confirmation** (to Subcontractor)
+   - Triggered when: Broker is assigned
+   - Contains:
+     - Auto-generated login credentials
+     - Broker contact information
+     - Link to Subcontractor Dashboard: `/subcontractor-dashboard?id={subId}`
+     - Instructions to contact broker for questions
+
+4. **COI Upload Notification** (to All Admins)
+   - Triggered when: Broker uploads COI for review
+   - Contains:
+     - Subcontractor and project details
+     - COI ID and upload date
+     - Link to COI Review: `/COIReview?id={coiId}`
+     - Link to Admin Dashboard: `/admin-dashboard?section=PendingReviews&coiId={coiId}`
+   - Sent to all admin emails from `ADMIN_EMAILS` env var
+
+5. **COI Approval Email** (to Subcontractor)
+   - Triggered when: Admin approves COI
+   - Contains:
+     - Project details
+     - Approval confirmation
+     - Coverage summary
+     - Link to Subcontractor Dashboard with project details
+
+6. **COI Deficiency Email** (to Broker)
+   - Triggered when: Admin rejects COI with deficiency notes
+   - Contains:
+     - Deficiency notes from admin
+     - Link to replace/re-upload documents
+     - Instructions to correct and resubmit
+
+7. **Expiration Warning Emails** (to Broker & Subcontractor)
+   - Triggered when: Policy expires within 30 days
+   - Reminders to renew policies
+
+8. **Password Reset Email**
+   - Triggered when: User requests password reset
+   - Contains:
+     - Secure reset token link (expires in 1 hour)
+     - Reset link: `/reset-password?token={token}`
+
+#### Link Generation System (`src/urlConfig.js`):
+
+All links are environment-aware (works in Codespaces, local, production):
+
+```javascript
+// Broker Dashboard Link
+/broker-dashboard?email={brokerEmail}&name={brokerName}
+
+// Broker Upload Link
+/broker-upload?type={global|per-policy}&subId={subId}
+
+// Subcontractor Dashboard Link
+/subcontractor-dashboard?id={subId}
+
+// Admin Dashboard with Filters
+/admin-dashboard?section=PendingReviews&coiId={coiId}
+
+// COI Review Page
+/COIReview?id={coiId}
+```
+
+#### Auto-Generated User Accounts:
+
+When broker/subcontractor is assigned, system automatically:
+1. Generates secure random password
+2. Creates user account with role
+3. Emails credentials in welcome message
+4. User can login immediately with provided credentials
+
+#### Message System Integration:
+
+- In-app messages created alongside emails
+- Messages linked to entities (COI, Subcontractor, Project)
+- Viewable in dashboard message centers
+- Admin and Broker can communicate via threaded messages
+
 ### 1. Admin Dashboard
 - **Role**: Super admin manages the entire platform
 - **Actions**:
