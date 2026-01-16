@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { WinstonModule } from 'nest-winston';
 import { AuthModule } from './modules/auth/auth.module';
@@ -22,6 +23,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
       isGlobal: true,
     }),
     WinstonModule.forRoot(winstonConfig),
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{
       ttl: 60000, // 60 seconds in milliseconds
       limit: 10,
