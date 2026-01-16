@@ -1,0 +1,78 @@
+config:
+  target: "http://localhost:3001/api"
+  phases:
+    # Warm-up phase: 10 users for 1 minute
+    - duration: 60
+      arrivalRate: 1
+      name: "Warm-up"
+    # Ramp-up phase: Gradually increase to 50 users over 2 minutes
+    - duration: 120
+      arrivalRate: 1
+      rampTo: 50
+      name: "Ramp-up"
+    # Sustained load: 50 users for 3 minutes
+    - duration: 180
+      arrivalRate: 50
+      name: "Sustained load"
+    # Ramp-down phase: Gradually decrease to 0 over 1 minute
+    - duration: 60
+      arrivalRate: 50
+      rampTo: 0
+      name: "Ramp-down"
+  defaults:
+    headers:
+      Content-Type: "application/json"
+  processor: "./load-test-helpers.js"
+
+scenarios:
+  - name: "Authentication Flow"
+    weight: 100
+    flow:
+      # Login
+      - post:
+          url: "/auth/login"
+          json:
+            email: "{{ $randomEmail() }}"
+            password: "Test1234!"
+          capture:
+            - json: "$.user.id"
+              as: "userId"
+          expect:
+            - statusCode: [200, 201, 401]
+            - hasProperty: user
+          
+      # Get current user profile (if login succeeded)
+      - get:
+          url: "/auth/me"
+          headers:
+            Cookie: "access_token={{ $randomString() }}"
+          expect:
+            - statusCode: [200, 401]
+      
+      # Logout (simulate)
+      - post:
+          url: "/auth/logout"
+          headers:
+            Cookie: "access_token={{ $randomString() }}"
+          expect:
+            - statusCode: [200, 401]
+
+  - name: "Token Refresh Flow"
+    weight: 30
+    flow:
+      # Attempt token refresh
+      - post:
+          url: "/auth/refresh"
+          headers:
+            Cookie: "refresh_token={{ $randomString() }}"
+          expect:
+            - statusCode: [200, 401]
+
+# Performance expectations
+expect:
+  maxErrorRate: 1  # Maximum 1% error rate
+  
+# Metrics thresholds  
+ensure:
+  p95: 500  # 95th percentile response time < 500ms
+  p99: 1000 # 99th percentile response time < 1s

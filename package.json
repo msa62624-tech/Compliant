@@ -17,10 +17,16 @@
     "db:migrate": "cd packages/backend && pnpm db:migrate",
     "db:push": "cd packages/backend && pnpm db:push",
     "backend": "cd packages/backend && pnpm dev",
-    "frontend": "cd packages/frontend && pnpm dev"
+    "frontend": "cd packages/frontend && pnpm dev",
+    "load:auth": "artillery run tests/load/auth-load-test.yml",
+    "load:contractors": "artillery run tests/load/contractors-load-test.yml",
+    "load:test": "artillery run tests/load/auth-load-test.yml && artillery run tests/load/contractors-load-test.yml",
+    "security:scan": "bash scripts/security-scan.sh",
+    "security:audit": "pnpm audit --audit-level=moderate"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
+    "artillery": "^2.0.27",
     "prettier": "^3.1.1",
     "turbo": "^1.11.3",
     "typescript": "^5.3.3"

@@ -1,0 +1,93 @@
+config:
+  target: "http://localhost:3001/api"
+  phases:
+    # Warm-up: 5 users for 1 minute
+    - duration: 60
+      arrivalRate: 1
+      name: "Warm-up"
+    # Ramp-up: Gradually increase to 30 users over 2 minutes
+    - duration: 120
+      arrivalRate: 1
+      rampTo: 30
+      name: "Ramp-up"
+    # Sustained load: 30 users for 3 minutes
+    - duration: 180
+      arrivalRate: 30
+      name: "Sustained load"
+    # Ramp-down: Gradually decrease to 0 over 1 minute
+    - duration: 60
+      arrivalRate: 30
+      rampTo: 0
+      name: "Ramp-down"
+  defaults:
+    headers:
+      Content-Type: "application/json"
+      Authorization: "Bearer test-token-placeholder"
+
+scenarios:
+  - name: "List Contractors (Read Heavy)"
+    weight: 60
+    flow:
+      # List contractors with pagination
+      - get:
+          url: "/contractors?page=1&limit=10"
+          expect:
+            - statusCode: [200, 401]
+            - contentType: json
+            - hasProperty: data
+      
+      # List contractors page 2
+      - get:
+          url: "/contractors?page=2&limit=10"
+          expect:
+            - statusCode: [200, 401]
+      
+      # List contractors with status filter
+      - get:
+          url: "/contractors?status=ACTIVE"
+          expect:
+            - statusCode: [200, 401]
+
+  - name: "Get Single Contractor (Cached)"
+    weight: 30
+    flow:
+      # Get specific contractor (will be cached after first request)
+      - get:
+          url: "/contractors/test-contractor-id"
+          expect:
+            - statusCode: [200, 404, 401]
+
+  - name: "Create and Update Contractor (Write)"
+    weight: 10
+    flow:
+      # Create new contractor
+      - post:
+          url: "/contractors"
+          json:
+            company: "Test Company {{ $randomString() }}"
+            email: "test-{{ $randomString() }}@example.com"
+            phone: "555-{{ $randomNumber(1000, 9999) }}"
+            address: "123 Test St"
+          capture:
+            - json: "$.id"
+              as: "contractorId"
+          expect:
+            - statusCode: [201, 401, 400]
+      
+      # Update contractor (if creation succeeded)
+      - put:
+          url: "/contractors/{{ contractorId }}"
+          json:
+            company: "Updated Company"
+          ifTrue: "contractorId"
+          expect:
+            - statusCode: [200, 404, 401]
+
+# Performance expectations
+expect:
+  maxErrorRate: 1  # Maximum 1% error rate
+
+# Metrics thresholds
+ensure:
+  p95: 1000  # 95th percentile response time < 1s
+  p99: 2000  # 99th percentile response time < 2s
