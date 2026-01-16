@@ -94,6 +94,9 @@ pnpm lint       # Lint code
 
 - **API Documentation**: Visit http://localhost:3001/api/docs when backend is running
 - **Database Schema**: See `packages/backend/prisma/schema.prisma`
+- **Getting Started Guide**: See [GETTING_STARTED.md](./GETTING_STARTED.md)
+- **Deployment Guide**: See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
+- **Implementation Guidelines**: See [IMPLEMENTATION_GUIDELINES.md](./IMPLEMENTATION_GUIDELINES.md)
 
 ## 🔧 Configuration
 
