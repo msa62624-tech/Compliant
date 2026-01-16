@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, BrokerType } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -100,6 +100,11 @@ async function main() {
       company: 'ABC Construction',
       status: 'ACTIVE',
       insuranceStatus: 'COMPLIANT',
+      brokerType: BrokerType.GLOBAL,
+      brokerName: 'Global Insurance Broker',
+      brokerEmail: 'broker@globalinsurance.com',
+      brokerPhone: '+1-555-0200',
+      brokerCompany: 'Global Insurance Services',
       createdById: admin.id,
     },
   });
@@ -112,6 +117,13 @@ async function main() {
       company: 'XYZ Builders',
       status: 'ACTIVE',
       insuranceStatus: 'PENDING',
+      brokerType: BrokerType.PER_POLICY,
+      brokerGlName: 'GL Policy Broker',
+      brokerGlEmail: 'gl@policybroker.com',
+      brokerGlPhone: '+1-555-0201',
+      brokerWcName: 'WC Policy Broker',
+      brokerWcEmail: 'wc@policybroker.com',
+      brokerWcPhone: '+1-555-0202',
       createdById: manager.id,
     },
   });
