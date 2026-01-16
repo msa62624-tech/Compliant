@@ -17,7 +17,7 @@ export const authApi = {
   },
 
   getMe: async () => {
-    const response = await apiClient.post('/auth/me');
+    const response = await apiClient.get('/auth/me');
     return response.data;
   },
 };
