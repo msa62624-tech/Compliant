@@ -23,8 +23,11 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  contractors Contractor[]
-  projects    Project[]
+  contractors    Contractor[]
+  projects       Project[]
+  refreshTokens  RefreshToken[]
+  sessions       Session[]
+  files          File[]
 
   @@map("users")
 }
@@ -142,3 +145,86 @@ enum DocumentStatus {
   REJECTED
   EXPIRED
 }
+
+// ============================================
+// PR #2: Core Infrastructure Models
+// ============================================
+
+// RefreshToken Model - for JWT refresh token rotation
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  revoked   Boolean  @default(false)
+
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
+}
+
+// Session Model - for session management with Redis
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@map("sessions")
+}
+
+// EmailLog Model - for email tracking and logging
+model EmailLog {
+  id        String      @id @default(uuid())
+  to        String
+  from      String
+  subject   String
+  template  String
+  status    EmailStatus
+  sentAt    DateTime?
+  errorMsg  String?
+  metadata  Json?
+  createdAt DateTime    @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("email_logs")
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+  BOUNCED
+}
+
+// File Model - for file upload management
+model File {
+  id              String   @id @default(uuid())
+  filename        String
+  originalName    String
+  mimeType        String
+  size            Int
+  path            String
+  url             String?
+  thumbnailUrl    String?
+  uploadedBy      String
+  user            User     @relation(fields: [uploadedBy], references: [id], onDelete: Cascade)
+  virusScanned    Boolean  @default(false)
+  virusScanResult String?
+  metadata        Json?
+  createdAt       DateTime @default(now())
+
+  @@index([uploadedBy])
+  @@index([createdAt])
+  @@map("files")
+}
+
