@@ -23,11 +23,16 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  contractors    Contractor[]
-  projects       Project[]
-  refreshTokens  RefreshToken[]
-  sessions       Session[]
-  files          File[]
+  contractors        Contractor[]
+  projects           Project[]
+  refreshTokens      RefreshToken[]
+  sessions           Session[]
+  files              File[]
+  submittedReviews   COIReview[]      @relation("Submitter")
+  assignedReviews    COIReview[]      @relation("Reviewer")
+  approvals          Approval[]
+  resolvedDeficiencies Deficiency[]
+  reminders          Reminder[]
 
   @@map("users")
 }
@@ -54,6 +59,7 @@ model Contractor {
 
   insuranceDocuments InsuranceDocument[]
   projectContractors ProjectContractor[]
+  coiReviews         COIReview[]
 
   @@map("contractors")
 }
@@ -268,5 +274,157 @@ model ExtractionResult {
   @@index([documentId])
   @@index([needsReview])
   @@map("extraction_results")
+}
+
+// ============================================
+// PR #4: COI Workflow Models
+// ============================================
+
+// COIReview Model - for Certificate of Insurance review workflow
+model COIReview {
+  id           String          @id @default(uuid())
+  contractorId String
+  contractor   Contractor      @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  documentId   String
+  submittedBy  String
+  submitter    User            @relation("Submitter", fields: [submittedBy], references: [id])
+  assignedTo   String?
+  reviewer     User?           @relation("Reviewer", fields: [assignedTo], references: [id])
+  status       ReviewStatus
+  priority     Priority        @default(NORMAL)
+  dueDate      DateTime?
+  submittedAt  DateTime        @default(now())
+  reviewedAt   DateTime?
+  decision     ReviewDecision?
+  notes        String?         @db.Text
+  deficiencies Deficiency[]
+  approvals    Approval[]
+
+  @@index([contractorId])
+  @@index([status])
+  @@index([assignedTo])
+  @@index([dueDate])
+  @@map("coi_reviews")
+}
+
+enum ReviewStatus {
+  PENDING
+  IN_REVIEW
+  APPROVED
+  REJECTED
+  REQUIRES_CHANGES
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum ReviewDecision {
+  APPROVED
+  REJECTED
+  CONDITIONAL_APPROVAL
+}
+
+// Approval Model - for multi-level approval workflow
+model Approval {
+  id         String           @id @default(uuid())
+  reviewId   String
+  review     COIReview        @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  approverId String
+  approver   User             @relation(fields: [approverId], references: [id])
+  decision   ApprovalDecision
+  comments   String?          @db.Text
+  conditions String?          @db.Text
+  approvedAt DateTime         @default(now())
+
+  @@index([reviewId])
+  @@index([approverId])
+  @@map("approvals")
+}
+
+enum ApprovalDecision {
+  APPROVED
+  REJECTED
+  DELEGATED
+}
+
+// ApprovalRule Model - for auto-approval rules
+model ApprovalRule {
+  id          String   @id @default(uuid())
+  name        String
+  description String?  @db.Text
+  conditions  Json
+  action      String
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("approval_rules")
+}
+
+// Deficiency Model - for deficiency tracking and management
+model Deficiency {
+  id              String             @id @default(uuid())
+  reviewId        String
+  review          COIReview          @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  category        DeficiencyCategory
+  severity        Severity
+  description     String             @db.Text
+  requiredAction  String             @db.Text
+  dueDate         DateTime
+  status          DeficiencyStatus   @default(OPEN)
+  resolvedBy      String?
+  resolver        User?              @relation(fields: [resolvedBy], references: [id])
+  resolvedAt      DateTime?
+  resolutionNotes String?            @db.Text
+  reminders       Reminder[]
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@index([reviewId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("deficiencies")
+}
+
+enum DeficiencyCategory {
+  COVERAGE_AMOUNT
+  EXPIRED_POLICY
+  MISSING_ENDORSEMENT
+  INCORRECT_NAMED_INSURED
+  MISSING_ADDITIONAL_INSURED
+  CERTIFICATE_HOLDER
+  OTHER
+}
+
+enum Severity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum DeficiencyStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  WAIVED
+}
+
+// Reminder Model - for deficiency reminders
+model Reminder {
+  id           String     @id @default(uuid())
+  deficiencyId String
+  deficiency   Deficiency @relation(fields: [deficiencyId], references: [id], onDelete: Cascade)
+  sentTo       String
+  recipient    User       @relation(fields: [sentTo], references: [id])
+  sentAt       DateTime   @default(now())
+  acknowledged Boolean    @default(false)
+
+  @@index([deficiencyId])
+  @@map("reminders")
 }
 
