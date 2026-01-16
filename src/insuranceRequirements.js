@@ -420,18 +420,17 @@ export async function validateCOICompliance(coi, project, subTrades) {
       });
     }
 
-    // Check for hammer clauses (consent to settle clause)
-    // Hard hammer: Insurer can settle without insured's consent; insurer's liability capped at settlement
-    //              amount if insured rejects and loses more at trial (insured pays excess)
-    // Soft hammer: If insured rejects settlement, costs above settlement amount are shared between
-    //              insurer and insured (typically 50/50 split)
+    // Check for hammer clauses
+    // Hard hammer: Provision requiring hired subcontractors to carry certain limits/endorsements;
+    //              if not met, contractor has NO coverage in case of a claim
+    // Soft hammer: Same provision but with a higher deductible instead of no coverage
     if (coi.gl_has_hammer_clause) {
       const hammerType = coi.gl_hammer_clause_type || 'unknown';
       const hammerDetails = hammerType === 'hard hammer' 
-        ? 'insurer can settle without consent; insured pays excess if settlement rejected'
+        ? 'hired subcontractors must meet insurance requirements or NO coverage for contractor'
         : hammerType === 'soft hammer'
-        ? 'costs above rejected settlement are shared between insurer and insured'
-        : 'limits insured\'s control over settlements';
+        ? 'hired subcontractors must meet insurance requirements or higher deductible applies'
+        : 'subcontractor insurance requirements may affect coverage';
       
       warnings.push({
         type: 'HAMMER_CLAUSE_PRESENT',
