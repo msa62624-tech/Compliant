@@ -16,6 +16,9 @@ export enum UserRole {
   ADMIN = 'ADMIN',
   MANAGER = 'MANAGER',
   USER = 'USER',
+  CONTRACTOR = 'CONTRACTOR',
+  SUBCONTRACTOR = 'SUBCONTRACTOR',
+  BROKER = 'BROKER',
 }
 
 export interface CreateUserDto {

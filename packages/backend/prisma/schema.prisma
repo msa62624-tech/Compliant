@@ -33,6 +33,9 @@ enum UserRole {
   ADMIN
   MANAGER
   USER
+  CONTRACTOR
+  SUBCONTRACTOR
+  BROKER
 }
 
 // Contractor Model
