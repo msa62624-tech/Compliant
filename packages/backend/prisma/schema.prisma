@@ -67,6 +67,7 @@ model Contractor {
   placeVerifications PlaceVerification[]
   generatedCOIs      GeneratedCOI[]
   policyAlerts       ExpiringPolicyAlert[]
+  gcPortalAccess     GCPortalAccess?
 
   @@index([createdById])
   @@index([email])
@@ -594,5 +595,68 @@ model ExpiringPolicyAlert {
   @@index([resolved])
   @@index([expirationDate])
   @@map("expiring_policy_alerts")
+}
+
+// AdminSettings Model - System-wide admin settings
+model AdminSettings {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String   @db.Text
+  description String?  @db.Text
+  updatedBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("admin_settings")
+}
+
+// AuditLog Model - System audit trail
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  action     String
+  entity     String
+  entityId   String?
+  changes    Json?
+  ipAddress  String?
+  userAgent  String?  @db.Text
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([entity])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// GCPortalAccess Model - General Contractor portal access
+model GCPortalAccess {
+  id            String   @id @default(uuid())
+  contractorId  String   @unique
+  contractor    Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  accessCode    String   @unique
+  enabled       Boolean  @default(true)
+  lastAccess    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([accessCode])
+  @@map("gc_portal_access")
+}
+
+// BrokerPortalAccess Model - Broker portal access
+model BrokerPortalAccess {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  companyName   String
+  accessCode    String   @unique
+  enabled       Boolean  @default(true)
+  permissions   Json?
+  lastAccess    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([accessCode])
+  @@index([email])
+  @@map("broker_portal_access")
 }
 
