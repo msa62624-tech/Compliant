@@ -192,4 +192,25 @@ export class AuthService {
 
     return { message: 'Logged out successfully' };
   }
+
+  /**
+   * Clean up expired refresh tokens
+   * Should be called periodically (e.g., daily cron job)
+   * @returns Number of tokens deleted
+   */
+  async cleanupExpiredTokens(): Promise<number> {
+    const result = await this.prisma.refreshToken.deleteMany({
+      where: {
+        expiresAt: { lt: new Date() },
+      },
+    });
+
+    this.logger.log({
+      message: 'Cleaned up expired refresh tokens',
+      context: 'Auth',
+      count: result.count,
+    });
+
+    return result.count;
+  }
 }
