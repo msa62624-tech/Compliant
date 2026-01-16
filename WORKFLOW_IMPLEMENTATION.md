@@ -2,6 +2,111 @@
 
 ## Complete Workflow (from commit 114ffb1)
 
+### AI Integration & Automated Analysis
+
+**YES - The original app has comprehensive AI-powered analysis** (`backend/integrations/ai-analysis-service.js`)
+
+#### AI Features:
+
+1. **COI Compliance Analysis**
+   - Automatically analyzes uploaded COI against project requirements
+   - Identifies deficiencies and compliance gaps
+   - Returns structured JSON with severity levels (critical, high, medium, low)
+   - Categories: coverage limits, policy types, endorsements, dates
+
+2. **Policy Data Extraction**
+   - Extracts structured data from policy documents
+   - Parses: policy numbers, dates, insurer names, coverage limits
+   - Extracts deductibles, additional insureds, endorsements
+   - Works with GL, WC, Auto, Umbrella policies
+
+3. **Risk Assessment**
+   - Rates COI risk level: LOW, MEDIUM, HIGH, CRITICAL
+   - Risk score 1-10 with detailed factors
+   - Evaluates expiration risk, coverage adequacy
+   - Checks subrogation waivers and endorsements
+
+4. **Review Recommendations**
+   - Generates 3-5 actionable recommendations for admin reviewers
+   - Based on identified deficiencies
+   - Expert insurance compliance guidance
+   - Suggests specific corrective actions
+
+5. **Automated Deficiency Detection**
+   - Coverage amount checks (GL < $2M flagged)
+   - Missing policy detection (WC, Auto, Umbrella)
+   - Expiration date warnings (<30 days = critical)
+   - Additional insured verification
+   - Waiver of subrogation checks
+
+#### AI Provider Support:
+- **OpenAI** (GPT-4, GPT-4-turbo) - default
+- **Anthropic Claude** (Claude Opus, Sonnet)
+- Configurable model selection
+
+#### Environment Variables:
+- `AI_PROVIDER` - 'openai' or 'anthropic' (default: openai)
+- `AI_API_KEY` or `OPENAI_API_KEY` - API key for AI service
+- `AI_MODEL` - Model name (default: gpt-4-turbo-preview)
+
+#### Integration Points:
+
+**Backend Endpoints:**
+- `/integrations/analyze-policy` - Authenticated AI analysis endpoint
+- `/public/program-review` - Public AI review of insurance programs
+- Used automatically when COI is uploaded for admin review
+
+**Admin Dashboard:**
+- AI analysis results shown in COI review interface
+- Deficiencies highlighted with severity indicators
+- Recommendations displayed for reviewer guidance
+- Risk level badge (color-coded: red=critical, orange=high, yellow=medium, green=low)
+
+#### AI Workflow:
+1. Broker uploads COI document
+2. Adobe PDF extracts text automatically
+3. AI analyzes extracted data against requirements
+4. Deficiencies identified and categorized
+5. Recommendations generated
+6. Risk level assessed
+7. Results presented to admin reviewer
+8. Admin can approve or reject based on AI findings
+
+#### Response Format:
+```json
+{
+  "analysis": {
+    "compliant": false,
+    "deficiency_count": 3,
+    "critical_count": 1,
+    "timestamp": "2024-01-16T..."
+  },
+  "deficiencies": [
+    {
+      "severity": "critical",
+      "category": "coverage_limits",
+      "title": "Insufficient GL Aggregate",
+      "description": "GL Aggregate is $1M, project requires $2M minimum",
+      "required_action": "Request updated policy with $2M aggregate"
+    }
+  ],
+  "recommendations": [
+    "Request proof of increased aggregate limit",
+    "Verify umbrella policy can supplement GL coverage",
+    "Consider requiring project-specific endorsement"
+  ],
+  "risk": {
+    "level": "HIGH",
+    "score": 7,
+    "factors": [
+      "Coverage below minimum",
+      "Expiring in 25 days",
+      "No waiver of subrogation"
+    ]
+  }
+}
+```
+
 ### Adobe PDF Services & eSign Integration
 
 **YES - The original app has Adobe PDF Services integration** (`backend/integrations/adobe-pdf-service.js`)
