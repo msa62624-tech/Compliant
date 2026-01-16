@@ -99,12 +99,14 @@ export class AuthService {
   async refresh(refreshTokenString: string) {
     try {
       // Parse the refresh token: selector:verifier
-      const parts = refreshTokenString.split(':');
-      if (parts.length !== 2) {
+      // Using indexOf to ensure exactly one colon separator
+      const colonIndex = refreshTokenString.indexOf(':');
+      if (colonIndex === -1 || colonIndex !== refreshTokenString.lastIndexOf(':')) {
         throw new UnauthorizedException('Invalid refresh token format');
       }
 
-      const [selector, verifier] = parts;
+      const selector = refreshTokenString.substring(0, colonIndex);
+      const verifier = refreshTokenString.substring(colonIndex + 1);
 
       // Validate selector and verifier format
       // Selector: exactly 32 hex characters (16 bytes)
@@ -209,6 +211,11 @@ export class AuthService {
    * Clean up expired refresh tokens
    * Should be called periodically (e.g., daily cron job)
    * Processes in batches to prevent blocking the database
+   * 
+   * Note: Intentionally processes only one batch per call for production safety.
+   * For large numbers of expired tokens, call this method multiple times
+   * or schedule it more frequently rather than processing everything in one go.
+   * 
    * @param batchSize Maximum number of tokens to delete per call (default: 1000)
    * @returns Number of tokens deleted
    */
