@@ -2,6 +2,214 @@
 
 ## Complete Workflow (from commit 114ffb1)
 
+### Admin & Assistant Admin System
+
+**YES - The original app has a hierarchical admin system with role-based access control**
+
+#### Admin Roles:
+
+1. **Super Admin** (`super_admin`)
+   - Full access to entire platform
+   - Can see ALL COIs, projects, subcontractors, GCs
+   - Can assign COIs/projects to assistant admins
+   - Views all system messages
+   - No filtering by assignment
+
+2. **Assistant Admin** (`admin`)
+   - Limited access based on assignments
+   - Only sees COIs assigned to them (via `assigned_admin_email`)
+   - Only sees projects assigned to them
+   - Only sees subcontractors assigned to them
+   - Only sees their own messages (not other assistant admins' messages)
+   - Cannot see unassigned items
+
+#### Assignment System:
+
+**Fields tracked:**
+- COIs: `assignedAdminEmail` field
+- Projects: `assigned_admin_email` field  
+- Subcontractors: `assigned_admin_email` field
+- Messages filtered by sender/recipient
+
+**Filtering Logic:**
+```javascript
+// For Assistant Admins (role === 'admin')
+if (currentUser?.role === 'admin' && currentUser?.email) {
+  // Show only items assigned to this admin OR unassigned items
+  filtered = items.filter(item => 
+    !item.assigned_admin_email || 
+    item.assigned_admin_email === currentUser.email
+  );
+}
+
+// For Super Admins (role === 'super_admin')
+// No filtering - see everything
+```
+
+**Use Cases:**
+- Large organizations with multiple admin staff
+- Workload distribution across admin team
+- Territory/project-based admin assignments
+- Privacy between different admin workstreams
+
+#### Message System Isolation:
+
+**Super Admin:**
+- Only sees their own messages
+- Does NOT see messages between assistant admins and brokers/subs
+- Prevents cross-contamination of admin communications
+
+**Assistant Admin:**
+- Only sees messages where they are sender or recipient
+- Cannot see other assistant admins' conversations
+- Maintains privacy per admin assignment
+
+### Project Information Requirements
+
+**YES - Projects have comprehensive data requirements**
+
+#### Required Project Fields:
+
+Based on the original app schema and forms:
+
+1. **Basic Information:**
+   - `project_name` - Project title/name (required)
+   - `project_address` - Physical location (required)
+   - `gc_name` - General Contractor name (required)
+   - `gc_id` - GC identifier (required)
+   - `assigned_admin_email` - Admin responsible for this project
+
+2. **Dates:**
+   - `created_date` - When project was created
+   - `start_date` - Project start date
+   - `end_date` - Expected completion date
+
+3. **Status:**
+   - `status` - Project status (active, planning, completed, on_hold, cancelled)
+
+4. **Insurance Requirements:**
+   - Minimum coverage amounts per policy type
+   - Required policy types (GL, WC, Auto, Umbrella)
+   - Additional insured requirements
+   - Waiver of subrogation requirements
+   - Project-specific endorsements
+
+5. **Assignments:**
+   - Linked subcontractors (via ProjectSubcontractor junction table)
+   - Each subcontractor must have valid COI for project
+
+### AI Auto-Extraction & What Gets Saved
+
+**YES - Comprehensive auto-extraction on document upload**
+
+#### What Auto-Extracts:
+
+When broker uploads COI/policy document → Adobe PDF extracts text → AI parses → Data auto-saves
+
+**1. Policy Numbers:**
+- Format: POL-XXXX-YYYY or similar
+- Extracted via regex patterns
+- Saved to: `policy_number`, `gl_policy_number`, `wc_policy_number`, etc.
+
+**2. Dates:**
+- **Effective Dates** - When coverage starts
+- **Expiration Dates** - When coverage ends
+- Format: MM/DD/YYYY, YYYY-MM-DD
+- Extracted via regex and AI parsing
+- Saved to: `effective_date`, `expiration_date`, `gl_effective_date`, `gl_expiration_date`, etc.
+- **Auto-calculated:**
+  - Days until expiry
+  - Expiration risk level (EXPIRED, CRITICAL <30 days, HIGH <90 days, LOW)
+  - Renewal reminders triggered automatically
+
+**3. Coverage Amounts:**
+- Format: $X,XXX,XXX
+- Each occurrence limits
+- Aggregate limits
+- Per-claim limits
+- Saved to: `gl_each_occurrence`, `gl_aggregate`, `coverage_amount`, etc.
+
+**4. Insurance Carriers:**
+- Insurer/carrier names
+- Saved to: `insurer_name`, `insurance_provider`
+
+**5. Policy Holders:**
+- Insured party name
+- Additional insureds
+- Saved to: `subcontractor_name`, `additional_insureds[]`
+
+**6. Endorsements & Waivers:**
+- Additional insured endorsements
+- Waiver of subrogation clauses
+- Saved to: `waiver_of_subrogation`, `endorsements[]`
+
+**7. Deductibles:**
+- Standard deductibles
+- Medical-only deductibles
+- Saved to: `deductibles` object
+
+**8. Contact Information:**
+- Email addresses
+- Phone numbers (if present)
+- Saved to: `contact_emails[]`
+
+#### Auto-Save Workflow:
+
+```
+1. Broker uploads PDF
+   ↓
+2. Adobe PDF Service extracts text
+   ↓
+3. AI analyzes extracted text with prompts:
+   - "Extract policy_number, effective_date, expiration_date..."
+   - Returns structured JSON
+   ↓
+4. System automatically saves to GeneratedCOI record:
+   - gl_policy_number
+   - gl_effective_date
+   - gl_expiration_date
+   - gl_each_occurrence
+   - gl_aggregate
+   - insurer_name
+   - additional_insureds
+   - waiver_of_subrogation
+   ↓
+5. Auto-triggers:
+   - Compliance analysis (AI checks against requirements)
+   - Risk assessment calculation
+   - Deficiency detection
+   - Admin notification email
+   ↓
+6. All extracted data visible in admin review interface
+```
+
+**No Manual Entry Required:**
+- Broker just uploads PDF
+- All fields auto-populate
+- Admin reviews auto-extracted data
+- Can manually correct if AI misread something
+
+### Hold Harmless & Indemnification System
+
+**NOTE: Not explicitly found as separate feature in the original app code**
+
+However, the system tracks:
+- **Additional Insureds** - Projects/GCs listed as additional insured on policies
+- **Waiver of Subrogation** - Whether carrier waives right to sue additional insureds
+- **Endorsements** - Special policy endorsements including hold harmless language
+
+These are part of the AI compliance checking:
+```javascript
+// AI checks for:
+deficiencies.push({
+  severity: 'high',
+  category: 'endorsements',
+  title: 'Missing Additional Insured Endorsement',
+  description: 'Project owner not listed as additional insured',
+  required_action: 'Request CG 20 10 endorsement'
+});
+```
+
 ### AI Integration & Automated Analysis
 
 **YES - The original app has comprehensive AI-powered analysis** (`backend/integrations/ai-analysis-service.js`)
