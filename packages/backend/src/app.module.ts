@@ -14,6 +14,9 @@ import { DeficienciesModule } from './modules/deficiencies/deficiencies.module';
 import { COIGeneratorModule } from './modules/coi-generator/coi-generator.module';
 import { NYCDOBModule } from './modules/integrations/nyc-dob/nyc-dob.module';
 import { GooglePlacesModule } from './modules/integrations/google-places/google-places.module';
+import { MessagingModule } from './modules/messaging/messaging.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { PolicyAlertsModule } from './modules/policy-alerts/policy-alerts.module';
 import { PrismaModule } from './config/prisma.module';
 
 @Module({
@@ -36,6 +39,9 @@ import { PrismaModule } from './config/prisma.module';
     COIGeneratorModule,
     NYCDOBModule,
     GooglePlacesModule,
+    MessagingModule,
+    NotificationsModule,
+    PolicyAlertsModule,
   ],
 })
 export class AppModule {}
