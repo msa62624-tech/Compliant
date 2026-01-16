@@ -26,13 +26,23 @@ export function isValidFileUrl(url: string | undefined): boolean {
     const pathname = parsedUrl.pathname.toLowerCase();
     const hasValidExtension = validExtensions.some(ext => pathname.endsWith(ext));
     
-    // Allow URLs without extensions if they contain "policy" or common cloud storage patterns
+    // Validate trusted cloud storage domains (exact match or proper subdomain)
+    const trustedDomains = [
+      '.s3.amazonaws.com',
+      '.amazonaws.com',
+      '.blob.core.windows.net',
+      '.storage.googleapis.com',
+    ];
+    const isTrustedDomain = trustedDomains.some(domain => 
+      parsedUrl.hostname === domain.slice(1) || // exact match without leading dot
+      parsedUrl.hostname.endsWith(domain) // proper subdomain match
+    );
+    
+    // Allow URLs without extensions if they are from trusted domains or contain common patterns
     const hasValidPattern = 
       pathname.includes('policy') || 
       pathname.includes('document') ||
-      parsedUrl.hostname.includes('s3.amazonaws.com') ||
-      parsedUrl.hostname.includes('blob.core.windows.net') ||
-      parsedUrl.hostname.includes('storage.googleapis.com');
+      isTrustedDomain;
 
     return hasValidExtension || hasValidPattern;
   } catch (error) {

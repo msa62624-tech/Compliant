@@ -17,7 +17,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const message =
       exception instanceof HttpException
         ? (isDev ? exception.getResponse() : 'Internal server error')
-        : (isDev ? { message: 'Internal server error', error: String(exception) } : { message: 'Internal server error' });
+        : (isDev && exception instanceof Error 
+            ? { message: 'Internal server error', error: exception.message, name: exception.name } 
+            : { message: 'Internal server error' });
 
     response.status(status).json({
       statusCode: status,

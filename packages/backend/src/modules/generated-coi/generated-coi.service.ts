@@ -166,17 +166,17 @@ export class GeneratedCOIService {
     }
 
     // Validate file URLs and types
-    if (!isValidFileUrl(uploadPoliciesDto.glPolicyUrl)) {
-      throw new BadRequestException('Invalid file URL for GL policy');
-    }
-    if (!isValidFileUrl(uploadPoliciesDto.umbrellaPolicyUrl)) {
-      throw new BadRequestException('Invalid file URL for Umbrella policy');
-    }
-    if (!isValidFileUrl(uploadPoliciesDto.autoPolicyUrl)) {
-      throw new BadRequestException('Invalid file URL for Auto policy');
-    }
-    if (!isValidFileUrl(uploadPoliciesDto.wcPolicyUrl)) {
-      throw new BadRequestException('Invalid file URL for WC policy');
+    const policyFields = [
+      { field: 'glPolicyUrl', value: uploadPoliciesDto.glPolicyUrl, label: 'GL policy' },
+      { field: 'umbrellaPolicyUrl', value: uploadPoliciesDto.umbrellaPolicyUrl, label: 'Umbrella policy' },
+      { field: 'autoPolicyUrl', value: uploadPoliciesDto.autoPolicyUrl, label: 'Auto policy' },
+      { field: 'wcPolicyUrl', value: uploadPoliciesDto.wcPolicyUrl, label: 'WC policy' },
+    ];
+
+    for (const { value, label } of policyFields) {
+      if (!isValidFileUrl(value)) {
+        throw new BadRequestException(`Invalid file URL for ${label}`);
+      }
     }
 
     return this.prisma.generatedCOI.update({
