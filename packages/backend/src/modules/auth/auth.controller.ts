@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Get, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
+import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -7,7 +7,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { GetUser } from '../../common/decorators/get-user.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 
-// Rate limiting configuration for auth endpoints
+// Rate limiting configuration for login endpoint to prevent brute force attacks
 const AUTH_THROTTLE_CONFIG = { default: { limit: 10, ttl: 60000 } };
 
 @ApiTags('Authentication')
@@ -27,7 +27,6 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @Throttle(AUTH_THROTTLE_CONFIG)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: 200, description: 'Token refreshed' })
@@ -38,7 +37,6 @@ export class AuthController {
   }
 
   @Post('logout')
-  @Throttle(AUTH_THROTTLE_CONFIG)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @HttpCode(HttpStatus.OK)
@@ -50,6 +48,7 @@ export class AuthController {
   }
 
   @Get('me')
+  @SkipThrottle()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get current user' })
