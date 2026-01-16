@@ -79,6 +79,7 @@ For production deployment, see [docs/DEPLOY.md](docs/DEPLOY.md) for complete ins
 - [docs/COMPLETE_CONFIGURATION_GUIDE.md](docs/COMPLETE_CONFIGURATION_GUIDE.md) - **🔧 Complete guide to remove ALL mocking**
 - [docs/BACKEND_CONNECTION_SETUP.md](docs/BACKEND_CONNECTION_SETUP.md) - **🔧 Fix "Backend is Mocked" issue**
 - [docs/SECURITY_CREDENTIAL_ROTATION.md](docs/SECURITY_CREDENTIAL_ROTATION.md) - **⚠️ CRITICAL: Post-merge credential rotation required**
+- [docs/CREATING_NEW_REPO_FROM_OLD_FILE.md](docs/CREATING_NEW_REPO_FROM_OLD_FILE.md) - **📦 Guide to creating a new repository and migrating files**
 - [docs/QUICKSTART.md](docs/QUICKSTART.md) - Quick start guide
 - [docs/EMAIL_SETUP.md](docs/EMAIL_SETUP.md) - Email configuration guide
 - [docs/DEPLOY.md](docs/DEPLOY.md) - Deployment instructions
