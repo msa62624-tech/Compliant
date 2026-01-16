@@ -55,22 +55,26 @@ export class AuthService {
     const payload = { email: user.email, sub: user.id, role: user.role };
     const accessToken = this.jwtService.sign(payload);
     
-    // Generate refresh token
-    const refreshTokenString = crypto.randomBytes(32).toString('hex');
+    // Generate refresh token using selector/verifier pattern
+    // Selector: 16 bytes (32 hex chars) - used for O(1) database lookup
+    // Verifier: 32 bytes (64 hex chars) - hashed for secure storage
+    const selector = crypto.randomBytes(16).toString('hex');
+    const verifier = crypto.randomBytes(32).toString('hex');
     
-    // Hash the refresh token before storing
-    const refreshTokenHash = await bcrypt.hash(refreshTokenString, REFRESH_TOKEN_SALT_ROUNDS);
+    // Hash only the verifier for storage
+    const verifierHash = await bcrypt.hash(verifier, REFRESH_TOKEN_SALT_ROUNDS);
     
     // Set refresh token expiration to 7 days from now
-    const refreshTokenExpiresAt = new Date();
-    refreshTokenExpiresAt.setDate(refreshTokenExpiresAt.getDate() + REFRESH_TOKEN_EXPIRATION_DAYS);
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + REFRESH_TOKEN_EXPIRATION_DAYS);
 
-    // Store hashed refresh token in User model with expiration
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { 
-        refreshTokenHash: refreshTokenHash,
-        refreshTokenExpiresAt: refreshTokenExpiresAt,
+    // Store refresh token in separate table with indexed selector
+    await this.prisma.refreshToken.create({
+      data: {
+        userId: user.id,
+        selector: selector,
+        verifier: verifierHash,
+        expiresAt: expiresAt,
       },
     });
 
@@ -82,57 +86,70 @@ export class AuthService {
       email: user.email,
     });
 
+    // Return combined token: selector:verifier (both plaintext)
+    const refreshToken = `${selector}:${verifier}`;
+
     return {
       user,
       accessToken,
-      refreshToken: refreshTokenString,
+      refreshToken,
     };
   }
 
   async refresh(refreshTokenString: string) {
     try {
-      // Find all users with non-null, non-expired refresh tokens
-      // This prevents timing attacks by always performing the same database query
-      // Limited to 1000 users to prevent DoS (most apps will have far fewer active sessions)
-      const users = await this.prisma.user.findMany({
-        where: {
-          refreshTokenHash: { not: null },
-          refreshTokenExpiresAt: { gte: new Date() },
-        },
-        take: 1000,
-      });
-
-      // Find the user with a matching refresh token hash using constant-time comparison
-      let validUser = null;
-      for (const user of users) {
-        if (user.refreshTokenHash) {
-          // Use bcrypt.compare which includes constant-time comparison
-          const isValid = await bcrypt.compare(refreshTokenString, user.refreshTokenHash);
-          if (isValid) {
-            validUser = user;
-            // Continue checking all tokens to maintain constant-time behavior
-          }
-        }
+      // Parse the refresh token: selector:verifier
+      const parts = refreshTokenString.split(':');
+      if (parts.length !== 2) {
+        throw new UnauthorizedException('Invalid refresh token format');
       }
 
-      if (!validUser) {
+      const [selector, verifier] = parts;
+
+      // O(1) lookup using indexed selector - no timing attack vulnerability
+      const tokenRecord = await this.prisma.refreshToken.findUnique({
+        where: { 
+          selector: selector,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      // Check if token exists and is not expired
+      if (!tokenRecord || tokenRecord.expiresAt < new Date()) {
+        throw new UnauthorizedException('Invalid or expired refresh token');
+      }
+
+      // Single bcrypt.compare - constant time regardless of position
+      // This prevents timing attacks since we only do ONE comparison
+      const isValid = await bcrypt.compare(verifier, tokenRecord.verifier);
+      if (!isValid) {
         throw new UnauthorizedException('Invalid refresh token');
       }
 
-      const newPayload = { email: validUser.email, sub: validUser.id, role: validUser.role };
+      const user = tokenRecord.user;
+      const newPayload = { email: user.email, sub: user.id, role: user.role };
       const accessToken = this.jwtService.sign(newPayload);
 
-      // Rotate refresh token - generate new one with new expiration
-      const newRefreshTokenString = crypto.randomBytes(32).toString('hex');
-      const newRefreshTokenHash = await bcrypt.hash(newRefreshTokenString, REFRESH_TOKEN_SALT_ROUNDS);
-      const newRefreshTokenExpiresAt = new Date();
-      newRefreshTokenExpiresAt.setDate(newRefreshTokenExpiresAt.getDate() + REFRESH_TOKEN_EXPIRATION_DAYS);
+      // Rotate refresh token - delete old one and create new one
+      await this.prisma.refreshToken.delete({
+        where: { id: tokenRecord.id },
+      });
+
+      // Generate new refresh token with new selector and verifier
+      const newSelector = crypto.randomBytes(16).toString('hex');
+      const newVerifier = crypto.randomBytes(32).toString('hex');
+      const newVerifierHash = await bcrypt.hash(newVerifier, REFRESH_TOKEN_SALT_ROUNDS);
+      const newExpiresAt = new Date();
+      newExpiresAt.setDate(newExpiresAt.getDate() + REFRESH_TOKEN_EXPIRATION_DAYS);
       
-      await this.prisma.user.update({
-        where: { id: validUser.id },
-        data: { 
-          refreshTokenHash: newRefreshTokenHash,
-          refreshTokenExpiresAt: newRefreshTokenExpiresAt,
+      await this.prisma.refreshToken.create({
+        data: {
+          userId: user.id,
+          selector: newSelector,
+          verifier: newVerifierHash,
+          expiresAt: newExpiresAt,
         },
       });
 
@@ -140,12 +157,14 @@ export class AuthService {
       this.logger.log({
         message: 'Token refreshed successfully',
         context: 'Auth',
-        userId: validUser.id,
+        userId: user.id,
       });
+
+      const newRefreshToken = `${newSelector}:${newVerifier}`;
 
       return {
         accessToken,
-        refreshToken: newRefreshTokenString,
+        refreshToken: newRefreshToken,
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -159,13 +178,9 @@ export class AuthService {
   }
 
   async logout(userId: string) {
-    // Clear refresh token hash and expiration for user
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { 
-        refreshTokenHash: null,
-        refreshTokenExpiresAt: null,
-      },
+    // Delete all refresh tokens for the user
+    await this.prisma.refreshToken.deleteMany({
+      where: { userId },
     });
 
     // Log logout

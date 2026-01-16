@@ -22,8 +22,6 @@ model User {
   lastName               String
   role                   UserRole  @default(USER)
   isActive               Boolean   @default(true)
-  refreshTokenHash       String?
-  refreshTokenExpiresAt  DateTime?
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
 
@@ -31,8 +29,26 @@ model User {
   projects              Project[]
   generatedCOIsAssigned GeneratedCOI[] @relation("AssignedAdmin")
   auditLogs             AuditLog[]
+  refreshTokens         RefreshToken[]
 
   @@map("users")
+}
+
+// Separate table for refresh tokens - prevents timing attacks and DoS
+// Uses selector/verifier pattern for O(1) lookup with single bcrypt comparison
+model RefreshToken {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  selector    String   @unique // Indexed for O(1) lookup (plaintext)
+  verifier    String   // Hashed with bcrypt (for secure comparison)
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([selector])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
 }
 
 enum UserRole {
