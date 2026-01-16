@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../config/prisma.service';
 import { CreateCOIDto } from './dto/create-coi.dto';
 import { UpdateBrokerInfoDto } from './dto/update-broker-info.dto';
 import { UploadPoliciesDto } from './dto/upload-policies.dto';
@@ -31,12 +31,11 @@ export class GeneratedCOIService {
           subcontractorId: createCOIDto.subcontractorId,
           assignedAdminEmail: createCOIDto.assignedAdminEmail,
           status: COIStatus.AWAITING_ADMIN_REVIEW, // Skip broker steps if copying
-          createdBy: currentUserEmail,
           // Copy broker info from existing COI
-          brokerType: existingActiveCOI.brokerType,
-          brokerGlobalName: existingActiveCOI.brokerGlobalName,
-          brokerGlobalEmail: existingActiveCOI.brokerGlobalEmail,
-          brokerGlobalPhone: existingActiveCOI.brokerGlobalPhone,
+          brokerName: existingActiveCOI.brokerName,
+          brokerEmail: existingActiveCOI.brokerEmail,
+          brokerPhone: existingActiveCOI.brokerPhone,
+          brokerCompany: existingActiveCOI.brokerCompany,
           brokerGlName: existingActiveCOI.brokerGlName,
           brokerGlEmail: existingActiveCOI.brokerGlEmail,
           brokerGlPhone: existingActiveCOI.brokerGlPhone,
@@ -50,32 +49,19 @@ export class GeneratedCOIService {
           brokerWcEmail: existingActiveCOI.brokerWcEmail,
           brokerWcPhone: existingActiveCOI.brokerWcPhone,
           // Copy policy URLs (admin will review if still valid)
-          policyGlUrl: existingActiveCOI.policyGlUrl,
-          policyUmbrellaUrl: existingActiveCOI.policyUmbrellaUrl,
-          policyAutoUrl: existingActiveCOI.policyAutoUrl,
-          policyWcUrl: existingActiveCOI.policyWcUrl,
-          signatureGlUrl: existingActiveCOI.signatureGlUrl,
-          signatureUmbrellaUrl: existingActiveCOI.signatureUmbrellaUrl,
-          signatureAutoUrl: existingActiveCOI.signatureAutoUrl,
-          signatureWcUrl: existingActiveCOI.signatureWcUrl,
-          // Copy extracted policy data
-          policyGlNumber: existingActiveCOI.policyGlNumber,
-          policyGlEffectiveDate: existingActiveCOI.policyGlEffectiveDate,
-          policyGlExpirationDate: existingActiveCOI.policyGlExpirationDate,
-          policyGlLimit: existingActiveCOI.policyGlLimit,
-          policyGlAggregate: existingActiveCOI.policyGlAggregate,
-          policyUmbrellaNumber: existingActiveCOI.policyUmbrellaNumber,
-          policyUmbrellaEffectiveDate: existingActiveCOI.policyUmbrellaEffectiveDate,
-          policyUmbrellaExpirationDate: existingActiveCOI.policyUmbrellaExpirationDate,
-          policyUmbrellaLimit: existingActiveCOI.policyUmbrellaLimit,
-          policyAutoNumber: existingActiveCOI.policyAutoNumber,
-          policyAutoEffectiveDate: existingActiveCOI.policyAutoEffectiveDate,
-          policyAutoExpirationDate: existingActiveCOI.policyAutoExpirationDate,
-          policyAutoLimit: existingActiveCOI.policyAutoLimit,
-          policyWcNumber: existingActiveCOI.policyWcNumber,
-          policyWcEffectiveDate: existingActiveCOI.policyWcEffectiveDate,
-          policyWcExpirationDate: existingActiveCOI.policyWcExpirationDate,
-          policyWcLimit: existingActiveCOI.policyWcLimit,
+          glPolicyUrl: existingActiveCOI.glPolicyUrl,
+          umbrellaPolicyUrl: existingActiveCOI.umbrellaPolicyUrl,
+          autoPolicyUrl: existingActiveCOI.autoPolicyUrl,
+          wcPolicyUrl: existingActiveCOI.wcPolicyUrl,
+          glBrokerSignatureUrl: existingActiveCOI.glBrokerSignatureUrl,
+          umbrellaBrokerSignatureUrl: existingActiveCOI.umbrellaBrokerSignatureUrl,
+          autoBrokerSignatureUrl: existingActiveCOI.autoBrokerSignatureUrl,
+          wcBrokerSignatureUrl: existingActiveCOI.wcBrokerSignatureUrl,
+          // Copy expiration dates
+          glExpirationDate: existingActiveCOI.glExpirationDate,
+          umbrellaExpirationDate: existingActiveCOI.umbrellaExpirationDate,
+          autoExpirationDate: existingActiveCOI.autoExpirationDate,
+          wcExpirationDate: existingActiveCOI.wcExpirationDate,
         },
         include: {
           project: true,
@@ -91,7 +77,6 @@ export class GeneratedCOIService {
         subcontractorId: createCOIDto.subcontractorId,
         assignedAdminEmail: createCOIDto.assignedAdminEmail,
         status: COIStatus.AWAITING_BROKER_INFO,
-        createdBy: currentUserEmail,
       },
       include: {
         project: true,
@@ -187,7 +172,7 @@ export class GeneratedCOIService {
     }
 
     // Broker signs COI in-system using Adobe eSign integration
-    // signPoliciesDto contains signatureGlUrl, signatureUmbrellaUrl, etc.
+    // signPoliciesDto contains glBrokerSignatureUrl, umbrellaBrokerSignatureUrl, etc.
     // These are Adobe eSign agreement IDs or signed document URLs from Adobe API
     // The broker portal UI calls Adobe eSign widget, broker signs electronically,
     // Adobe returns signed document URL which is saved here
@@ -196,7 +181,6 @@ export class GeneratedCOIService {
       data: {
         ...signPoliciesDto,
         status: COIStatus.AWAITING_ADMIN_REVIEW,
-        signedAt: new Date(), // Record when broker signed in system
       },
     });
   }
@@ -219,10 +203,6 @@ export class GeneratedCOIService {
       data: {
         status: newStatus,
         deficiencyNotes: reviewCOIDto.deficiencyNotes,
-        holdHarmlessCompliant: reviewCOIDto.holdHarmlessCompliant,
-        holdHarmlessNotes: reviewCOIDto.holdHarmlessNotes,
-        reviewedBy: reviewerEmail,
-        reviewedAt: new Date(),
       },
     });
   }
@@ -234,16 +214,38 @@ export class GeneratedCOIService {
     return this.prisma.generatedCOI.findMany({
       where: {
         status: COIStatus.ACTIVE,
-        expirationDate: {
-          lte: futureDate,
-          gte: new Date(),
-        },
+        OR: [
+          {
+            glExpirationDate: {
+              lte: futureDate,
+              gte: new Date(),
+            },
+          },
+          {
+            umbrellaExpirationDate: {
+              lte: futureDate,
+              gte: new Date(),
+            },
+          },
+          {
+            autoExpirationDate: {
+              lte: futureDate,
+              gte: new Date(),
+            },
+          },
+          {
+            wcExpirationDate: {
+              lte: futureDate,
+              gte: new Date(),
+            },
+          },
+        ],
       },
       include: {
         project: true,
         subcontractor: true,
       },
-      orderBy: { expirationDate: 'asc' },
+      orderBy: { glExpirationDate: 'asc' },
     });
   }
 
@@ -265,12 +267,11 @@ export class GeneratedCOIService {
         subcontractorId: expiredCOI.subcontractorId,
         assignedAdminEmail: expiredCOI.assignedAdminEmail,
         status: COIStatus.AWAITING_BROKER_UPLOAD, // Skip broker info since we have it
-        createdBy: currentUserEmail,
         // Copy broker info from expired COI
-        brokerType: expiredCOI.brokerType,
-        brokerGlobalName: expiredCOI.brokerGlobalName,
-        brokerGlobalEmail: expiredCOI.brokerGlobalEmail,
-        brokerGlobalPhone: expiredCOI.brokerGlobalPhone,
+        brokerName: expiredCOI.brokerName,
+        brokerEmail: expiredCOI.brokerEmail,
+        brokerPhone: expiredCOI.brokerPhone,
+        brokerCompany: expiredCOI.brokerCompany,
         brokerGlName: expiredCOI.brokerGlName,
         brokerGlEmail: expiredCOI.brokerGlEmail,
         brokerGlPhone: expiredCOI.brokerGlPhone,

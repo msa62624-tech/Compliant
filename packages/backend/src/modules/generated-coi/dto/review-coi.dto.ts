@@ -7,12 +7,4 @@ export class ReviewCOIDto {
   @IsOptional()
   @IsString()
   deficiencyNotes?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  holdHarmlessCompliant?: boolean;
-
-  @IsOptional()
-  @IsString()
-  holdHarmlessNotes?: string;
 }

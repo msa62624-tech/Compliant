@@ -3,17 +3,17 @@ import { IsString, IsOptional, IsUrl } from 'class-validator';
 export class UploadPoliciesDto {
   @IsOptional()
   @IsUrl()
-  policyGlUrl?: string;
+  glPolicyUrl?: string;
 
   @IsOptional()
   @IsUrl()
-  policyUmbrellaUrl?: string;
+  umbrellaPolicyUrl?: string;
 
   @IsOptional()
   @IsUrl()
-  policyAutoUrl?: string;
+  autoPolicyUrl?: string;
 
   @IsOptional()
   @IsUrl()
-  policyWcUrl?: string;
+  wcPolicyUrl?: string;
 }

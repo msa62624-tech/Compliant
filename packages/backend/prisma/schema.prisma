@@ -15,27 +15,27 @@ datasource db {
 // ============================================
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  firstName String
-  lastName  String
-  role      UserRole @default(USER)
-  isActive  Boolean  @default(true)
+  id           String   @id @default(uuid())
+  email        String   @unique
+  password     String
+  firstName    String
+  lastName     String
+  role         UserRole @default(USER)
+  isActive     Boolean  @default(true)
   refreshToken String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  contractorsCreated Contractor[]  @relation("ContractorCreator")
-  projects           Project[]
+  contractorsCreated    Contractor[]   @relation("ContractorCreator")
+  projects              Project[]
   generatedCOIsAssigned GeneratedCOI[] @relation("AssignedAdmin")
 
   @@map("users")
 }
 
 enum UserRole {
-  SUPER_ADMIN  // Full access, sees everything, no filtering
-  ADMIN        // Assistant admin, filtered by assigned_admin_email
+  SUPER_ADMIN // Full access, sees everything, no filtering
+  ADMIN // Assistant admin, filtered by assigned_admin_email
   MANAGER
   USER
   CONTRACTOR
@@ -44,14 +44,6 @@ enum UserRole {
 }
 
 model Contractor {
-  id             String           @id @default(uuid())
-  name           String
-  email          String           @unique
-  phone          String?
-  company        String?
-  contractorType ContractorType   @default(SUBCONTRACTOR)
-  status         ContractorStatus @default(PENDING)
-  insuranceStatus InsuranceStatus @default(PENDING)
   id              String           @id @default(uuid())
   name            String
   email           String           @unique
@@ -60,39 +52,35 @@ model Contractor {
   contractorType  ContractorType   @default(SUBCONTRACTOR)
   status          ContractorStatus @default(PENDING)
   insuranceStatus InsuranceStatus  @default(PENDING)
-  
+
   // Broker information
-  brokerName      String?
-  brokerEmail     String?
-  brokerPhone     String?
-  brokerCompany   String?
-  brokerType      BrokerType?
-  
+  brokerName    String?
+  brokerEmail   String?
+  brokerPhone   String?
+  brokerCompany String?
+  brokerType    BrokerType?
+
   // Per-policy broker fields
-  brokerGlName    String?
-  brokerGlEmail   String?
-  brokerGlPhone   String?
-  brokerAutoName  String?
-  brokerAutoEmail String?
-  brokerAutoPhone String?
+  brokerGlName        String?
+  brokerGlEmail       String?
+  brokerGlPhone       String?
+  brokerAutoName      String?
+  brokerAutoEmail     String?
+  brokerAutoPhone     String?
   brokerUmbrellaName  String?
   brokerUmbrellaEmail String?
   brokerUmbrellaPhone String?
-  brokerWcName    String?
-  brokerWcEmail   String?
-  brokerWcPhone   String?
-  
+  brokerWcName        String?
+  brokerWcEmail       String?
+  brokerWcPhone       String?
+
   // Admin assignment (for assistant admin filtering)
   assignedAdminEmail String?
-  
+
   createdById String
-  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdBy   User     @relation("ContractorCreator", fields: [createdById], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  createdById     String
-  createdBy       User             @relation("ContractorCreator", fields: [createdById], references: [id], onDelete: Cascade)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
 
   insuranceDocuments    InsuranceDocument[]
   projectContractors    ProjectContractor[]
@@ -130,20 +118,20 @@ model Project {
   id          String        @id @default(uuid())
   name        String
   description String?
-  address     String?       // Project location/address
+  address     String? // Project location/address
   startDate   DateTime
   endDate     DateTime?
   status      ProjectStatus @default(PLANNING)
   gcName      String?
   location    String?
-  
+
   // Admin assignment (for assistant admin filtering)
   assignedAdminEmail String?
-  
+
   createdById String
-  createdBy   User          @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   projectContractors    ProjectContractor[]
   projectSubcontractors ProjectSubcontractor[]
@@ -190,71 +178,71 @@ model ProjectSubcontractor {
 // Generated COI (Certificate of Insurance) - Core of the workflow
 // Generated COI (Certificate of Insurance) Model
 model GeneratedCOI {
-  id                String    @id @default(uuid())
-  projectId         String
-  project           Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  subcontractorId   String
-  subcontractor     Contractor @relation(fields: [subcontractorId], references: [id], onDelete: Cascade)
-  
+  id              String     @id @default(uuid())
+  projectId       String
+  project         Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  subcontractorId String
+  subcontractor   Contractor @relation(fields: [subcontractorId], references: [id], onDelete: Cascade)
+
   projectName       String?
   gcName            String?
   subcontractorName String?
-  
-  status            COIStatus @default(AWAITING_BROKER_INFO)
-  
+
+  status COIStatus @default(AWAITING_BROKER_INFO)
+
   // Broker information
-  brokerName        String?
-  brokerEmail       String?
-  brokerPhone       String?
-  brokerCompany     String?
-  
+  brokerName    String?
+  brokerEmail   String?
+  brokerPhone   String?
+  brokerCompany String?
+
   // Per-policy broker info
-  brokerGlName      String?
-  brokerGlEmail     String?
-  brokerGlPhone     String?
-  brokerAutoName    String?
-  brokerAutoEmail   String?
-  brokerAutoPhone   String?
-  brokerUmbrellaName   String?
-  brokerUmbrellaEmail  String?
-  brokerUmbrellaPhone  String?
-  brokerWcName      String?
-  brokerWcEmail     String?
-  brokerWcPhone     String?
-  
+  brokerGlName        String?
+  brokerGlEmail       String?
+  brokerGlPhone       String?
+  brokerAutoName      String?
+  brokerAutoEmail     String?
+  brokerAutoPhone     String?
+  brokerUmbrellaName  String?
+  brokerUmbrellaEmail String?
+  brokerUmbrellaPhone String?
+  brokerWcName        String?
+  brokerWcEmail       String?
+  brokerWcPhone       String?
+
   // Policy documents
   glPolicyUrl       String?
   umbrellaPolicyUrl String?
   autoPolicyUrl     String?
   wcPolicyUrl       String?
-  
+
   // Broker signatures
   glBrokerSignatureUrl       String?
   umbrellaBrokerSignatureUrl String?
   autoBrokerSignatureUrl     String?
   wcBrokerSignatureUrl       String?
-  
+
   // Policy details
   glExpirationDate       DateTime?
   umbrellaExpirationDate DateTime?
   autoExpirationDate     DateTime?
   wcExpirationDate       DateTime?
-  
+
   // First COI tracking
-  firstCOIUploaded Boolean   @default(false)
+  firstCOIUploaded Boolean @default(false)
   firstCOIUrl      String?
-  
+
   // Admin review
   assignedAdminEmail String?
   assignedAdmin      User?   @relation("AssignedAdmin", fields: [assignedAdminEmail], references: [email], onDelete: SetNull)
   deficiencyNotes    String?
   rejectionReason    String?
-  
+
   // Timestamps
-  uploadedForReviewDate DateTime?
-  brokerVerifiedAtRenewal Boolean @default(false)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  uploadedForReviewDate   DateTime?
+  brokerVerifiedAtRenewal Boolean   @default(false)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
 
   @@index([projectId])
   @@index([subcontractorId])
