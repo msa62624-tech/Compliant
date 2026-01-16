@@ -106,6 +106,17 @@ export class AuthService {
 
       const [selector, verifier] = parts;
 
+      // Validate selector and verifier format
+      // Selector: 32 hex characters (16 bytes)
+      // Verifier: 64 hex characters (32 bytes)
+      const hexRegex = /^[a-f0-9]+$/i;
+      if (selector.length !== 32 || !hexRegex.test(selector)) {
+        throw new UnauthorizedException('Invalid refresh token format');
+      }
+      if (verifier.length !== 64 || !hexRegex.test(verifier)) {
+        throw new UnauthorizedException('Invalid refresh token format');
+      }
+
       // O(1) lookup using indexed selector - no timing attack vulnerability
       const tokenRecord = await this.prisma.refreshToken.findUnique({
         where: { 
@@ -132,26 +143,28 @@ export class AuthService {
       const newPayload = { email: user.email, sub: user.id, role: user.role };
       const accessToken = this.jwtService.sign(newPayload);
 
-      // Rotate refresh token - delete old one and create new one
-      await this.prisma.refreshToken.delete({
-        where: { id: tokenRecord.id },
-      });
-
       // Generate new refresh token with new selector and verifier
       const newSelector = crypto.randomBytes(16).toString('hex');
       const newVerifier = crypto.randomBytes(32).toString('hex');
       const newVerifierHash = await bcrypt.hash(newVerifier, REFRESH_TOKEN_SALT_ROUNDS);
       const newExpiresAt = new Date();
       newExpiresAt.setDate(newExpiresAt.getDate() + REFRESH_TOKEN_EXPIRATION_DAYS);
-      
-      await this.prisma.refreshToken.create({
-        data: {
-          userId: user.id,
-          selector: newSelector,
-          verifier: newVerifierHash,
-          expiresAt: newExpiresAt,
-        },
-      });
+
+      // Use transaction to ensure atomicity: delete old token and create new one
+      // This prevents race condition where deletion succeeds but creation fails
+      await this.prisma.$transaction([
+        this.prisma.refreshToken.delete({
+          where: { id: tokenRecord.id },
+        }),
+        this.prisma.refreshToken.create({
+          data: {
+            userId: user.id,
+            selector: newSelector,
+            verifier: newVerifierHash,
+            expiresAt: newExpiresAt,
+          },
+        }),
+      ]);
 
       // Log token refresh
       this.logger.log({
@@ -196,13 +209,16 @@ export class AuthService {
   /**
    * Clean up expired refresh tokens
    * Should be called periodically (e.g., daily cron job)
+   * Processes in batches to prevent blocking the database
+   * @param batchSize Maximum number of tokens to delete per call (default: 1000)
    * @returns Number of tokens deleted
    */
-  async cleanupExpiredTokens(): Promise<number> {
+  async cleanupExpiredTokens(batchSize: number = 1000): Promise<number> {
     const result = await this.prisma.refreshToken.deleteMany({
       where: {
         expiresAt: { lt: new Date() },
       },
+      take: batchSize,
     });
 
     this.logger.log({
