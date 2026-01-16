@@ -60,6 +60,40 @@ Once running, visit:
 - Swagger UI: http://localhost:3001/api/docs
 - OpenAPI JSON: http://localhost:3001/api/docs-json
 
+### API Versioning
+
+The API supports header-based versioning. Include the `X-API-Version` header in your requests to specify the API version:
+
+```bash
+# Example with version 1 (default)
+curl -H "X-API-Version: 1" http://localhost:3001/api/users
+
+# If no header is provided, version 1 is used by default
+curl http://localhost:3001/api/users
+```
+
+To version a controller or endpoint, use the `@Version()` decorator:
+
+```typescript
+import { Controller, Get, Version } from '@nestjs/common';
+
+@Controller('users')
+export class UsersController {
+  // Available in version 1
+  @Get()
+  @Version('1')
+  findAllV1() {
+    return this.usersService.findAll();
+  }
+
+  // Available in version 2
+  @Get()
+  @Version('2')
+  findAllV2() {
+    return this.usersService.findAllWithNewFeatures();
+  }
+}
+
 ## Default Credentials
 
 After seeding:

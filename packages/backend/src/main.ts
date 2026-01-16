@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { WINSTON_MODULE_NEST_PROVIDER, WinstonModule } from 'nest-winston';
@@ -33,8 +33,15 @@ async function bootstrap() {
     }),
   );
 
-  // API prefix
-  app.setGlobalPrefix('api/v1');
+  // Header-based versioning
+  app.enableVersioning({
+    type: VersioningType.HEADER,
+    header: 'X-API-Version',
+    defaultVersion: '1',
+  });
+
+  // API prefix (removed version from path since we use header-based versioning)
+  app.setGlobalPrefix('api');
 
   // Swagger documentation
   const config = new DocumentBuilder()
@@ -60,8 +67,9 @@ async function bootstrap() {
 
   console.log('');
   console.log('🚀 Backend server is running!');
-  console.log(`📍 API: http://localhost:${port}/api/v1`);
+  console.log(`📍 API: http://localhost:${port}/api`);
   console.log(`📚 Swagger Docs: http://localhost:${port}/api/docs`);
+  console.log(`💡 Tip: Use 'X-API-Version' header for versioning (default: 1)`);
   console.log('');
 }
 
