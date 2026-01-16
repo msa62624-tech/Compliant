@@ -40,12 +40,11 @@ model RefreshToken {
   id          String   @id @default(uuid())
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  selector    String   @unique // Indexed for O(1) lookup (plaintext)
+  selector    String   @unique // Unique constraint creates index automatically
   verifier    String   // Hashed with bcrypt (for secure comparison)
   expiresAt   DateTime
   createdAt   DateTime @default(now())
 
-  @@index([selector])
   @@index([userId, expiresAt]) // Composite index for user-specific cleanup operations
   @@map("refresh_tokens")
 }

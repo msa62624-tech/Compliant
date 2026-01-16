@@ -107,13 +107,12 @@ export class AuthService {
       const [selector, verifier] = parts;
 
       // Validate selector and verifier format
-      // Selector: 32 hex characters (16 bytes)
-      // Verifier: 64 hex characters (32 bytes)
-      const hexRegex = /^[a-f0-9]+$/i;
-      if (selector.length !== 32 || !hexRegex.test(selector)) {
+      // Selector: exactly 32 hex characters (16 bytes)
+      // Verifier: exactly 64 hex characters (32 bytes)
+      if (!/^[a-f0-9]{32}$/i.test(selector)) {
         throw new UnauthorizedException('Invalid refresh token format');
       }
-      if (verifier.length !== 64 || !hexRegex.test(verifier)) {
+      if (!/^[a-f0-9]{64}$/i.test(verifier)) {
         throw new UnauthorizedException('Invalid refresh token format');
       }
 
@@ -150,12 +149,9 @@ export class AuthService {
       const newExpiresAt = new Date();
       newExpiresAt.setDate(newExpiresAt.getDate() + REFRESH_TOKEN_EXPIRATION_DAYS);
 
-      // Use transaction to ensure atomicity: delete old token and create new one
-      // This prevents race condition where deletion succeeds but creation fails
+      // Use transaction to ensure atomicity: create new token first, then delete old
+      // This order prevents user logout if create fails after delete
       await this.prisma.$transaction([
-        this.prisma.refreshToken.delete({
-          where: { id: tokenRecord.id },
-        }),
         this.prisma.refreshToken.create({
           data: {
             userId: user.id,
@@ -163,6 +159,9 @@ export class AuthService {
             verifier: newVerifierHash,
             expiresAt: newExpiresAt,
           },
+        }),
+        this.prisma.refreshToken.delete({
+          where: { id: tokenRecord.id },
         }),
       ]);
 
