@@ -113,7 +113,7 @@ packages/backend/src/modules/auth/
 **Database Schema**:
 ```prisma
 model RefreshToken {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   token     String   @unique
   userId    String
   user      User     @relation(fields: [userId], references: [id])
@@ -123,7 +123,7 @@ model RefreshToken {
 }
 
 model Session {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   token     String   @unique
@@ -183,7 +183,7 @@ packages/backend/src/modules/email/
 **Database Schema**:
 ```prisma
 model EmailLog {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   to          String
   from        String
   subject     String
@@ -255,7 +255,7 @@ packages/backend/src/modules/files/
 **Database Schema**:
 ```prisma
 model File {
-  id              String   @id @default(cuid())
+  id              String   @id @default(uuid())
   filename        String
   originalName    String
   mimeType        String
@@ -404,7 +404,7 @@ packages/backend/src/modules/ai/
 **Database Schema**:
 ```prisma
 model AIAnalysis {
-  id                String   @id @default(cuid())
+  id                String   @id @default(uuid())
   documentId        String
   provider          String   // openai, claude
   model             String   // gpt-4, claude-3-opus
@@ -468,7 +468,7 @@ packages/backend/src/modules/extraction/
 **Database Schema**:
 ```prisma
 model ExtractionResult {
-  id              String   @id @default(cuid())
+  id              String   @id @default(uuid())
   documentId      String
   extractionType  String
   extractedData   Json
@@ -532,7 +532,7 @@ packages/backend/src/modules/coi-review/
 **Database Schema**:
 ```prisma
 model COIReview {
-  id                String         @id @default(cuid())
+  id                String         @id @default(uuid())
   contractorId      String
   contractor        Contractor     @relation(fields: [contractorId], references: [id])
   documentId        String
@@ -617,7 +617,7 @@ packages/backend/src/modules/approvals/
 **Database Schema**:
 ```prisma
 model Approval {
-  id            String          @id @default(cuid())
+  id            String          @id @default(uuid())
   reviewId      String
   review        COIReview       @relation(fields: [reviewId], references: [id])
   approverId    String
@@ -638,7 +638,7 @@ enum ApprovalDecision {
 }
 
 model ApprovalRule {
-  id              String   @id @default(cuid())
+  id              String   @id @default(uuid())
   name            String
   description     String?
   conditions      Json
@@ -682,7 +682,7 @@ packages/backend/src/modules/deficiencies/
 **Database Schema**:
 ```prisma
 model Deficiency {
-  id                String            @id @default(cuid())
+  id                String            @id @default(uuid())
   reviewId          String
   review            COIReview         @relation(fields: [reviewId], references: [id])
   category          DeficiencyCategory
@@ -729,7 +729,7 @@ enum DeficiencyStatus {
 }
 
 model Reminder {
-  id              String      @id @default(cuid())
+  id              String      @id @default(uuid())
   deficiencyId    String
   deficiency      Deficiency  @relation(fields: [deficiencyId], references: [id])
   sentTo          String
@@ -789,7 +789,7 @@ packages/backend/src/modules/integrations/nyc-dob/
 **Database Schema**:
 ```prisma
 model DOBRecord {
-  id                String   @id @default(cuid())
+  id                String   @id @default(uuid())
   contractorId      String
   contractor        Contractor @relation(fields: [contractorId], references: [id])
   licenseNumber     String
@@ -846,7 +846,7 @@ packages/backend/src/modules/integrations/google-places/
 **Database Schema**:
 ```prisma
 model PlaceVerification {
-  id              String   @id @default(cuid())
+  id              String   @id @default(uuid())
   contractorId    String
   contractor      Contractor @relation(fields: [contractorId], references: [id])
   placeId         String
@@ -921,7 +921,7 @@ packages/backend/src/modules/messaging/
 **Database Schema**:
 ```prisma
 model MessageThread {
-  id            String    @id @default(cuid())
+  id            String    @id @default(uuid())
   subject       String?
   participants  User[]    @relation("ThreadParticipants")
   messages      Message[]
@@ -933,7 +933,7 @@ model MessageThread {
 }
 
 model Message {
-  id          String        @id @default(cuid())
+  id          String        @id @default(uuid())
   threadId    String
   thread      MessageThread @relation(fields: [threadId], references: [id])
   senderId    String
@@ -949,7 +949,7 @@ model Message {
 }
 
 model MessageRead {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   messageId String
   message   Message  @relation(fields: [messageId], references: [id])
   userId    String
@@ -1005,7 +1005,7 @@ packages/backend/src/modules/notifications/
 **Database Schema**:
 ```prisma
 model Notification {
-  id            String             @id @default(cuid())
+  id            String             @id @default(uuid())
   userId        String
   user          User               @relation(fields: [userId], references: [id])
   type          NotificationType
@@ -1038,7 +1038,7 @@ enum NotificationChannel {
 }
 
 model NotificationPreference {
-  id        String                @id @default(cuid())
+  id        String                @id @default(uuid())
   userId    String                @unique
   user      User                  @relation(fields: [userId], references: [id])
   settings  Json                  // { POLICY_EXPIRING: ['EMAIL', 'IN_APP'], ... }
@@ -1094,7 +1094,7 @@ packages/backend/src/modules/policy-alerts/
 **Database Schema**:
 ```prisma
 model PolicyAlert {
-  id                String       @id @default(cuid())
+  id                String       @id @default(uuid())
   policyId          String
   policy            InsuranceDocument @relation(fields: [policyId], references: [id])
   alertType         AlertType
@@ -1118,7 +1118,7 @@ enum AlertType {
 }
 
 model AlertConfig {
-  id              String   @id @default(cuid())
+  id              String   @id @default(uuid())
   organizationId  String
   alertThresholds Json     // { 30: ['EMAIL'], 14: ['EMAIL', 'SMS'], 7: ['EMAIL', 'SMS', 'IN_APP'] }
   escalationRules Json
@@ -1170,7 +1170,7 @@ packages/backend/src/modules/admin/
 **Database Schema**:
 ```prisma
 model AuditLog {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   userId      String
   user        User     @relation(fields: [userId], references: [id])
   action      String
@@ -1187,7 +1187,7 @@ model AuditLog {
 }
 
 model SystemConfig {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   key       String   @unique
   value     Json
   updatedBy String
@@ -1196,7 +1196,7 @@ model SystemConfig {
 }
 
 model Role {
-  id          String       @id @default(cuid())
+  id          String       @id @default(uuid())
   name        String       @unique
   description String?
   permissions Permission[]
@@ -1205,7 +1205,7 @@ model Role {
 }
 
 model Permission {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   name        String   @unique
   resource    String
   action      String
@@ -1317,7 +1317,7 @@ packages/backend/src/modules/broker-portal/
 **Database Schema**:
 ```prisma
 model Broker {
-  id              String     @id @default(cuid())
+  id              String     @id @default(uuid())
   userId          String     @unique
   user            User       @relation(fields: [userId], references: [id])
   licenseNumber   String     @unique
@@ -1332,7 +1332,7 @@ model Broker {
 }
 
 model Client {
-  id            String     @id @default(cuid())
+  id            String     @id @default(uuid())
   brokerId      String
   broker        Broker     @relation(fields: [brokerId], references: [id])
   contractorId  String     @unique
@@ -1345,7 +1345,7 @@ model Client {
 }
 
 model Policy {
-  id              String     @id @default(cuid())
+  id              String     @id @default(uuid())
   clientId        String
   client          Client     @relation(fields: [clientId], references: [id])
   policyNumber    String     @unique
@@ -1370,7 +1370,7 @@ enum PolicyStatus {
 }
 
 model Commission {
-  id            String   @id @default(cuid())
+  id            String   @id @default(uuid())
   brokerId      String
   broker        Broker   @relation(fields: [brokerId], references: [id])
   policyId      String
@@ -1802,6 +1802,974 @@ CORS_ORIGIN=http://localhost:3000
 NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
 NEXT_PUBLIC_WS_URL=ws://localhost:3001
 NEXT_PUBLIC_ENV=development
+```
+
+---
+
+## AWS Infrastructure
+
+### Architecture Overview
+
+The Compliant Insurance Platform uses enterprise-grade AWS infrastructure for production deployment:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                          AWS Cloud                               │
+│                                                                   │
+│  ┌──────────────────┐         ┌────────────────────┐           │
+│  │   CloudFront     │────────▶│     S3 Bucket      │           │
+│  │  (CDN/Static)    │         │   (Frontend)       │           │
+│  └──────────────────┘         └────────────────────┘           │
+│           │                                                      │
+│           │                                                      │
+│  ┌──────────────────────────────────────────┐                  │
+│  │         Application Load Balancer         │                  │
+│  └──────────────────────────────────────────┘                  │
+│           │                                                      │
+│  ┌────────▼────────┐     ┌─────────────────┐                  │
+│  │   ECS Fargate   │────▶│  ElastiCache    │                  │
+│  │   (Backend API) │     │    (Redis)      │                  │
+│  └─────────────────┘     └─────────────────┘                  │
+│           │                                                      │
+│  ┌────────▼────────┐     ┌─────────────────┐                  │
+│  │   RDS Aurora    │────▶│   S3 Bucket     │                  │
+│  │  (PostgreSQL)   │     │  (File Upload)  │                  │
+│  └─────────────────┘     └─────────────────┘                  │
+│                                                                   │
+│  ┌─────────────────┐     ┌─────────────────┐                  │
+│  │   CloudWatch    │     │   Secrets Mgr   │                  │
+│  │ (Monitoring)    │     │   (API Keys)    │                  │
+│  └─────────────────┘     └─────────────────┘                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Required AWS Services
+
+#### 1. Compute - ECS Fargate
+
+**Backend API Deployment**:
+```yaml
+# task-definition.json
+{
+  "family": "compliant-backend",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "containerDefinitions": [
+    {
+      "name": "backend",
+      "image": "<account-id>.dkr.ecr.<region>.amazonaws.com/compliant-backend:latest",
+      "portMappings": [
+        {
+          "containerPort": 3001,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "PORT",
+          "value": "3001"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:<region>:<account>:secret:compliant/database-url"
+        },
+        {
+          "name": "JWT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:<region>:<account>:secret:compliant/jwt-secret"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/compliant-backend",
+          "awslogs-region": "<region>",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:3001/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+}
+```
+
+**ECS Service Configuration**:
+```yaml
+# ecs-service.json
+{
+  "serviceName": "compliant-backend-service",
+  "cluster": "compliant-cluster",
+  "taskDefinition": "compliant-backend",
+  "desiredCount": 2,
+  "launchType": "FARGATE",
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "subnets": [
+        "subnet-xxxxx",
+        "subnet-yyyyy"
+      ],
+      "securityGroups": ["sg-xxxxx"],
+      "assignPublicIp": "DISABLED"
+    }
+  },
+  "loadBalancers": [
+    {
+      "targetGroupArn": "arn:aws:elasticloadbalancing:...",
+      "containerName": "backend",
+      "containerPort": 3001
+    }
+  ],
+  "healthCheckGracePeriodSeconds": 60,
+  "deploymentConfiguration": {
+    "maximumPercent": 200,
+    "minimumHealthyPercent": 100,
+    "deploymentCircuitBreaker": {
+      "enable": true,
+      "rollback": true
+    }
+  }
+}
+```
+
+#### 2. Database - RDS Aurora PostgreSQL
+
+**Terraform Configuration**:
+```hcl
+# rds.tf
+resource "aws_rds_cluster" "compliant_db" {
+  cluster_identifier      = "compliant-aurora-cluster"
+  engine                  = "aurora-postgresql"
+  engine_version          = "15.3"
+  database_name           = "compliant_prod"
+  master_username         = "compliant_admin"
+  master_password         = var.db_master_password
+  
+  backup_retention_period = 7
+  preferred_backup_window = "03:00-04:00"
+  
+  vpc_security_group_ids  = [aws_security_group.rds.id]
+  db_subnet_group_name    = aws_db_subnet_group.compliant.name
+  
+  enabled_cloudwatch_logs_exports = ["postgresql"]
+  
+  deletion_protection = true
+  
+  tags = {
+    Environment = "production"
+    Application = "compliant"
+  }
+}
+
+resource "aws_rds_cluster_instance" "compliant_db_instances" {
+  count              = 2
+  identifier         = "compliant-aurora-instance-${count.index}"
+  cluster_identifier = aws_rds_cluster.compliant_db.id
+  instance_class     = "db.r6g.large"
+  engine             = aws_rds_cluster.compliant_db.engine
+  engine_version     = aws_rds_cluster.compliant_db.engine_version
+  
+  performance_insights_enabled = true
+  monitoring_interval         = 60
+}
+```
+
+#### 3. Caching - ElastiCache Redis
+
+**Terraform Configuration**:
+```hcl
+# elasticache.tf
+resource "aws_elasticache_replication_group" "compliant_redis" {
+  replication_group_id       = "compliant-redis"
+  replication_group_description = "Redis cluster for Compliant session management"
+  
+  engine               = "redis"
+  engine_version       = "7.0"
+  node_type           = "cache.r6g.large"
+  number_cache_clusters = 2
+  
+  parameter_group_name = "default.redis7"
+  port                = 6379
+  
+  subnet_group_name  = aws_elasticache_subnet_group.compliant.name
+  security_group_ids = [aws_security_group.redis.id]
+  
+  at_rest_encryption_enabled = true
+  transit_encryption_enabled = true
+  
+  automatic_failover_enabled = true
+  
+  snapshot_retention_limit = 5
+  snapshot_window         = "03:00-05:00"
+  
+  tags = {
+    Environment = "production"
+    Application = "compliant"
+  }
+}
+```
+
+#### 4. File Storage - S3
+
+**Terraform Configuration**:
+```hcl
+# s3.tf
+resource "aws_s3_bucket" "compliant_files" {
+  bucket = "compliant-insurance-files"
+  
+  tags = {
+    Environment = "production"
+    Application = "compliant"
+  }
+}
+
+resource "aws_s3_bucket_versioning" "compliant_files" {
+  bucket = aws_s3_bucket.compliant_files.id
+  
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_encryption" "compliant_files" {
+  bucket = aws_s3_bucket.compliant_files.id
+  
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "compliant_files" {
+  bucket = aws_s3_bucket.compliant_files.id
+  
+  rule {
+    id     = "archive_old_files"
+    status = "Enabled"
+    
+    transition {
+      days          = 90
+      storage_class = "INTELLIGENT_TIERING"
+    }
+    
+    transition {
+      days          = 365
+      storage_class = "GLACIER"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "compliant_files" {
+  bucket = aws_s3_bucket.compliant_files.id
+  
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+```
+
+#### 5. CDN - CloudFront (Frontend)
+
+**Terraform Configuration**:
+```hcl
+# cloudfront.tf
+resource "aws_cloudfront_distribution" "compliant_frontend" {
+  enabled             = true
+  is_ipv6_enabled     = true
+  comment             = "Compliant Insurance Platform Frontend"
+  default_root_object = "index.html"
+  price_class         = "PriceClass_100"
+  
+  origin {
+    domain_name = aws_s3_bucket.compliant_frontend.bucket_regional_domain_name
+    origin_id   = "S3-compliant-frontend"
+    
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.compliant.cloudfront_access_identity_path
+    }
+  }
+  
+  default_cache_behavior {
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "S3-compliant-frontend"
+    
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+    
+    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+    compress               = true
+  }
+  
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+  
+  viewer_certificate {
+    acm_certificate_arn      = aws_acm_certificate.compliant.arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
+  }
+}
+```
+
+#### 6. Secrets Management - AWS Secrets Manager
+
+**Storing Secrets**:
+```bash
+# Store database URL
+aws secretsmanager create-secret \
+  --name compliant/database-url \
+  --secret-string "postgresql://user:pass@rds-endpoint:5432/compliant_prod"
+
+# Store JWT secrets
+aws secretsmanager create-secret \
+  --name compliant/jwt-secret \
+  --secret-string "your-256-bit-jwt-secret"
+
+aws secretsmanager create-secret \
+  --name compliant/jwt-refresh-secret \
+  --secret-string "your-256-bit-refresh-secret"
+
+# Store API keys
+aws secretsmanager create-secret \
+  --name compliant/openai-api-key \
+  --secret-string "your-openai-api-key"
+
+aws secretsmanager create-secret \
+  --name compliant/sendgrid-api-key \
+  --secret-string "your-sendgrid-api-key"
+```
+
+#### 7. Monitoring - CloudWatch
+
+**CloudWatch Dashboard**:
+```json
+{
+  "widgets": [
+    {
+      "type": "metric",
+      "properties": {
+        "metrics": [
+          ["AWS/ECS", "CPUUtilization", {"stat": "Average"}],
+          [".", "MemoryUtilization", {"stat": "Average"}]
+        ],
+        "period": 300,
+        "stat": "Average",
+        "region": "us-east-1",
+        "title": "ECS Resource Utilization"
+      }
+    },
+    {
+      "type": "metric",
+      "properties": {
+        "metrics": [
+          ["AWS/RDS", "DatabaseConnections"],
+          [".", "CPUUtilization"],
+          [".", "FreeableMemory"]
+        ],
+        "period": 300,
+        "stat": "Average",
+        "region": "us-east-1",
+        "title": "RDS Performance"
+      }
+    },
+    {
+      "type": "log",
+      "properties": {
+        "query": "SOURCE '/ecs/compliant-backend'\n| fields @timestamp, @message\n| filter @message like /ERROR/\n| sort @timestamp desc\n| limit 20",
+        "region": "us-east-1",
+        "title": "Recent Errors"
+      }
+    }
+  ]
+}
+```
+
+**CloudWatch Alarms**:
+```hcl
+# cloudwatch-alarms.tf
+resource "aws_cloudwatch_metric_alarm" "ecs_cpu_high" {
+  alarm_name          = "compliant-backend-cpu-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = "300"
+  statistic           = "Average"
+  threshold           = "80"
+  alarm_description   = "This metric monitors ECS CPU utilization"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  
+  dimensions = {
+    ServiceName = "compliant-backend-service"
+    ClusterName = "compliant-cluster"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "rds_connection_high" {
+  alarm_name          = "compliant-db-connections-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "DatabaseConnections"
+  namespace           = "AWS/RDS"
+  period              = "300"
+  statistic           = "Average"
+  threshold           = "80"
+  alarm_description   = "This metric monitors RDS connections"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+}
+```
+
+### VPC Configuration
+
+**Terraform VPC Setup**:
+```hcl
+# vpc.tf
+resource "aws_vpc" "compliant" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+  
+  tags = {
+    Name        = "compliant-vpc"
+    Environment = "production"
+  }
+}
+
+# Public subnets (ALB)
+resource "aws_subnet" "public" {
+  count             = 2
+  vpc_id            = aws_vpc.compliant.id
+  cidr_block        = "10.0.${count.index}.0/24"
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+  
+  map_public_ip_on_launch = true
+  
+  tags = {
+    Name = "compliant-public-${count.index + 1}"
+  }
+}
+
+# Private subnets (ECS, RDS, ElastiCache)
+resource "aws_subnet" "private" {
+  count             = 2
+  vpc_id            = aws_vpc.compliant.id
+  cidr_block        = "10.0.${count.index + 10}.0/24"
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+  
+  tags = {
+    Name = "compliant-private-${count.index + 1}"
+  }
+}
+
+# Internet Gateway
+resource "aws_internet_gateway" "compliant" {
+  vpc_id = aws_vpc.compliant.id
+  
+  tags = {
+    Name = "compliant-igw"
+  }
+}
+
+# NAT Gateway
+resource "aws_eip" "nat" {
+  count  = 2
+  domain = "vpc"
+}
+
+resource "aws_nat_gateway" "compliant" {
+  count         = 2
+  allocation_id = aws_eip.nat[count.index].id
+  subnet_id     = aws_subnet.public[count.index].id
+  
+  tags = {
+    Name = "compliant-nat-${count.index + 1}"
+  }
+}
+```
+
+---
+
+## CI/CD Pipeline
+
+### GitHub Actions Workflow
+
+Create comprehensive CI/CD pipeline at `.github/workflows/deploy.yml`:
+
+```yaml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: compliant-backend
+  ECS_CLUSTER: compliant-cluster
+  ECS_SERVICE: compliant-backend-service
+  ECS_TASK_DEFINITION: task-definition.json
+
+jobs:
+  # Job 1: Code Quality Checks
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Lint code
+        run: pnpm lint
+      
+      - name: Type check
+        run: pnpm type-check
+      
+      - name: Build shared package
+        run: cd packages/shared && pnpm build
+
+  # Job 2: Backend Tests
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: compliant_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build shared package
+        run: cd packages/shared && pnpm build
+      
+      - name: Run Prisma migrations
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/compliant_test
+        run: cd packages/backend && npx prisma migrate deploy
+      
+      - name: Run backend tests
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/compliant_test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-secret-for-ci-minimum-32-characters
+          JWT_REFRESH_SECRET: test-refresh-secret-for-ci-minimum-32
+        run: cd packages/backend && pnpm test:cov
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./packages/backend/coverage/lcov.info
+          flags: backend
+
+  # Job 3: Frontend Tests
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build shared package
+        run: cd packages/shared && pnpm build
+      
+      - name: Run frontend tests
+        run: cd packages/frontend && pnpm test
+      
+      - name: Build frontend
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
+        run: cd packages/frontend && pnpm build
+
+  # Job 4: Security Scan
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Run npm audit
+        run: pnpm audit --audit-level=high
+
+  # Job 5: Build and Push Docker Images
+  build-and-push:
+    name: Build & Push to ECR
+    runs-on: ubuntu-latest
+    needs: [code-quality, backend-tests, frontend-tests, security-scan]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      
+      - name: Build, tag, and push backend image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f packages/backend/Dockerfile .
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+      
+      - name: Build frontend for S3
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.PRODUCTION_API_URL }}
+        run: |
+          cd packages/frontend
+          pnpm install --frozen-lockfile
+          pnpm build
+      
+      - name: Deploy frontend to S3
+        run: |
+          aws s3 sync packages/frontend/out s3://compliant-frontend-prod --delete
+      
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+
+  # Job 6: Deploy to ECS
+  deploy-backend:
+    name: Deploy Backend to ECS
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      
+      - name: Fill in the new image ID in the ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: backend
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+      
+      - name: Run database migrations
+        run: |
+          # Execute migrations using ECS run-task
+          aws ecs run-task \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --task-definition compliant-migration \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[${{ secrets.PRIVATE_SUBNETS }}],securityGroups=[${{ secrets.ECS_SECURITY_GROUP }}]}"
+      
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+      
+      - name: Verify deployment
+        run: |
+          # Check health endpoint
+          LOAD_BALANCER_URL="${{ secrets.LOAD_BALANCER_URL }}"
+          MAX_RETRIES=30
+          RETRY_INTERVAL=10
+          
+          for i in $(seq 1 $MAX_RETRIES); do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" $LOAD_BALANCER_URL/health)
+            if [ $HTTP_CODE -eq 200 ]; then
+              echo "Deployment successful! Health check passed."
+              exit 0
+            fi
+            echo "Attempt $i/$MAX_RETRIES: Health check returned $HTTP_CODE. Retrying in $RETRY_INTERVAL seconds..."
+            sleep $RETRY_INTERVAL
+          done
+          
+          echo "Deployment verification failed after $MAX_RETRIES attempts."
+          exit 1
+
+  # Job 7: Database Backup
+  backup-database:
+    name: Backup Database
+    runs-on: ubuntu-latest
+    needs: deploy-backend
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Create RDS snapshot
+        run: |
+          SNAPSHOT_ID="compliant-prod-$(date +%Y%m%d-%H%M%S)"
+          aws rds create-db-cluster-snapshot \
+            --db-cluster-snapshot-identifier $SNAPSHOT_ID \
+            --db-cluster-identifier compliant-aurora-cluster
+          echo "Created snapshot: $SNAPSHOT_ID"
+
+  # Job 8: Notify Deployment
+  notify:
+    name: Notify Team
+    runs-on: ubuntu-latest
+    needs: deploy-backend
+    if: always()
+    
+    steps:
+      - name: Send Slack notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Deployment Status: ${{ job.status }}
+            Branch: ${{ github.ref }}
+            Commit: ${{ github.sha }}
+            Author: ${{ github.actor }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        if: always()
+```
+
+### Deployment Scripts
+
+**Create deployment helper script** (`scripts/deploy.sh`):
+
+```bash
+#!/bin/bash
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Configuration
+ENVIRONMENT=${1:-production}
+AWS_REGION="us-east-1"
+ECR_REPOSITORY="compliant-backend"
+ECS_CLUSTER="compliant-cluster"
+ECS_SERVICE="compliant-backend-service"
+
+echo -e "${GREEN}Starting deployment to ${ENVIRONMENT}...${NC}"
+
+# Step 1: Run tests
+echo -e "${YELLOW}Step 1: Running tests...${NC}"
+pnpm test
+echo -e "${GREEN}✓ Tests passed${NC}"
+
+# Step 2: Build Docker image
+echo -e "${YELLOW}Step 2: Building Docker image...${NC}"
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+ECR_URL="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+IMAGE_TAG=$(git rev-parse --short HEAD)
+
+docker build -t ${ECR_REPOSITORY}:${IMAGE_TAG} -f packages/backend/Dockerfile .
+echo -e "${GREEN}✓ Docker image built${NC}"
+
+# Step 3: Login to ECR
+echo -e "${YELLOW}Step 3: Logging in to ECR...${NC}"
+aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_URL}
+echo -e "${GREEN}✓ Logged in to ECR${NC}"
+
+# Step 4: Tag and push image
+echo -e "${YELLOW}Step 4: Pushing image to ECR...${NC}"
+docker tag ${ECR_REPOSITORY}:${IMAGE_TAG} ${ECR_URL}/${ECR_REPOSITORY}:${IMAGE_TAG}
+docker tag ${ECR_REPOSITORY}:${IMAGE_TAG} ${ECR_URL}/${ECR_REPOSITORY}:latest
+docker push ${ECR_URL}/${ECR_REPOSITORY}:${IMAGE_TAG}
+docker push ${ECR_URL}/${ECR_REPOSITORY}:latest
+echo -e "${GREEN}✓ Image pushed to ECR${NC}"
+
+# Step 5: Update ECS service
+echo -e "${YELLOW}Step 5: Updating ECS service...${NC}"
+aws ecs update-service \
+  --cluster ${ECS_CLUSTER} \
+  --service ${ECS_SERVICE} \
+  --force-new-deployment \
+  --region ${AWS_REGION}
+echo -e "${GREEN}✓ ECS service updated${NC}"
+
+# Step 6: Wait for deployment
+echo -e "${YELLOW}Step 6: Waiting for deployment to complete...${NC}"
+aws ecs wait services-stable \
+  --cluster ${ECS_CLUSTER} \
+  --services ${ECS_SERVICE} \
+  --region ${AWS_REGION}
+echo -e "${GREEN}✓ Deployment completed successfully${NC}"
+
+# Step 7: Verify health
+echo -e "${YELLOW}Step 7: Verifying health check...${NC}"
+LOAD_BALANCER_URL=$(aws elbv2 describe-load-balancers --query "LoadBalancers[?LoadBalancerName=='compliant-alb'].DNSName" --output text)
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://${LOAD_BALANCER_URL}/health)
+
+if [ $HTTP_CODE -eq 200 ]; then
+  echo -e "${GREEN}✓ Health check passed (HTTP ${HTTP_CODE})${NC}"
+else
+  echo -e "${RED}✗ Health check failed (HTTP ${HTTP_CODE})${NC}"
+  exit 1
+fi
+
+echo -e "${GREEN}Deployment completed successfully!${NC}"
+```
+
+### Required GitHub Secrets
+
+Configure these secrets in your GitHub repository:
+
+```
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+AWS_REGION
+CLOUDFRONT_DISTRIBUTION_ID
+PRODUCTION_API_URL
+LOAD_BALANCER_URL
+PRIVATE_SUBNETS
+ECS_SECURITY_GROUP
+SLACK_WEBHOOK (optional)
 ```
 
 ---
