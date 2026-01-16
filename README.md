@@ -96,7 +96,8 @@ pnpm lint       # Lint code
 - **Database Schema**: See `packages/backend/prisma/schema.prisma`
 - **Getting Started Guide**: See [GETTING_STARTED.md](./GETTING_STARTED.md)
 - **Deployment Guide**: See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
-- **Implementation Guidelines**: See [IMPLEMENTATION_GUIDELINES.md](./IMPLEMENTATION_GUIDELINES.md)
+- **Implementation Guidelines**: See [docs/IMPLEMENTATION_GUIDELINES.md](./docs/IMPLEMENTATION_GUIDELINES.md)
+- **Additional Documentation**: See [docs/](./docs/) directory for feature requirements, workflow details, and PR implementation notes
 
 ## 🔧 Configuration
 
