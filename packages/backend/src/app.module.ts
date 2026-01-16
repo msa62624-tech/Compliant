@@ -20,6 +20,7 @@ import { PolicyAlertsModule } from './modules/policy-alerts/policy-alerts.module
 import { AdminModule } from './modules/admin/admin.module';
 import { GCPortalModule } from './modules/portals/gc-portal/gc-portal.module';
 import { BrokerPortalModule } from './modules/portals/broker-portal/broker-portal.module';
+import { GeneratedCOIModule } from './modules/generated-coi/generated-coi.module';
 import { PrismaModule } from './config/prisma.module';
 
 @Module({
@@ -48,6 +49,7 @@ import { PrismaModule } from './config/prisma.module';
     AdminModule,
     GCPortalModule,
     BrokerPortalModule,
+    GeneratedCOIModule,
   ],
 })
 export class AppModule {}
