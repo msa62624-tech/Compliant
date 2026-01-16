@@ -7,6 +7,9 @@ import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { PrismaService } from '../../config/prisma.service';
 
+// Refresh token expiration in days
+const REFRESH_TOKEN_EXPIRATION_DAYS = 7;
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -45,7 +48,7 @@ export class AuthService {
     
     // Set refresh token expiration to 7 days from now
     const refreshTokenExpiresAt = new Date();
-    refreshTokenExpiresAt.setDate(refreshTokenExpiresAt.getDate() + 7);
+    refreshTokenExpiresAt.setDate(refreshTokenExpiresAt.getDate() + REFRESH_TOKEN_EXPIRATION_DAYS);
 
     // Store refresh token in User model with expiration
     await this.prisma.user.update({
@@ -90,7 +93,7 @@ export class AuthService {
       // Rotate refresh token - generate new one with new expiration
       const newRefreshTokenString = crypto.randomBytes(32).toString('hex');
       const newRefreshTokenExpiresAt = new Date();
-      newRefreshTokenExpiresAt.setDate(newRefreshTokenExpiresAt.getDate() + 7);
+      newRefreshTokenExpiresAt.setDate(newRefreshTokenExpiresAt.getDate() + REFRESH_TOKEN_EXPIRATION_DAYS);
       
       await this.prisma.user.update({
         where: { id: user.id },
