@@ -1806,7 +1806,7 @@ CORS_ORIGIN=http://localhost:3000
 
 **packages/frontend/.env.local**:
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
 NEXT_PUBLIC_WS_URL=ws://localhost:3001
 NEXT_PUBLIC_ENV=development
 ```
@@ -2481,7 +2481,7 @@ jobs:
       
       - name: Build frontend
         env:
-          NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
+          NEXT_PUBLIC_API_URL: http://localhost:3001/api
         run: cd packages/frontend && pnpm build
 
   # Job 4: Security Scan

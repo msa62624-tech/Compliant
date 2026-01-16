@@ -125,7 +125,7 @@ pnpm dev
 
 ### Access Points
 - Frontend: http://localhost:3000
-- Backend API: http://localhost:3001/api/v1
+- Backend API: http://localhost:3001/api
 - API Documentation: http://localhost:3001/api/docs
 - Database GUI: `cd packages/backend && npx prisma studio` → http://localhost:5555
 
@@ -245,25 +245,25 @@ kill $(lsof -t -i:3001)
 All endpoints documented at http://localhost:3001/api/docs
 
 ### Authentication
-- `POST /api/v1/auth/login` - Login with email/password
-- `POST /api/v1/auth/refresh` - Refresh JWT token
-- `POST /api/v1/auth/logout` - Logout
-- `GET /api/v1/auth/me` - Get current user
+- `POST /api/auth/login` - Login with email/password
+- `POST /api/auth/refresh` - Refresh JWT token
+- `POST /api/auth/logout` - Logout
+- `GET /api/auth/me` - Get current user
 
 ### Contractors
-- `GET /api/v1/contractors` - List all contractors
-- `POST /api/v1/contractors` - Create contractor
-- `GET /api/v1/contractors/:id` - Get contractor details
-- `PATCH /api/v1/contractors/:id` - Update contractor
-- `DELETE /api/v1/contractors/:id` - Delete contractor
-- `GET /api/v1/contractors/:id/insurance-status` - Check insurance compliance
+- `GET /api/contractors` - List all contractors
+- `POST /api/contractors` - Create contractor
+- `GET /api/contractors/:id` - Get contractor details
+- `PATCH /api/contractors/:id` - Update contractor
+- `DELETE /api/contractors/:id` - Delete contractor
+- `GET /api/contractors/:id/insurance-status` - Check insurance compliance
 
 ### Users (Admin only)
-- `GET /api/v1/users` - List users
-- `POST /api/v1/users` - Create user
-- `GET /api/v1/users/:id` - Get user
-- `PATCH /api/v1/users/:id` - Update user
-- `DELETE /api/v1/users/:id` - Delete user
+- `GET /api/users` - List users
+- `POST /api/users` - Create user
+- `GET /api/users/:id` - Get user
+- `PATCH /api/users/:id` - Update user
+- `DELETE /api/users/:id` - Delete user
 
 ## 🎨 Technology Stack
 

@@ -366,13 +366,13 @@ COOKIE_SECURE=true
 
 ```bash
 # Login (cookies will be set automatically)
-curl -X POST http://localhost:3001/api/v1/auth/login \
+curl -X POST http://localhost:3001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"password"}' \
   -c cookies.txt
 
 # Use authenticated endpoint (cookies sent automatically)
-curl http://localhost:3001/api/v1/auth/me \
+curl http://localhost:3001/api/auth/me \
   -b cookies.txt
 ```
 
@@ -380,24 +380,24 @@ curl http://localhost:3001/api/v1/auth/me \
 
 ```bash
 # Full health check
-curl http://localhost:3001/api/v1/health
+curl http://localhost:3001/api/health
 
 # Liveness probe
-curl http://localhost:3001/api/v1/health/liveness
+curl http://localhost:3001/api/health/liveness
 
 # Readiness probe
-curl http://localhost:3001/api/v1/health/readiness
+curl http://localhost:3001/api/health/readiness
 ```
 
 ### 3. Test Audit Logs (as admin):
 
 ```bash
 # Get all audit logs
-curl http://localhost:3001/api/v1/audit \
+curl http://localhost:3001/api/audit \
   -H "Authorization: Bearer YOUR_TOKEN"
 
 # Filter by action
-curl "http://localhost:3001/api/v1/audit?action=LOGIN" \
+curl "http://localhost:3001/api/audit?action=LOGIN" \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -429,7 +429,7 @@ curl "http://localhost:3001/api/v1/audit?action=LOGIN" \
 
 ### 4. API Security:
 - ✅ Rate limiting with @nestjs/throttler
-- ✅ API versioning (/api/v1)
+- ✅ Header-based API versioning (X-API-Version)
 - ✅ OpenAPI/Swagger documentation
 - ✅ Role-based access control
 - ✅ JWT with secure secrets
@@ -495,9 +495,9 @@ The changes maintain backward compatibility:
 ## Security Contacts
 
 For security issues or concerns:
-1. Check audit logs: `/api/v1/audit`
+1. Check audit logs: `/api/audit`
 2. Review error logs: `logs/error.log`
-3. Monitor health: `/api/v1/health`
+3. Monitor health: `/api/health`
 4. Contact development team immediately
 
 ---

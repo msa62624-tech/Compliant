@@ -34,15 +34,15 @@ pnpm dev
 
 ```bash
 # Health check
-curl http://localhost:3001/api/v1/health
+curl http://localhost:3001/api/health
 
 # Login with cookies
-curl -c cookies.txt -X POST http://localhost:3001/api/v1/auth/login \
+curl -c cookies.txt -X POST http://localhost:3001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"password"}'
 
 # Access protected route
-curl -b cookies.txt http://localhost:3001/api/v1/auth/me
+curl -b cookies.txt http://localhost:3001/api/auth/me
 ```
 
 ---
@@ -84,20 +84,20 @@ const token = localStorage.getItem('accessToken');
 ## 📊 New API Endpoints
 
 ### Health Monitoring:
-- `GET /api/v1/health` - Full health check
-- `GET /api/v1/health/liveness` - Liveness probe
-- `GET /api/v1/health/readiness` - Readiness probe
+- `GET /api/health` - Full health check
+- `GET /api/health/liveness` - Liveness probe
+- `GET /api/health/readiness` - Readiness probe
 
 ### Audit Logs (Admin/Manager):
-- `GET /api/v1/audit` - Query audit logs
-- `GET /api/v1/audit/resource` - Resource audit logs
-- `GET /api/v1/audit/user` - User audit logs
+- `GET /api/audit` - Query audit logs
+- `GET /api/audit/resource` - Resource audit logs
+- `GET /api/audit/user` - User audit logs
 
 ### Authentication (Modified):
-- `POST /api/v1/auth/login` - Returns user (tokens in cookies)
-- `POST /api/v1/auth/refresh` - Refreshes tokens in cookies
-- `POST /api/v1/auth/logout` - Clears cookies
-- `GET /api/v1/auth/me` - Current user (unchanged)
+- `POST /api/auth/login` - Returns user (tokens in cookies)
+- `POST /api/auth/refresh` - Refreshes tokens in cookies
+- `POST /api/auth/logout` - Clears cookies
+- `GET /api/auth/me` - Current user (unchanged)
 
 ---
 
@@ -151,7 +151,7 @@ pnpm build
 pnpm dev
 
 # In another terminal
-curl http://localhost:3001/api/v1/health
+curl http://localhost:3001/api/health
 ```
 
 ### Comprehensive Testing:
@@ -240,7 +240,7 @@ pnpm db:push
 ### Health Endpoints:
 ```bash
 # Check application health
-curl http://localhost:3001/api/v1/health
+curl http://localhost:3001/api/health
 
 # Expected: {"status":"ok","info":{...}}
 ```
@@ -248,7 +248,7 @@ curl http://localhost:3001/api/v1/health
 ### Audit Logs:
 ```bash
 # View recent activity (requires admin token)
-curl http://localhost:3001/api/v1/audit \
+curl http://localhost:3001/api/audit \
   -H "Authorization: Bearer ADMIN_TOKEN"
 ```
 
@@ -273,7 +273,7 @@ curl http://localhost:3001/api/v1/audit \
 3. **Test Endpoints**:
    ```bash
    # Health check should always work
-   curl http://localhost:3001/api/v1/health
+   curl http://localhost:3001/api/health
    ```
 
 4. **Common Issues**:

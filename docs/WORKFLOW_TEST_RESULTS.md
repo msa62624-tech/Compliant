@@ -169,37 +169,37 @@ Four action cards with links:
 **API Sections:**
 
 **1. Authentication**
-- POST `/api/v1/auth/login` - User login
-- POST `/api/v1/auth/refresh` - Refresh access token
-- POST `/api/v1/auth/logout` - User logout (requires auth)
-- GET `/api/v1/auth/me` - Get current user (requires auth)
+- POST `/api/auth/login` - User login
+- POST `/api/auth/refresh` - Refresh access token
+- POST `/api/auth/logout` - User logout (requires auth)
+- GET `/api/auth/me` - Get current user (requires auth)
 
 **2. Users**
-- POST `/api/v1/users` - Create a new user (Admin only, requires auth)
-- GET `/api/v1/users` - Get all users (requires auth)
-- GET `/api/v1/users/{id}` - Get user by ID (requires auth)
-- PATCH `/api/v1/users/{id}` - Update user (Admin only, requires auth)
-- DELETE `/api/v1/users/{id}` - Delete user (Admin only, requires auth)
+- POST `/api/users` - Create a new user (Admin only, requires auth)
+- GET `/api/users` - Get all users (requires auth)
+- GET `/api/users/{id}` - Get user by ID (requires auth)
+- PATCH `/api/users/{id}` - Update user (Admin only, requires auth)
+- DELETE `/api/users/{id}` - Delete user (Admin only, requires auth)
 
 **3. Contractors**
-- POST `/api/v1/contractors` - Create a new contractor (requires auth)
-- GET `/api/v1/contractors` - Get all contractors (requires auth)
-- GET `/api/v1/contractors/{id}` - Get contractor by ID (requires auth)
-- PATCH `/api/v1/contractors/{id}` - Update contractor (requires auth)
-- DELETE `/api/v1/contractors/{id}` - Delete contractor (requires auth)
-- GET `/api/v1/contractors/{id}/insurance-status` - Get contractor insurance status (requires auth)
+- POST `/api/contractors` - Create a new contractor (requires auth)
+- GET `/api/contractors` - Get all contractors (requires auth)
+- GET `/api/contractors/{id}` - Get contractor by ID (requires auth)
+- PATCH `/api/contractors/{id}` - Update contractor (requires auth)
+- DELETE `/api/contractors/{id}` - Delete contractor (requires auth)
+- GET `/api/contractors/{id}/insurance-status` - Get contractor insurance status (requires auth)
 
 **4. Generated COI (Certificate of Insurance)**
-- POST `/api/v1/generated-coi` - Create COI
-- GET `/api/v1/generated-coi` - Get all COIs
-- GET `/api/v1/generated-coi/expiring` - Get expiring COIs
-- GET `/api/v1/generated-coi/{id}` - Get COI by ID
-- PATCH `/api/v1/generated-coi/{id}/broker-info` - Update broker information
-- PATCH `/api/v1/generated-coi/{id}/upload` - Upload policy documents
-- PATCH `/api/v1/generated-coi/{id}/sign` - Sign policies
-- PATCH `/api/v1/generated-coi/{id}/review` - Review COI
-- POST `/api/v1/generated-coi/{id}/renew` - Renew COI
-- PATCH `/api/v1/generated-coi/{id}/resubmit` - Resubmit after deficiency
+- POST `/api/generated-coi` - Create COI
+- GET `/api/generated-coi` - Get all COIs
+- GET `/api/generated-coi/expiring` - Get expiring COIs
+- GET `/api/generated-coi/{id}` - Get COI by ID
+- PATCH `/api/generated-coi/{id}/broker-info` - Update broker information
+- PATCH `/api/generated-coi/{id}/upload` - Upload policy documents
+- PATCH `/api/generated-coi/{id}/sign` - Sign policies
+- PATCH `/api/generated-coi/{id}/review` - Review COI
+- POST `/api/generated-coi/{id}/renew` - Renew COI
+- PATCH `/api/generated-coi/{id}/resubmit` - Resubmit after deficiency
 
 **Observations:**
 - Comprehensive API coverage for insurance tracking workflow
@@ -306,7 +306,7 @@ The dashboard page (`packages/frontend/app/dashboard/page.tsx`, lines 38-50) aut
 - ✅ "Try it out" functionality available
 - ✅ Query parameters documented
 
-**GET /api/v1/contractors Details:**
+**GET /api/contractors Details:**
 
 **Parameters:**
 - `page` (number, query) - Pagination page number

@@ -51,7 +51,7 @@ cd packages/frontend && pnpm dev
 
 #### 1. Login (Sets Cookies)
 ```bash
-curl -v -X POST http://localhost:3001/api/v1/auth/login \
+curl -v -X POST http://localhost:3001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"password123"}' \
   -c cookies.txt
@@ -64,7 +64,7 @@ curl -v -X POST http://localhost:3001/api/v1/auth/login \
 
 #### 2. Access Protected Endpoint (Uses Cookies)
 ```bash
-curl -v http://localhost:3001/api/v1/auth/me \
+curl -v http://localhost:3001/api/auth/me \
   -b cookies.txt
 
 # Expected Response:
@@ -74,7 +74,7 @@ curl -v http://localhost:3001/api/v1/auth/me \
 
 #### 3. Refresh Token
 ```bash
-curl -v -X POST http://localhost:3001/api/v1/auth/refresh \
+curl -v -X POST http://localhost:3001/api/auth/refresh \
   -b cookies.txt \
   -c cookies.txt
 
@@ -86,7 +86,7 @@ curl -v -X POST http://localhost:3001/api/v1/auth/refresh \
 
 #### 4. Logout (Clears Cookies)
 ```bash
-curl -v -X POST http://localhost:3001/api/v1/auth/logout \
+curl -v -X POST http://localhost:3001/api/auth/logout \
   -b cookies.txt
 
 # Expected Response:
@@ -101,7 +101,7 @@ curl -v -X POST http://localhost:3001/api/v1/auth/logout \
 
 ### 1. Full Health Check
 ```bash
-curl http://localhost:3001/api/v1/health
+curl http://localhost:3001/api/health
 
 # Expected Response:
 {
@@ -117,7 +117,7 @@ curl http://localhost:3001/api/v1/health
 
 ### 2. Liveness Probe
 ```bash
-curl http://localhost:3001/api/v1/health/liveness
+curl http://localhost:3001/api/health/liveness
 
 # Expected Response:
 {
@@ -128,7 +128,7 @@ curl http://localhost:3001/api/v1/health/liveness
 
 ### 3. Readiness Probe
 ```bash
-curl http://localhost:3001/api/v1/health/readiness
+curl http://localhost:3001/api/health/readiness
 
 # Expected Response:
 {
@@ -145,29 +145,29 @@ curl http://localhost:3001/api/v1/health/readiness
 
 ### 1. Get All Audit Logs (Admin Only)
 ```bash
-curl http://localhost:3001/api/v1/audit \
+curl http://localhost:3001/api/audit \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
 
 # Or with cookies:
-curl http://localhost:3001/api/v1/audit \
+curl http://localhost:3001/api/audit \
   -b cookies.txt
 ```
 
 ### 2. Filter by Action
 ```bash
-curl "http://localhost:3001/api/v1/audit?action=LOGIN" \
+curl "http://localhost:3001/api/audit?action=LOGIN" \
   -b cookies.txt
 ```
 
 ### 3. Filter by Date Range
 ```bash
-curl "http://localhost:3001/api/v1/audit?startDate=2026-01-01&endDate=2026-01-31" \
+curl "http://localhost:3001/api/audit?startDate=2026-01-01&endDate=2026-01-31" \
   -b cookies.txt
 ```
 
 ### 4. Get Resource Audit Logs
 ```bash
-curl "http://localhost:3001/api/v1/audit/resource?resource=USER&resourceId=USER_ID" \
+curl "http://localhost:3001/api/audit/resource?resource=USER&resourceId=USER_ID" \
   -b cookies.txt
 ```
 
@@ -262,29 +262,29 @@ cat logs/combined.log | jq 'select(.userId == "USER_ID")'
 
 ```bash
 # 1. Login
-LOGIN_RESPONSE=$(curl -s -c /tmp/cookies.txt -X POST http://localhost:3001/api/v1/auth/login \
+LOGIN_RESPONSE=$(curl -s -c /tmp/cookies.txt -X POST http://localhost:3001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"password123"}')
 echo "Login: $LOGIN_RESPONSE"
 
 # 2. Access protected endpoint
-ME_RESPONSE=$(curl -s -b /tmp/cookies.txt http://localhost:3001/api/v1/auth/me)
+ME_RESPONSE=$(curl -s -b /tmp/cookies.txt http://localhost:3001/api/auth/me)
 echo "User data: $ME_RESPONSE"
 
 # 3. Refresh token
-REFRESH_RESPONSE=$(curl -s -b /tmp/cookies.txt -c /tmp/cookies.txt -X POST http://localhost:3001/api/v1/auth/refresh)
+REFRESH_RESPONSE=$(curl -s -b /tmp/cookies.txt -c /tmp/cookies.txt -X POST http://localhost:3001/api/auth/refresh)
 echo "Refresh: $REFRESH_RESPONSE"
 
 # 4. Access protected endpoint again
-ME_RESPONSE2=$(curl -s -b /tmp/cookies.txt http://localhost:3001/api/v1/auth/me)
+ME_RESPONSE2=$(curl -s -b /tmp/cookies.txt http://localhost:3001/api/auth/me)
 echo "User data after refresh: $ME_RESPONSE2"
 
 # 5. Logout
-LOGOUT_RESPONSE=$(curl -s -b /tmp/cookies.txt -X POST http://localhost:3001/api/v1/auth/logout)
+LOGOUT_RESPONSE=$(curl -s -b /tmp/cookies.txt -X POST http://localhost:3001/api/auth/logout)
 echo "Logout: $LOGOUT_RESPONSE"
 
 # 6. Try to access protected endpoint (should fail)
-UNAUTHORIZED=$(curl -s -b /tmp/cookies.txt http://localhost:3001/api/v1/auth/me)
+UNAUTHORIZED=$(curl -s -b /tmp/cookies.txt http://localhost:3001/api/auth/me)
 echo "After logout (should be 401): $UNAUTHORIZED"
 ```
 
@@ -296,10 +296,10 @@ echo "After logout (should be 401): $UNAUTHORIZED"
 
 ```bash
 # Test health endpoint
-ab -n 1000 -c 10 http://localhost:3001/api/v1/health/liveness
+ab -n 1000 -c 10 http://localhost:3001/api/health/liveness
 
 # Test login endpoint (with auth)
-ab -n 100 -c 5 -p login.json -T application/json http://localhost:3001/api/v1/auth/login
+ab -n 100 -c 5 -p login.json -T application/json http://localhost:3001/api/auth/login
 
 # Create login.json:
 echo '{"email":"test@example.com","password":"password123"}' > login.json
@@ -310,7 +310,7 @@ echo '{"email":"test@example.com","password":"password123"}' > login.json
 ```yaml
 # artillery-test.yml
 config:
-  target: 'http://localhost:3001/api/v1'
+  target: 'http://localhost:3001/api'
   phases:
     - duration: 60
       arrivalRate: 10
@@ -408,7 +408,7 @@ pnpm dev
 cat .env | grep CORS
 
 # Test with verbose curl
-curl -v -X POST http://localhost:3001/api/v1/auth/login \
+curl -v -X POST http://localhost:3001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"password123"}'
 ```
@@ -431,7 +431,7 @@ pnpm db:push
 
 ```bash
 # Check which service is failing
-curl http://localhost:3001/api/v1/health
+curl http://localhost:3001/api/health
 
 # Check logs
 tail -f packages/backend/logs/error.log
@@ -456,7 +456,7 @@ Monitor these with:
 
 ```bash
 # Time a request
-time curl http://localhost:3001/api/v1/health
+time curl http://localhost:3001/api/health
 
 # Check response time in logs
 tail -f logs/combined.log | grep responseTime

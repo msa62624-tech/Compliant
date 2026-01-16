@@ -30,7 +30,7 @@ This guide explains how to migrate the frontend from localStorage-based token st
 ```typescript
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 export const apiClient = axios.create({
   baseURL: API_URL,
@@ -56,7 +56,7 @@ apiClient.interceptors.request.use(
 ```typescript
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 export const apiClient = axios.create({
   baseURL: API_URL,
@@ -264,10 +264,10 @@ export const authApi = {
 Add CORS configuration to `.env.local`:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
 
 # For production:
-# NEXT_PUBLIC_API_URL=https://api.yourdomain.com/api/v1
+# NEXT_PUBLIC_API_URL=https://api.yourdomain.com/api
 ```
 
 Ensure backend has correct CORS settings in `.env`:
@@ -375,7 +375,7 @@ CORS_ORIGIN=https://yourdomain.com
 ### 2. Frontend Configuration:
 
 ```env
-NEXT_PUBLIC_API_URL=https://api.yourdomain.com/api/v1
+NEXT_PUBLIC_API_URL=https://api.yourdomain.com/api
 ```
 
 ### 3. Domain Configuration:
