@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
-import { Prisma } from '@prisma/client';
+import { Prisma, ContractorType } from '@prisma/client';
 
 @Injectable()
 export class ProjectsService {
@@ -42,7 +42,7 @@ export class ProjectsService {
         data: {
           projectId: project.id,
           contractorId: createProjectDto.gcId,
-          role: 'GENERAL_CONTRACTOR',
+          role: ContractorType.GENERAL_CONTRACTOR,
         },
       });
     }
