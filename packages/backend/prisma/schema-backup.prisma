@@ -1,0 +1,672 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Model
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  password     String
+  firstName    String
+  lastName     String
+  role         UserRole  @default(USER)
+  isActive     Boolean   @default(true)
+  refreshToken String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  contractors        Contractor[]
+  projects           Project[]
+  refreshTokens      RefreshToken[]
+  sessions           Session[]
+  files              File[]
+  submittedReviews   COIReview[]      @relation("Submitter")
+  assignedReviews    COIReview[]      @relation("Reviewer")
+  approvals          Approval[]
+  resolvedDeficiencies Deficiency[]
+  reminders          Reminder[]
+  sentMessages       Message[]        @relation("Sender")
+  receivedMessages   Message[]        @relation("Receiver")
+  notifications      Notification[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  USER
+}
+
+// Contractor Model
+model Contractor {
+  id              String           @id @default(uuid())
+  name            String
+  email           String           @unique
+  phone           String?
+  company         String?
+  status          ContractorStatus @default(PENDING)
+  insuranceStatus InsuranceStatus  @default(PENDING)
+  createdById     String
+  createdBy       User             @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  insuranceDocuments     InsuranceDocument[]
+  projectContractors     ProjectContractor[]
+  coiReviews             COIReview[]
+  dobRecords             DOBRecord[]
+  placeVerifications     PlaceVerification[]
+  policyAlerts           ExpiringPolicyAlert[]
+  gcPortalAccess         GCPortalAccess?
+  subcontractorPortalAccess SubcontractorPortalAccess?
+
+  @@index([createdById])
+  @@index([email])
+  @@map("contractors")
+}
+
+enum ContractorStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+  SUSPENDED
+}
+
+enum InsuranceStatus {
+  COMPLIANT
+  NON_COMPLIANT
+  PENDING
+  EXPIRED
+}
+
+// Project Model
+model Project {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime?
+  status      ProjectStatus @default(PLANNING)
+  createdById String
+  createdBy   User          @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  projectContractors ProjectContractor[]
+
+  @@map("projects")
+}
+
+enum ProjectStatus {
+  PLANNING
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+// Junction table for Project <-> Contractor (many-to-many)
+model ProjectContractor {
+  id           String     @id @default(uuid())
+  projectId    String
+  project      Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  contractorId String
+  contractor   Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  role         String?
+  assignedAt   DateTime   @default(now())
+
+  @@unique([projectId, contractorId])
+  @@map("project_contractors")
+}
+
+// Insurance Document Model
+model InsuranceDocument {
+  id                      String         @id @default(uuid())
+  contractorId            String
+  contractor              Contractor     @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  type                    InsuranceType
+  provider                String
+  policyNumber            String
+  coverageAmount          Float
+  effectiveDate           DateTime
+  expirationDate          DateTime
+  status                  DocumentStatus @default(PENDING)
+  fileUrl                 String?
+  // COI Certificate fields
+  certificateNumber       String?        @unique
+  certificateFileId       String?
+  certificateGeneratedAt  DateTime?
+  certificateHolder       String?
+  additionalInsured       String?
+  description             String?        @db.Text
+  createdAt               DateTime       @default(now())
+  updatedAt               DateTime       @updatedAt
+
+  @@index([contractorId])
+  @@index([status])
+  @@index([expirationDate])
+  @@map("insurance_documents")
+}
+
+enum InsuranceType {
+  GENERAL_LIABILITY
+  WORKERS_COMPENSATION
+  AUTO_LIABILITY
+  PROFESSIONAL_LIABILITY
+  UMBRELLA
+}
+
+enum DocumentStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+// ============================================
+// PR #2: Core Infrastructure Models
+// ============================================
+
+// RefreshToken Model - for JWT refresh token rotation
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  revoked   Boolean  @default(false)
+
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
+}
+
+// Session Model - for session management with Redis
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@map("sessions")
+}
+
+// EmailLog Model - for email tracking and logging
+model EmailLog {
+  id        String      @id @default(uuid())
+  to        String
+  from      String
+  subject   String
+  template  String
+  status    EmailStatus
+  sentAt    DateTime?
+  errorMsg  String?
+  metadata  Json?
+  createdAt DateTime    @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("email_logs")
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+  BOUNCED
+}
+
+// File Model - for file upload management
+model File {
+  id              String   @id @default(uuid())
+  filename        String
+  originalName    String
+  mimeType        String
+  size            Int
+  path            String
+  url             String?
+  thumbnailUrl    String?
+  uploadedBy      String
+  user            User     @relation(fields: [uploadedBy], references: [id], onDelete: Cascade)
+  virusScanned    Boolean  @default(false)
+  virusScanResult String?
+  metadata        Json?
+  createdAt       DateTime @default(now())
+
+  @@index([uploadedBy])
+  @@index([createdAt])
+  @@map("files")
+}
+
+// ============================================
+// PR #3: AI & Document Processing Models
+// ============================================
+
+// AIAnalysis Model - for AI-powered document analysis
+model AIAnalysis {
+  id             String   @id @default(uuid())
+  documentId     String
+  provider       String   // openai, claude
+  model          String   // gpt-4, claude-3-opus
+  prompt         String   @db.Text
+  response       Json
+  tokensUsed     Int
+  cost           Float
+  processingTime Int      // milliseconds
+  confidence     Float?
+  extractedData  Json?
+  createdAt      DateTime @default(now())
+
+  @@index([documentId])
+  @@index([createdAt])
+  @@map("ai_analyses")
+}
+
+// ExtractionResult Model - for automated data extraction results
+model ExtractionResult {
+  id             String    @id @default(uuid())
+  documentId     String
+  extractionType String
+  extractedData  Json
+  confidence     Float
+  needsReview    Boolean   @default(false)
+  reviewedBy     String?
+  reviewedAt     DateTime?
+  corrections    Json?
+  createdAt      DateTime  @default(now())
+
+  @@index([documentId])
+  @@index([needsReview])
+  @@map("extraction_results")
+}
+
+// ============================================
+// PR #4: COI Workflow Models
+// ============================================
+
+// COIReview Model - for Certificate of Insurance review workflow
+model COIReview {
+  id           String          @id @default(uuid())
+  contractorId String
+  contractor   Contractor      @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  documentId   String
+  submittedBy  String
+  submitter    User            @relation("Submitter", fields: [submittedBy], references: [id])
+  assignedTo   String?
+  reviewer     User?           @relation("Reviewer", fields: [assignedTo], references: [id])
+  status       ReviewStatus
+  priority     Priority        @default(NORMAL)
+  dueDate      DateTime?
+  submittedAt  DateTime        @default(now())
+  reviewedAt   DateTime?
+  decision     ReviewDecision?
+  notes        String?         @db.Text
+  deficiencies Deficiency[]
+  approvals    Approval[]
+
+  @@index([contractorId])
+  @@index([status])
+  @@index([assignedTo])
+  @@index([dueDate])
+  @@map("coi_reviews")
+}
+
+enum ReviewStatus {
+  PENDING
+  IN_REVIEW
+  APPROVED
+  REJECTED
+  REQUIRES_CHANGES
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum ReviewDecision {
+  APPROVED
+  REJECTED
+  CONDITIONAL_APPROVAL
+}
+
+// Approval Model - for multi-level approval workflow
+model Approval {
+  id           String           @id @default(uuid())
+  reviewId     String
+  review       COIReview        @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  approverId   String
+  approver     User             @relation(fields: [approverId], references: [id])
+  decision     ApprovalDecision
+  comments     String?          @db.Text
+  conditions   String?          @db.Text
+  approvedAt   DateTime         @default(now())
+  generatedCOI GeneratedCOI?
+
+  @@index([reviewId])
+  @@index([approverId])
+  @@map("approvals")
+}
+
+enum ApprovalDecision {
+  APPROVED
+  REJECTED
+  DELEGATED
+}
+
+// ApprovalRule Model - for auto-approval rules
+model ApprovalRule {
+  id          String   @id @default(uuid())
+  name        String
+  description String?  @db.Text
+  conditions  Json
+  action      String
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("approval_rules")
+}
+
+// Deficiency Model - for deficiency tracking and management
+model Deficiency {
+  id              String             @id @default(uuid())
+  reviewId        String
+  review          COIReview          @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  category        DeficiencyCategory
+  severity        Severity
+  description     String             @db.Text
+  requiredAction  String             @db.Text
+  dueDate         DateTime
+  status          DeficiencyStatus   @default(OPEN)
+  resolvedBy      String?
+  resolver        User?              @relation(fields: [resolvedBy], references: [id])
+  resolvedAt      DateTime?
+  resolutionNotes String?            @db.Text
+  reminders       Reminder[]
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@index([reviewId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("deficiencies")
+}
+
+enum DeficiencyCategory {
+  COVERAGE_AMOUNT
+  EXPIRED_POLICY
+  MISSING_ENDORSEMENT
+  INCORRECT_NAMED_INSURED
+  MISSING_ADDITIONAL_INSURED
+  CERTIFICATE_HOLDER
+  OTHER
+}
+
+enum Severity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum DeficiencyStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  WAIVED
+}
+
+// Reminder Model - for deficiency reminders
+model Reminder {
+  id           String     @id @default(uuid())
+  deficiencyId String
+  deficiency   Deficiency @relation(fields: [deficiencyId], references: [id], onDelete: Cascade)
+  sentTo       String
+  recipient    User       @relation(fields: [sentTo], references: [id])
+  sentAt       DateTime   @default(now())
+  acknowledged Boolean    @default(false)
+
+  @@index([deficiencyId])
+  @@map("reminders")
+}
+
+// ============================================
+// PR #5: External Integrations & COI Generation
+// ============================================
+
+// DOBRecord Model - NYC DOB API integration data
+model DOBRecord {
+  id             String     @id @default(uuid())
+  contractorId   String
+  contractor     Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  licenseNumber  String
+  businessName   String
+  licenseType    String
+  licenseStatus  String
+  expirationDate DateTime?
+  violations     Json?
+  complaints     Json?
+  lastVerified   DateTime   @default(now())
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@index([contractorId])
+  @@index([licenseNumber])
+  @@map("dob_records")
+}
+
+// PlaceVerification Model - Google Places API integration data
+model PlaceVerification {
+  id               String     @id @default(uuid())
+  contractorId     String
+  contractor       Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  placeId          String
+  name             String
+  address          String
+  phone            String?
+  website          String?
+  businessStatus   String
+  rating           Float?
+  userRatingsTotal Int?
+  verified         Boolean    @default(false)
+  verifiedAt       DateTime   @default(now())
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  @@index([contractorId])
+  @@index([placeId])
+  @@map("place_verifications")
+}
+
+// GeneratedCOI Model - Generated Certificate of Insurance tracking
+model GeneratedCOI {
+  id                String     @id @default(uuid())
+  contractorId      String
+  contractor        Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  projectId         String?
+  certificateNumber String     @unique
+  producer          String
+  insured           String
+  address           String
+  coverages         Json
+  effectiveDate     DateTime
+  expirationDate    DateTime
+  certificateHolder String
+  description       String?    @db.Text
+  fileId            String?
+  generatedBy       String
+  generatedAt       DateTime   @default(now())
+  status            COIStatus  @default(DRAFT)
+  approvalId        String?    @unique
+  approval          Approval?  @relation(fields: [approvalId], references: [id], onDelete: SetNull)
+
+  @@index([contractorId])
+  @@index([certificateNumber])
+  @@index([status])
+  @@map("generated_cois")
+}
+
+enum COIStatus {
+  DRAFT
+  PENDING_APPROVAL
+  ISSUED
+  EXPIRED
+  CANCELLED
+}
+
+// Message Model - Internal messaging system
+model Message {
+  id         String        @id @default(uuid())
+  senderId   String
+  sender     User          @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId String
+  receiver   User          @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  subject    String
+  body       String        @db.Text
+  read       Boolean       @default(false)
+  readAt     DateTime?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([read])
+  @@map("messages")
+}
+
+// Notification Model - System notifications
+model Notification {
+  id        String             @id @default(uuid())
+  userId    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  message   String             @db.Text
+  link      String?
+  read      Boolean            @default(false)
+  readAt    DateTime?
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@index([userId])
+  @@index([read])
+  @@index([type])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  COI_EXPIRING
+  COI_EXPIRED
+  REVIEW_ASSIGNED
+  REVIEW_COMPLETED
+  DEFICIENCY_CREATED
+  DEFICIENCY_RESOLVED
+  APPROVAL_REQUIRED
+  APPROVAL_GRANTED
+  APPROVAL_DENIED
+  SYSTEM_ALERT
+}
+
+// ExpiringPolicyAlert Model - Tracks alerts for expiring policies
+model ExpiringPolicyAlert {
+  id              String     @id @default(uuid())
+  contractorId    String
+  contractor      Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  policyType      String
+  policyNumber    String?
+  expirationDate  DateTime
+  daysUntilExpiry Int
+  alertSentAt     DateTime   @default(now())
+  resolved        Boolean    @default(false)
+  resolvedAt      DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([contractorId])
+  @@index([resolved])
+  @@index([expirationDate])
+  @@map("expiring_policy_alerts")
+}
+
+// AdminSettings Model - System-wide admin settings
+model AdminSettings {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String   @db.Text
+  description String?  @db.Text
+  updatedBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("admin_settings")
+}
+
+// AuditLog Model - System audit trail
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  action     String
+  entity     String
+  entityId   String?
+  changes    Json?
+  ipAddress  String?
+  userAgent  String?  @db.Text
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([entity])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// GCPortalAccess Model - General Contractor portal access
+model GCPortalAccess {
+  id            String   @id @default(uuid())
+  contractorId  String   @unique
+  contractor    Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  accessCode    String   @unique
+  enabled       Boolean  @default(true)
+  lastAccess    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([accessCode])
+  @@map("gc_portal_access")
+}
+
+// BrokerPortalAccess Model - Broker portal access
+model BrokerPortalAccess {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  companyName   String
+  accessCode    String   @unique
+  enabled       Boolean  @default(true)
+  permissions   Json?
+  lastAccess    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([accessCode])
+  @@index([email])
+  @@map("broker_portal_access")
+}
+

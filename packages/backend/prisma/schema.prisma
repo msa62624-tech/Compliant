@@ -10,18 +10,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User Model
+// ============================================
+// ORIGINAL ARCHITECTURE (from commit c1e9958)
+// ============================================
+
 model User {
-  id           String    @id @default(uuid())
-  email        String    @unique
-  password     String
-  firstName    String
-  lastName     String
-  role         UserRole  @default(USER)
-  isActive     Boolean   @default(true)
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true)
   refreshToken String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   contractorsCreated Contractor[]  @relation("ContractorCreator")
   projects           Project[]
@@ -31,7 +34,8 @@ model User {
 }
 
 enum UserRole {
-  ADMIN
+  SUPER_ADMIN  // Full access, sees everything, no filtering
+  ADMIN        // Assistant admin, filtered by assigned_admin_email
   MANAGER
   USER
   CONTRACTOR
@@ -39,8 +43,15 @@ enum UserRole {
   BROKER
 }
 
-// Contractor Model
 model Contractor {
+  id             String           @id @default(uuid())
+  name           String
+  email          String           @unique
+  phone          String?
+  company        String?
+  contractorType ContractorType   @default(SUBCONTRACTOR)
+  status         ContractorStatus @default(PENDING)
+  insuranceStatus InsuranceStatus @default(PENDING)
   id              String           @id @default(uuid())
   name            String
   email           String           @unique
@@ -71,6 +82,13 @@ model Contractor {
   brokerWcEmail   String?
   brokerWcPhone   String?
   
+  // Admin assignment (for assistant admin filtering)
+  assignedAdminEmail String?
+  
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   createdById     String
   createdBy       User             @relation("ContractorCreator", fields: [createdById], references: [id], onDelete: Cascade)
   createdAt       DateTime         @default(now())
@@ -108,16 +126,20 @@ enum InsuranceStatus {
   EXPIRED
 }
 
-// Project Model
 model Project {
   id          String        @id @default(uuid())
   name        String
   description String?
+  address     String?       // Project location/address
   startDate   DateTime
   endDate     DateTime?
   status      ProjectStatus @default(PLANNING)
   gcName      String?
   location    String?
+  
+  // Admin assignment (for assistant admin filtering)
+  assignedAdminEmail String?
+  
   createdById String
   createdBy   User          @relation(fields: [createdById], references: [id], onDelete: Cascade)
   createdAt   DateTime      @default(now())
@@ -138,7 +160,6 @@ enum ProjectStatus {
   CANCELLED
 }
 
-// Junction table for Project <-> Contractor (many-to-many)
 model ProjectContractor {
   id           String     @id @default(uuid())
   projectId    String
@@ -166,6 +187,7 @@ model ProjectSubcontractor {
   @@map("project_subcontractors")
 }
 
+// Generated COI (Certificate of Insurance) - Core of the workflow
 // Generated COI (Certificate of Insurance) Model
 model GeneratedCOI {
   id                String    @id @default(uuid())
@@ -234,6 +256,10 @@ model GeneratedCOI {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
+  @@index([projectId])
+  @@index([subcontractorId])
+  @@index([status])
+  @@index([assignedAdminEmail])
   @@map("generated_cois")
 }
 
@@ -263,6 +289,9 @@ model InsuranceDocument {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
+  @@index([contractorId])
+  @@index([status])
+  @@index([expirationDate])
   @@map("insurance_documents")
 }
 
