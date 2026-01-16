@@ -1,287 +1,185 @@
-# compliant.team
+# Compliant.team - Insurance Tracking Platform
 
-Full-stack insurance tracking application for General Contractors and their subcontractors. Built with React frontend and Express.js backend.
+Enterprise-grade insurance tracking application for General Contractors and their subcontractors. Built with NestJS backend, Next.js 14 frontend, and PostgreSQL database.
 
----
+## 🚀 Quick Start
 
-## 🏗️ ARCHITECTURE STATUS
+### Prerequisites
 
-**Current Architecture:** React + Vite + Express.js + In-memory storage
+- **Node.js**: >= 20.0.0
+- **pnpm**: >= 8.0.0 (Install: `npm install -g pnpm`)
+- **PostgreSQL**: >= 15.0
 
-This is a functional proof-of-concept with known architectural limitations. For production deployment and long-term sustainability, professional refactoring is recommended.
-
-### 📋 Planning Documentation
-- **[ARCHITECTURE_RECOMMENDATION.md](./ARCHITECTURE_RECOMMENDATION.md)** - Professional architecture proposal (NestJS + Next.js + PostgreSQL + AWS)
-- **[TECHNICAL_DEBT.md](./TECHNICAL_DEBT.md)** - Honest assessment of current limitations and technical debt
-- **[REFACTORING_PLAN.md](./REFACTORING_PLAN.md)** - Detailed timeline and budget breakdown for professional refactor (14 weeks, $225K)
-
-These documents provide transparency about the current state and a clear path forward for enterprise-grade deployment.
-
----
-
-## ⚠️ SECURITY NOTICE - CRITICAL ACTION REQUIRED
-
-**CRITICAL:** The `backend/.env` file with sensitive credentials (JWT_SECRET, SMTP credentials) was previously committed to the repository.
-
-**Current Status:**
-- ✅ The file is no longer tracked by git (as of this commit)
-- ✅ File removed from tracking in HEAD commit
-- ✅ File properly ignored by .gitignore
-- ❌ Credentials still exposed in git history (requires manual git-filter-repo + force push)
-- ⚠️ Credentials must be rotated after history cleanup
-
-**Required Actions:**
-1. **IMMEDIATELY after merging:** Run `git-filter-repo` to remove the file from all git history
-2. **IMMEDIATELY after merging:** Force push the cleaned history to the remote repository
-3. **After cleanup:** Rotate all exposed credentials immediately
-
-📄 **See [docs/SECURITY_CREDENTIAL_ROTATION.md](docs/SECURITY_CREDENTIAL_ROTATION.md) for complete instructions.**
-📋 **See [docs/POST_MERGE_CHECKLIST.md](docs/POST_MERGE_CHECKLIST.md) for step-by-step cleanup process.**
-
----
-
-## Quick Start
-
-### 🚨 "Backend is Mocked" Issue?
-
-If you see warnings about **"Backend not configured"** or **"MOCK MODE"**, the `.env` files are now included in this repository for local development. See [docs/BACKEND_CONNECTION_SETUP.md](docs/BACKEND_CONNECTION_SETUP.md) for the fix.
-
-### Frontend Setup
+### Installation
 
 ```bash
-npm install
-# .env file already configured for local development
-npm run dev
+# Install dependencies
+pnpm install
+
+# Set up environment variables
+cp packages/backend/.env.example packages/backend/.env
+cp packages/frontend/.env.example packages/frontend/.env.local
+
+# Configure your database connection in packages/backend/.env
+# DATABASE_URL="postgresql://user:password@localhost:5432/compliant_dev"
+
+# Push database schema
+pnpm db:push
+
+# Start development servers (both backend and frontend)
+pnpm dev
 ```
 
-**Optional:** Run `npm run setup` for an interactive configuration wizard.
+### Access Points
 
-### Backend Setup
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:3001/api/v1
+- **API Docs**: http://localhost:3001/api/docs
+- **Database GUI**: Run `pnpm db:studio` then visit http://localhost:5555
+
+## 📦 Architecture
+
+This is a monorepo with three packages:
+
+### `packages/backend` - NestJS API
+- NestJS 10.x framework
+- Prisma ORM + PostgreSQL
+- JWT authentication with refresh tokens
+- Role-based access control (RBAC)
+- Swagger/OpenAPI documentation
+
+### `packages/frontend` - Next.js 14 App
+- Next.js 14 with App Router
+- TypeScript + Tailwind CSS
+- React Query for data fetching
+- JWT auth with auto-refresh
+
+### `packages/shared` - Shared Code
+- TypeScript types
+- Zod validation schemas
+- Shared constants
+
+## 🛠️ Development Scripts
 
 ```bash
-cd backend
-npm install
-# .env file already configured with defaults
-npm run dev
+# Start all services
+pnpm dev
+
+# Start services individually
+pnpm backend   # Backend only (http://localhost:3001)
+pnpm frontend  # Frontend only (http://localhost:3000)
+
+# Database management
+pnpm db:studio  # Open Prisma Studio
+pnpm db:push    # Push schema changes
+pnpm db:migrate # Run migrations
+
+# Code quality
+pnpm build      # Build all packages
+pnpm test       # Run tests
+pnpm lint       # Lint code
 ```
-
-Backend runs on `http://localhost:3001`  
-Frontend runs on `http://localhost:5173`
-
-For email configuration, see [docs/EMAIL_SETUP.md](docs/EMAIL_SETUP.md).
-
-### Deployment
-
-For production deployment, see [docs/DEPLOY.md](docs/DEPLOY.md) for complete instructions.
-
-## 📚 Documentation
-
-- [docs/COMPLETE_CONFIGURATION_GUIDE.md](docs/COMPLETE_CONFIGURATION_GUIDE.md) - **🔧 Complete guide to remove ALL mocking**
-- [docs/BACKEND_CONNECTION_SETUP.md](docs/BACKEND_CONNECTION_SETUP.md) - **🔧 Fix "Backend is Mocked" issue**
-- [docs/SECURITY_CREDENTIAL_ROTATION.md](docs/SECURITY_CREDENTIAL_ROTATION.md) - **⚠️ CRITICAL: Post-merge credential rotation required**
-- [docs/QUICKSTART.md](docs/QUICKSTART.md) - Quick start guide
-- [docs/EMAIL_SETUP.md](docs/EMAIL_SETUP.md) - Email configuration guide
-- [docs/DEPLOY.md](docs/DEPLOY.md) - Deployment instructions
-- [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) - Full API reference
-- [docs/DATA_MODEL.md](docs/DATA_MODEL.md) - Database schema and entities
-- [docs/SYSTEM_ARCHITECTURE.md](docs/SYSTEM_ARCHITECTURE.md) - System design and architecture
-- [docs/CHANGELOG.md](docs/CHANGELOG.md) - Version history
-
-## 🔑 Default Users
-
-| Username | Password     | Role         | Description              |
-|----------|--------------|--------------|--------------------------|
-| admin    | INsure2026!  | super_admin  | Full system access       |
 
 ## 🏗️ Features
 
-### Core Functionality:
+- **Authentication**: Secure JWT-based authentication
+- **Contractor Management**: Full CRUD operations for contractors
+- **Insurance Tracking**: Monitor insurance documents and status
+- **Project Management**: Track projects and contractor assignments
+- **User Management**: Admin, Manager, and User roles
+- **Real-time Updates**: Automatic data refresh
+- **Responsive UI**: Mobile-friendly interface
 
-1. **General Contractor Management**
-   - Create and manage GC companies
-   - Assign GCs to admin users
-   - Track GC statistics and projects
+## 📚 Documentation
 
-2. **Project Management**
-   - Create construction projects
-   - Define owner entities and additional insured parties
-   - Set insurance requirements
-   - Track budget and timeline
+- **API Documentation**: Visit http://localhost:3001/api/docs when backend is running
+- **Database Schema**: See `packages/backend/prisma/schema.prisma`
 
-3. **Subcontractor Tracking**
-   - Add subcontractors to projects
-   - Assign multiple trades per subcontractor
-   - Track compliance status automatically
+## 🔧 Configuration
 
-4. **Insurance Compliance**
-   - Automatic requirement matching by trade
-   - Support for multiple requirement tiers
-   - Compliance status tracking
-   - COI generation with endorsements
+### Backend Environment Variables
 
-5. **Document Management**
-   - Upload insurance documents
-   - Track approval status
-   - Link documents to projects and subcontractors
+Edit `packages/backend/.env`:
 
-## 📊 Backend Entities (19 Total)
-
-All entities are configured and accessible via REST API:
-
-### Core Entities:
-- ✅ Contractor (GCs & Subcontractors)
-- ✅ Project
-- ✅ ProjectSubcontractor
-- ✅ User
-
-### Insurance Entities:
-- ✅ InsuranceDocument
-- ✅ GeneratedCOI
-- ✅ SubInsuranceRequirement
-- ✅ StateRequirement
-- ✅ InsuranceProgram
-
-### Supporting Entities:
-- ✅ Trade
-- ✅ Broker
-- ✅ BrokerUploadRequest
-- ✅ Subscription
-- ✅ PolicyDocument
-- ✅ COIDocument
-- ✅ ComplianceCheck
-- ✅ ProgramTemplate
-- ✅ Portal
-- ✅ Message
-
-## 🧪 Test Backend
-
-Run the entity test script to verify all endpoints:
-```bash
-./test-entities.sh
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/compliant_dev"
+JWT_SECRET="your-secret-key-min-32-characters"
+JWT_REFRESH_SECRET="your-refresh-secret-min-32-characters"
+JWT_EXPIRATION="15m"
+JWT_REFRESH_EXPIRATION="7d"
+PORT=3001
 ```
 
-Expected output: All 19 entities should return HTTP 200 ✅
+### Frontend Environment Variables
 
-## 🏛️ Architecture
+Edit `packages/frontend/.env.local`:
 
-- **Frontend:** React + Vite + Shadcn/ui + Tailwind CSS
-- **Backend:** Express.js + JWT auth (custom implementation, no external services)
-- **API Client:** Custom REST client (legacy name: "compliant" - purely internal, no external dependency)
-- **State:** React Query (@tanstack/react-query)
-- **Storage:** In-memory (migrate to PostgreSQL/MongoDB for production)
-- **Auth:** Bearer tokens (1hr expiry) + Refresh tokens (7d expiry)
-
-## 🔧 Environment Variables
-
-### Frontend (.env.local)
-```bash
-VITE_API_BASE_URL=https://organic-system-wrpwv4xxwvxv3v4pw-3001.app.github.dev
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
 ```
 
-**Note:** The `.env` file is automatically created from `.env.example` during builds if it doesn't exist. This ensures the backend URL is always configured. For local development, you can manually copy `.env.example` to `.env` and customize the URL.
+## 🧪 Testing
+
+```bash
+# Backend tests
+cd packages/backend
+pnpm test        # Unit tests
+pnpm test:e2e    # E2E tests
+pnpm test:cov    # Coverage report
+
+# Frontend tests
+cd packages/frontend
+pnpm test        # Component tests
+```
+
+## 📊 Database Setup
+
+```bash
+# Create database
+createdb compliant_dev
+
+# Or using Docker
+docker run --name compliant-postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=compliant_dev \
+  -p 5432:5432 -d postgres:15
+
+# Push Prisma schema
+pnpm db:push
+
+# Seed database with demo data (optional)
+cd packages/backend && pnpm db:seed
+```
+
+## 🚢 Deployment
 
 ### Backend
-```bash
-PORT=3001
-JWT_SECRET=compliant-dev-secret-change-in-production
-FRONTEND_URL=https://organic-system-wrpwv4xxwvxv3v4pw-5174.app.github.dev
-NODE_ENV=development
-```
+- Deploy to AWS ECS, Heroku, or similar
+- Set environment variables
+- Run migrations before deployment
 
-## 🚀 Quick Workflow Example
+### Frontend
+- Deploy to Vercel (recommended)
+- Or any Node.js hosting platform
+- Configure `NEXT_PUBLIC_API_URL` to production API
 
-```bash
-# 1. Login
-curl -X POST http://localhost:3001/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"INsure2026!"}'
+### Database
+- Use AWS RDS, Supabase, or managed PostgreSQL
+- Run migrations: `npx prisma migrate deploy`
 
-# 2. Get Projects (with token)
-curl http://localhost:3001/entities/Project \
-  -H "Authorization: Bearer <your_token>"
+## 🔒 Security
 
-# 3. Create a new Contractor
-curl -X POST http://localhost:3001/entities/Contractor \
-  -H "Authorization: Bearer <your_token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "company_name": "New Construction Co",
-    "contractor_type": "general_contractor",
-    "email": "contact@newconstruction.com",
-    "phone": "212-555-1234",
-    "status": "active"
-  }'
-```
+- ✅ JWT tokens with short expiration
+- ✅ Refresh token rotation
+- ✅ Password hashing with bcrypt
+- ✅ CORS configuration
+- ✅ Input validation
+- ✅ SQL injection prevention (Prisma)
 
-## 📱 Frontend Pages
+## 📝 License
 
-- ✅ Login Page
-- ✅ Contractors Page (GC list)
-- ✅ GC Details Page (projects, stats)
-- ✅ Project Details Page (subs, compliance)
-- ✅ Admin Dashboard
-- ✅ Contractor Dashboard
-- ✅ Subcontractor Portal
-- ✅ Financials Page
-- ✅ All Documents Page
+MIT License
 
-## 🚀 Getting Started
+---
 
-1. Open browser to frontend URL
-2. Login with `admin` / `INsure2026!`
-3. Navigate to Contractors page
-4. Create projects and add subcontractors
-
-## 🐛 Troubleshooting
-
-### "Backend is Mocked" / "Backend not configured" Error
-
-**⚠️ This is the most common issue!**
-
-If you see console warnings about "MOCK MODE" or data not persisting:
-
-1. **Quick Fix:** The `.env` files are now included in the repository
-2. **Verify:** Check that `.env` exists in the root directory with `VITE_API_BASE_URL=http://localhost:3001`
-3. **Start backend:**
-   ```bash
-   cd backend
-   npm install
-   npm run dev
-   ```
-4. **Start frontend:**
-   ```bash
-   npm install
-   npm run dev
-   ```
-
-**📖 Complete guide:** [docs/BACKEND_CONNECTION_SETUP.md](docs/BACKEND_CONNECTION_SETUP.md)
-
-### Backend Connection Issues
-
-If data isn't persisting or emails aren't sending:
-
-1. Ensure the backend is running:
-   ```bash
-   cd backend
-   npm run dev
-   ```
-
-2. Verify browser console shows API calls to `http://localhost:3001` (not mock mode warnings)
-
-3. Restart the frontend if needed
-
-For production deployments, see [docs/DEPLOY.md](docs/DEPLOY.md).
-
-### Email Configuration
-
-If emails appear to send but don't arrive:
-- Development mode without SMTP configured will log emails instead of sending them
-- To send real emails, configure SMTP in `backend/.env` - see [docs/EMAIL_SETUP.md](docs/EMAIL_SETUP.md) or [docs/COMPLETE_CONFIGURATION_GUIDE.md](docs/COMPLETE_CONFIGURATION_GUIDE.md)
-- Check backend console for email delivery status
-
-## ⚠️ Important Notes
-
-- **Production Ready:** Backend is configured to fail fast without mock data - all services must be properly configured
-- **Required Configuration:** See [docs/PRODUCTION_CONFIG.md](docs/PRODUCTION_CONFIG.md) for complete setup guide
-- **Data Storage:** Uses in-memory storage (resets on restart) - migrate to PostgreSQL/MongoDB for production persistence
-- **Environment Files:** `.env` file must be configured with real credentials for production deployment
+**Built with ❤️ using enterprise best practices**

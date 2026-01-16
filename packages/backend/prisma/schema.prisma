@@ -1,0 +1,144 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Model
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  password     String
+  firstName    String
+  lastName     String
+  role         UserRole  @default(USER)
+  isActive     Boolean   @default(true)
+  refreshToken String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  contractors Contractor[]
+  projects    Project[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  USER
+}
+
+// Contractor Model
+model Contractor {
+  id              String           @id @default(uuid())
+  name            String
+  email           String           @unique
+  phone           String?
+  company         String?
+  status          ContractorStatus @default(PENDING)
+  insuranceStatus InsuranceStatus  @default(PENDING)
+  createdById     String
+  createdBy       User             @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  insuranceDocuments InsuranceDocument[]
+  projectContractors ProjectContractor[]
+
+  @@map("contractors")
+}
+
+enum ContractorStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+  SUSPENDED
+}
+
+enum InsuranceStatus {
+  COMPLIANT
+  NON_COMPLIANT
+  PENDING
+  EXPIRED
+}
+
+// Project Model
+model Project {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime?
+  status      ProjectStatus @default(PLANNING)
+  createdById String
+  createdBy   User          @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  projectContractors ProjectContractor[]
+
+  @@map("projects")
+}
+
+enum ProjectStatus {
+  PLANNING
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+// Junction table for Project <-> Contractor (many-to-many)
+model ProjectContractor {
+  id           String     @id @default(uuid())
+  projectId    String
+  project      Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  contractorId String
+  contractor   Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  role         String?
+  assignedAt   DateTime   @default(now())
+
+  @@unique([projectId, contractorId])
+  @@map("project_contractors")
+}
+
+// Insurance Document Model
+model InsuranceDocument {
+  id             String         @id @default(uuid())
+  contractorId   String
+  contractor     Contractor     @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  type           InsuranceType
+  provider       String
+  policyNumber   String
+  coverageAmount Float
+  effectiveDate  DateTime
+  expirationDate DateTime
+  status         DocumentStatus @default(PENDING)
+  fileUrl        String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@map("insurance_documents")
+}
+
+enum InsuranceType {
+  GENERAL_LIABILITY
+  WORKERS_COMPENSATION
+  AUTO_LIABILITY
+  PROFESSIONAL_LIABILITY
+  UMBRELLA
+}
+
+enum DocumentStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
