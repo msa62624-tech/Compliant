@@ -25,7 +25,7 @@ export class COIGeneratorService {
     try {
       const certificateNumber = this.generateCertificateNumber();
 
-      // Create COI record in database
+      // Create COI record in database with PENDING_APPROVAL status
       const coi = await this.prisma.generatedCOI.create({
         data: {
           contractorId: data.contractorId,
@@ -40,28 +40,59 @@ export class COIGeneratorService {
           certificateHolder: data.certificateHolder,
           description: data.description,
           generatedBy,
-          status: 'ISSUED',
+          status: 'PENDING_APPROVAL',
         },
         include: {
           contractor: true,
         },
       });
 
-      // Generate PDF
+      this.logger.log(`COI generated (pending approval): ${certificateNumber}`);
+
+      return coi;
+    } catch (error) {
+      this.logger.error(`Failed to generate COI: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async approveCOI(id: string, approvalId: string): Promise<any> {
+    try {
+      // Update COI status to ISSUED and link approval
+      const coi = await this.prisma.generatedCOI.update({
+        where: { id },
+        data: {
+          status: 'ISSUED',
+          approvalId,
+        },
+        include: {
+          contractor: true,
+          approval: true,
+        },
+      });
+
+      // Generate PDF now that it's approved
       const pdfPath = await this.generatePDF(coi);
 
-      // Store PDF file reference (if file service is available)
-      // For now, we just return the COI record
-      this.logger.log(`COI generated: ${certificateNumber}`);
+      this.logger.log(`COI approved and issued: ${coi.certificateNumber}`);
 
       return {
         ...coi,
         pdfPath,
       };
     } catch (error) {
-      this.logger.error(`Failed to generate COI: ${error.message}`);
+      this.logger.error(`Failed to approve COI: ${error.message}`);
       throw error;
     }
+  }
+
+  async rejectCOI(id: string, reason: string): Promise<any> {
+    return this.prisma.generatedCOI.update({
+      where: { id },
+      data: {
+        status: 'CANCELLED',
+      },
+    });
   }
 
   private async generatePDF(coi: any): Promise<string> {

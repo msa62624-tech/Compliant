@@ -36,4 +36,14 @@ export class COIGeneratorController {
   async updateStatus(@Param('id') id: string, @Body('status') status: string) {
     return this.coiGeneratorService.updateCOIStatus(id, status);
   }
+
+  @Post(':id/approve')
+  async approveCOI(@Param('id') id: string, @Body('approvalId') approvalId: string) {
+    return this.coiGeneratorService.approveCOI(id, approvalId);
+  }
+
+  @Post(':id/reject')
+  async rejectCOI(@Param('id') id: string, @Body('reason') reason: string) {
+    return this.coiGeneratorService.rejectCOI(id, reason);
+  }
 }

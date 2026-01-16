@@ -33,6 +33,9 @@ model User {
   approvals          Approval[]
   resolvedDeficiencies Deficiency[]
   reminders          Reminder[]
+  sentMessages       Message[]        @relation("Sender")
+  receivedMessages   Message[]        @relation("Receiver")
+  notifications      Notification[]
 
   @@map("users")
 }
@@ -63,7 +66,10 @@ model Contractor {
   dobRecords         DOBRecord[]
   placeVerifications PlaceVerification[]
   generatedCOIs      GeneratedCOI[]
+  policyAlerts       ExpiringPolicyAlert[]
 
+  @@index([createdById])
+  @@index([email])
   @@map("contractors")
 }
 
@@ -333,15 +339,16 @@ enum ReviewDecision {
 
 // Approval Model - for multi-level approval workflow
 model Approval {
-  id         String           @id @default(uuid())
-  reviewId   String
-  review     COIReview        @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-  approverId String
-  approver   User             @relation(fields: [approverId], references: [id])
-  decision   ApprovalDecision
-  comments   String?          @db.Text
-  conditions String?          @db.Text
-  approvedAt DateTime         @default(now())
+  id           String           @id @default(uuid())
+  reviewId     String
+  review       COIReview        @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  approverId   String
+  approver     User             @relation(fields: [approverId], references: [id])
+  decision     ApprovalDecision
+  comments     String?          @db.Text
+  conditions   String?          @db.Text
+  approvedAt   DateTime         @default(now())
+  generatedCOI GeneratedCOI?
 
   @@index([reviewId])
   @@index([approverId])
@@ -498,6 +505,8 @@ model GeneratedCOI {
   generatedBy       String
   generatedAt       DateTime   @default(now())
   status            COIStatus  @default(DRAFT)
+  approvalId        String?    @unique
+  approval          Approval?  @relation(fields: [approvalId], references: [id], onDelete: SetNull)
 
   @@index([contractorId])
   @@index([certificateNumber])
@@ -507,8 +516,83 @@ model GeneratedCOI {
 
 enum COIStatus {
   DRAFT
+  PENDING_APPROVAL
   ISSUED
   EXPIRED
   CANCELLED
+}
+
+// Message Model - Internal messaging system
+model Message {
+  id         String        @id @default(uuid())
+  senderId   String
+  sender     User          @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId String
+  receiver   User          @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  subject    String
+  body       String        @db.Text
+  read       Boolean       @default(false)
+  readAt     DateTime?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([read])
+  @@map("messages")
+}
+
+// Notification Model - System notifications
+model Notification {
+  id        String             @id @default(uuid())
+  userId    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  message   String             @db.Text
+  link      String?
+  read      Boolean            @default(false)
+  readAt    DateTime?
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@index([userId])
+  @@index([read])
+  @@index([type])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  COI_EXPIRING
+  COI_EXPIRED
+  REVIEW_ASSIGNED
+  REVIEW_COMPLETED
+  DEFICIENCY_CREATED
+  DEFICIENCY_RESOLVED
+  APPROVAL_REQUIRED
+  APPROVAL_GRANTED
+  APPROVAL_DENIED
+  SYSTEM_ALERT
+}
+
+// ExpiringPolicyAlert Model - Tracks alerts for expiring policies
+model ExpiringPolicyAlert {
+  id              String     @id @default(uuid())
+  contractorId    String
+  contractor      Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  policyType      String
+  policyNumber    String?
+  expirationDate  DateTime
+  daysUntilExpiry Int
+  alertSentAt     DateTime   @default(now())
+  resolved        Boolean    @default(false)
+  resolvedAt      DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([contractorId])
+  @@index([resolved])
+  @@index([expirationDate])
+  @@map("expiring_policy_alerts")
 }
 
