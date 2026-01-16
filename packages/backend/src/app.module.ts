@@ -6,6 +6,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { ContractorsModule } from './modules/contractors/contractors.module';
 import { GeneratedCOIModule } from './modules/generated-coi/generated-coi.module';
+import { ProjectsModule } from './modules/projects/projects.module';
 import { PrismaModule } from './config/prisma.module';
 
 @Module({
@@ -22,6 +23,7 @@ import { PrismaModule } from './config/prisma.module';
     UsersModule,
     ContractorsModule,
     GeneratedCOIModule,
+    ProjectsModule,
   ],
   providers: [
     {

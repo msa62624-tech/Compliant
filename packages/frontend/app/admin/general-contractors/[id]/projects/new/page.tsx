@@ -3,6 +3,7 @@
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { getApiUrl } from '@/lib/api/config';
 
 interface Contractor {
   id: string;
@@ -57,7 +58,7 @@ export default function NewProjectForGCPage() {
   const fetchContractorDetails = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`http://localhost:3001/api/v1/contractors/${contractorId}`, {
+      const response = await fetch(`${getApiUrl()}/contractors/${contractorId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -98,7 +99,7 @@ export default function NewProjectForGCPage() {
         endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
       };
 
-      const response = await fetch('http://localhost:3001/api/v1/projects', {
+      const response = await fetch(`${getApiUrl()}/projects`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

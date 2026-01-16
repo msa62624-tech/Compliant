@@ -42,11 +42,18 @@ export class AuthService {
     
     // Generate refresh token
     const refreshTokenString = crypto.randomBytes(32).toString('hex');
+    
+    // Set refresh token expiration to 7 days from now
+    const refreshTokenExpiresAt = new Date();
+    refreshTokenExpiresAt.setDate(refreshTokenExpiresAt.getDate() + 7);
 
-    // Store refresh token in User model
+    // Store refresh token in User model with expiration
     await this.prisma.user.update({
       where: { id: user.id },
-      data: { refreshToken: refreshTokenString },
+      data: { 
+        refreshToken: refreshTokenString,
+        refreshTokenExpiresAt: refreshTokenExpiresAt,
+      },
     });
 
     return {
@@ -67,14 +74,30 @@ export class AuthService {
         throw new UnauthorizedException('Invalid refresh token');
       }
 
+      // Validate refresh token expiration
+      if (!user.refreshTokenExpiresAt || user.refreshTokenExpiresAt < new Date()) {
+        // Clear expired token
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: { refreshToken: null, refreshTokenExpiresAt: null },
+        });
+        throw new UnauthorizedException('Refresh token expired');
+      }
+
       const newPayload = { email: user.email, sub: user.id, role: user.role };
       const accessToken = this.jwtService.sign(newPayload);
 
-      // Rotate refresh token - generate new one
+      // Rotate refresh token - generate new one with new expiration
       const newRefreshTokenString = crypto.randomBytes(32).toString('hex');
+      const newRefreshTokenExpiresAt = new Date();
+      newRefreshTokenExpiresAt.setDate(newRefreshTokenExpiresAt.getDate() + 7);
+      
       await this.prisma.user.update({
         where: { id: user.id },
-        data: { refreshToken: newRefreshTokenString },
+        data: { 
+          refreshToken: newRefreshTokenString,
+          refreshTokenExpiresAt: newRefreshTokenExpiresAt,
+        },
       });
 
       return {
@@ -87,10 +110,13 @@ export class AuthService {
   }
 
   async logout(userId: string) {
-    // Clear refresh token for user
+    // Clear refresh token and expiration for user
     await this.prisma.user.update({
       where: { id: userId },
-      data: { refreshToken: null },
+      data: { 
+        refreshToken: null,
+        refreshTokenExpiresAt: null,
+      },
     });
 
     return { message: 'Logged out successfully' };

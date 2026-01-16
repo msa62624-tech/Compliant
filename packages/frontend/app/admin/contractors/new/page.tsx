@@ -3,6 +3,7 @@
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { getApiUrl } from '@/lib/api/config';
 
 export default function NewContractorPage() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -40,7 +41,7 @@ export default function NewContractorPage() {
 
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:3001/api/v1/contractors', {
+      const response = await fetch(`${getApiUrl()}/contractors`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -3,6 +3,7 @@
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { getApiUrl } from '@/lib/api/config';
 
 interface Contractor {
   id: string;
@@ -38,7 +39,7 @@ export default function GeneralContractorsPage() {
     try {
       setIsLoading(true);
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:3001/api/v1/contractors', {
+      const response = await fetch(`${getApiUrl()}/contractors`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

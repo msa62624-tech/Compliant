@@ -3,6 +3,7 @@
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { getApiUrl } from '@/lib/api/config';
 
 interface Contractor {
   id: string;
@@ -54,7 +55,7 @@ export default function ContractorDetailPage() {
     try {
       setIsLoading(true);
       const token = localStorage.getItem('accessToken');
-      const response = await fetch(`http://localhost:3001/api/v1/contractors/${contractorId}`, {
+      const response = await fetch(`${getApiUrl()}/contractors/${contractorId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -75,19 +76,23 @@ export default function ContractorDetailPage() {
   };
 
   const fetchContractorProjects = async () => {
-    // Mock projects for now - in real implementation, would fetch from API
-    setProjects([
-      {
-        id: '1',
-        name: 'Downtown Office Building',
-        description: 'New commercial office building',
-        address: '123 Main St',
-        startDate: '2024-01-01',
-        endDate: '2024-12-31',
-        status: 'ACTIVE',
-        location: 'New York, NY',
-      },
-    ]);
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${getApiUrl()}/projects/contractor/${contractorId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProjects(data);
+      } else {
+        console.error('Failed to load contractor projects');
+      }
+    } catch (err) {
+      console.error('Error fetching contractor projects:', err);
+    }
   };
 
   if (loading || !isAuthenticated || isLoading) {
