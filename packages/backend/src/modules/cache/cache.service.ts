@@ -22,13 +22,14 @@ export class CacheService implements OnModuleInit {
       if (redisUrl) {
         this.redis = new Redis(redisUrl, {
           retryStrategy: (times) => {
-            if (times > 2) {
-              this.logger.warn('Redis connection failed, falling back to memory cache');
+            if (times > 5) {
+              this.logger.warn('Redis connection failed after 5 retries, falling back to memory cache');
               return null;
             }
+            // Linear backoff with cap: 100ms, 200ms, 300ms, 400ms, 500ms (capped at 2000ms)
             return Math.min(times * 100, 2000);
           },
-          maxRetriesPerRequest: 2,
+          maxRetriesPerRequest: 5,
         });
 
         this.redis.on('connect', () => {
@@ -97,18 +98,41 @@ export class CacheService implements OnModuleInit {
 
   /**
    * Delete all keys matching a pattern
-   * Note: Use sparingly as this can be expensive with many keys
+   * Uses non-blocking SCAN to avoid production issues with large datasets
    */
   async delPattern(pattern: string): Promise<void> {
     try {
       if (this.redis) {
-        const keys = await this.redis.keys(pattern);
-        if (keys.length > 0) {
-          // Batch delete for better performance
-          if (keys.length > 100) {
-            this.logger.warn(`Deleting ${keys.length} keys matching pattern ${pattern}`);
+        const keysToDelete: string[] = [];
+        let cursor = '0';
+        
+        // Use SCAN to iterate through keys without blocking
+        do {
+          const [nextCursor, keys] = await this.redis.scan(
+            cursor,
+            'MATCH',
+            pattern,
+            'COUNT',
+            100
+          );
+          
+          cursor = nextCursor;
+          keysToDelete.push(...keys);
+          
+          // Delete in batches to avoid memory issues
+          if (keysToDelete.length >= 100) {
+            if (keysToDelete.length > 0) {
+              await this.redis.del(...keysToDelete);
+              this.logger.debug(`Deleted batch of ${keysToDelete.length} keys matching pattern ${pattern}`);
+              keysToDelete.length = 0; // Clear the array
+            }
           }
-          await this.redis.del(...keys);
+        } while (cursor !== '0');
+        
+        // Delete any remaining keys
+        if (keysToDelete.length > 0) {
+          await this.redis.del(...keysToDelete);
+          this.logger.debug(`Deleted final batch of ${keysToDelete.length} keys matching pattern ${pattern}`);
         }
       } else {
         // For memory cache, use simple pattern matching

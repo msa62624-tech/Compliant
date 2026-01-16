@@ -22,11 +22,19 @@ export class EncryptionService {
   private initializeKey() {
     try {
       const secret = this.configService.get<string>('ENCRYPTION_KEY');
-      const salt = this.configService.get<string>('ENCRYPTION_SALT') || 'compliant-platform-salt';
+      const salt = this.configService.get<string>('ENCRYPTION_SALT');
       
       if (!secret) {
         this.logger.warn('ENCRYPTION_KEY not set - field encryption will not be available');
         return;
+      }
+
+      if (!salt) {
+        throw new Error(
+          'ENCRYPTION_SALT is required but not set. ' +
+          'This is mandatory to prevent data loss when ENCRYPTION_KEY changes. ' +
+          'Generate a secure salt using: openssl rand -hex 16'
+        );
       }
 
       // Derive a 256-bit key from the secret using scrypt
@@ -34,6 +42,7 @@ export class EncryptionService {
       this.logger.log('Encryption key initialized successfully');
     } catch (error) {
       this.logger.error(`Failed to initialize encryption key: ${error.message}`);
+      throw error;
     }
   }
 
