@@ -3,10 +3,6 @@
 
 import http from 'k6/http';
 import { check, sleep } from 'k6';
-import { Rate } from 'k6/metrics';
-
-// Custom metrics
-const errorRate = new Rate('errors');
 
 // Load test configuration
 export const options = {
@@ -18,7 +14,7 @@ export const options = {
   thresholds: {
     http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
     http_req_failed: ['rate<0.1'],    // Error rate should be less than 10%
-    errors: ['rate<0.1'],             // Custom error rate threshold
+    checks: ['rate>0.9'],             // 90% of checks should pass
   },
 };
 
@@ -68,12 +64,9 @@ export default function(data) {
   });
 
   if (!loginSuccess) {
-    errorRate.add(1);
     console.error(`Login failed: ${loginRes.status} - ${loginRes.body}`);
     return;
   }
-
-  errorRate.add(0);
 
   // Extract access token for subsequent requests
   let accessToken;
@@ -82,7 +75,6 @@ export default function(data) {
     accessToken = loginBody.accessToken;
   } catch (e) {
     console.error('Failed to parse login response');
-    errorRate.add(1);
     return;
   }
 
@@ -99,7 +91,7 @@ export default function(data) {
 
   const profileRes = http.get(`${data.baseUrl}/auth/profile`, authParams);
   
-  const profileSuccess = check(profileRes, {
+  check(profileRes, {
     'profile status is 200': (r) => r.status === 200,
     'profile returns user data': (r) => {
       try {
@@ -110,12 +102,6 @@ export default function(data) {
       }
     },
   });
-
-  if (!profileSuccess) {
-    errorRate.add(1);
-  } else {
-    errorRate.add(0);
-  }
 
   sleep(1);
 

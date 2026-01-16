@@ -3,9 +3,6 @@
 
 import http from 'k6/http';
 import { check, sleep } from 'k6';
-import { Rate } from 'k6/metrics';
-
-const errorRate = new Rate('errors');
 
 export const options = {
   stages: [
@@ -16,7 +13,7 @@ export const options = {
   thresholds: {
     http_req_duration: ['p(95)<1000'], // 95% of requests under 1s
     http_req_failed: ['rate<0.1'],     // Error rate < 10%
-    errors: ['rate<0.1'],
+    checks: ['rate>0.9'],              // 90% of checks should pass
   },
 };
 
@@ -61,7 +58,7 @@ export default function(data) {
 
   // Test 1: List contractors
   const listRes = http.get(`${data.baseUrl}/contractors`, params);
-  const listSuccess = check(listRes, {
+  check(listRes, {
     'list contractors status is 200': (r) => r.status === 200,
     'list returns array': (r) => {
       try {
@@ -73,7 +70,6 @@ export default function(data) {
     },
   });
 
-  errorRate.add(listSuccess ? 0 : 1);
   sleep(1);
 
   // Test 2: Create contractor
@@ -105,14 +101,14 @@ export default function(data) {
     },
   });
 
-  errorRate.add(createSuccess ? 0 : 1);
-
   let contractorId;
-  try {
-    const body = JSON.parse(createRes.body);
-    contractorId = body.id;
-  } catch (e) {
-    console.error('Failed to get contractor ID from response');
+  if (createSuccess) {
+    try {
+      const body = JSON.parse(createRes.body);
+      contractorId = body.id;
+    } catch (e) {
+      console.error('Failed to get contractor ID from response');
+    }
   }
 
   sleep(1);
@@ -120,7 +116,7 @@ export default function(data) {
   // Test 3: Get specific contractor (if creation succeeded)
   if (contractorId) {
     const getRes = http.get(`${data.baseUrl}/contractors/${contractorId}`, params);
-    const getSuccess = check(getRes, {
+    check(getRes, {
       'get contractor status is 200': (r) => r.status === 200,
       'get returns contractor data': (r) => {
         try {
@@ -132,7 +128,6 @@ export default function(data) {
       },
     });
 
-    errorRate.add(getSuccess ? 0 : 1);
     sleep(1);
 
     // Test 4: Update contractor
@@ -146,11 +141,10 @@ export default function(data) {
       params
     );
 
-    const updateSuccess = check(updateRes, {
+    check(updateRes, {
       'update contractor status is 200': (r) => r.status === 200,
     });
 
-    errorRate.add(updateSuccess ? 0 : 1);
     sleep(1);
   }
 

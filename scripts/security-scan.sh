@@ -65,6 +65,9 @@ run_audit "${REPO_ROOT}/packages/shared" "shared"
 echo -e "${YELLOW}Running additional security checks...${NC}"
 
 # Check for hardcoded secrets (basic patterns)
+# Note: This is a basic check. For production use, consider dedicated tools
+# like gitleaks (https://github.com/gitleaks/gitleaks) or
+# truffleHog (https://github.com/trufflesecurity/truffleHog) for more accurate detection
 echo "Checking for hardcoded secrets..."
 if grep -r -E "(password|secret|api_key|apikey|token)\s*=\s*['\"][^'\"]{8,}" \
     --include="*.ts" --include="*.js" --include="*.json" \
