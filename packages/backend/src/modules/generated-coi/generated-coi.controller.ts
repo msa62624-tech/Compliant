@@ -84,4 +84,16 @@ export class GeneratedCOIController {
   ) {
     return this.generatedCOIService.reviewCOI(id, reviewCOIDto, req.user?.email);
   }
+
+  @Post(':id/renew')
+  @UseGuards(JwtAuthGuard)
+  renewCOI(@Param('id') id: string, @Request() req) {
+    return this.generatedCOIService.renewCOI(id, req.user?.email);
+  }
+
+  @Patch(':id/resubmit')
+  @UseGuards(JwtAuthGuard)
+  resubmitDeficiency(@Param('id') id: string) {
+    return this.generatedCOIService.resubmitDeficiency(id);
+  }
 }
