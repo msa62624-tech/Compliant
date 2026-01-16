@@ -21,18 +21,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is logged in
+    // Check if user is logged in by attempting to fetch user data
+    // Authentication cookies are automatically sent with the request
     const checkAuth = async () => {
       try {
-        const accessToken = localStorage.getItem('accessToken');
-        if (accessToken) {
-          const userData = await authApi.getMe();
-          setUser(userData);
-        }
+        const userData = await authApi.getMe();
+        setUser(userData);
       } catch (error) {
         console.error('Auth check failed:', error);
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        // User is not authenticated - cookies may have expired
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -44,8 +42,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (credentials: LoginDto) => {
     try {
       const response = await authApi.login(credentials);
-      localStorage.setItem('accessToken', response.accessToken);
-      localStorage.setItem('refreshToken', response.refreshToken);
+      // Tokens are now stored in httpOnly cookies by the server
+      // We only need to set the user in state
       setUser(response.user as User);
       router.push('/dashboard');
     } catch (error) {
@@ -60,8 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+      // Cookies are cleared by the server
       setUser(null);
       router.push('/login');
     }

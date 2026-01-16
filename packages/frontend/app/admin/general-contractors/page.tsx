@@ -3,7 +3,7 @@
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getApiUrl } from '@/lib/api/config';
+import apiClient from '@/lib/api/client';
 
 interface Contractor {
   id: string;
@@ -38,19 +38,8 @@ export default function GeneralContractorsPage() {
   const fetchContractors = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${getApiUrl()}/contractors`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setContractors(data);
-      } else {
-        setError('Failed to load contractors');
-      }
+      const response = await apiClient.get('/contractors');
+      setContractors(response.data);
     } catch (err) {
       setError('Error connecting to server');
       console.error('Error fetching contractors:', err);

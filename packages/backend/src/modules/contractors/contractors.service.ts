@@ -1,12 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
+import { CacheService } from '../cache/cache.service';
 import { CreateContractorDto } from './dto/create-contractor.dto';
 import { UpdateContractorDto } from './dto/update-contractor.dto';
 import { InsuranceStatus } from '@compliant/shared';
 
 @Injectable()
 export class ContractorsService {
-  constructor(private prisma: PrismaService) {}
+  private readonly CACHE_TTL = 300; // 5 minutes
+  private readonly CACHE_PREFIX = 'contractor:';
+
+  constructor(
+    private prisma: PrismaService,
+    private cacheService: CacheService,
+  ) {}
 
   async create(createContractorDto: CreateContractorDto, userId: string) {
     const contractor = await this.prisma.contractor.create({
@@ -26,10 +33,21 @@ export class ContractorsService {
       },
     });
 
+    // Invalidate list cache when creating a new contractor
+    await this.cacheService.delPattern(`${this.CACHE_PREFIX}list:*`);
+
     return contractor;
   }
 
   async findAll(page = 1, limit = 10, status?: string) {
+    const cacheKey = `${this.CACHE_PREFIX}list:${page}:${limit}:${status || 'all'}`;
+    
+    // Try to get from cache first
+    const cached = await this.cacheService.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const skip = (page - 1) * limit;
     const where = status ? { status: status as any } : {};
 
@@ -63,16 +81,29 @@ export class ContractorsService {
       this.prisma.contractor.count({ where }),
     ]);
 
-    return {
+    const result = {
       data: contractors,
       total,
       page,
       limit,
       totalPages: Math.ceil(total / limit),
     };
+
+    // Cache the result
+    await this.cacheService.set(cacheKey, result, this.CACHE_TTL);
+
+    return result;
   }
 
   async findOne(id: string) {
+    const cacheKey = `${this.CACHE_PREFIX}${id}`;
+    
+    // Try to get from cache first
+    const cached = await this.cacheService.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const contractor = await this.prisma.contractor.findUnique({
       where: { id },
       include: {
@@ -103,6 +134,9 @@ export class ContractorsService {
       throw new NotFoundException(`Contractor with ID ${id} not found`);
     }
 
+    // Cache the result
+    await this.cacheService.set(cacheKey, contractor, this.CACHE_TTL);
+
     return contractor;
   }
 
@@ -124,6 +158,10 @@ export class ContractorsService {
       },
     });
 
+    // Invalidate cache for this contractor and list cache
+    await this.cacheService.del(`${this.CACHE_PREFIX}${id}`);
+    await this.cacheService.delPattern(`${this.CACHE_PREFIX}list:*`);
+
     return contractor;
   }
 
@@ -133,6 +171,10 @@ export class ContractorsService {
     await this.prisma.contractor.delete({
       where: { id },
     });
+
+    // Invalidate cache for this contractor and list cache
+    await this.cacheService.del(`${this.CACHE_PREFIX}${id}`);
+    await this.cacheService.delPattern(`${this.CACHE_PREFIX}list:*`);
 
     return { message: 'Contractor deleted successfully' };
   }

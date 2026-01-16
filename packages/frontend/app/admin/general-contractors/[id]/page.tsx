@@ -3,7 +3,7 @@
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getApiUrl } from '@/lib/api/config';
+import apiClient from '@/lib/api/client';
 
 interface Contractor {
   id: string;
@@ -54,19 +54,8 @@ export default function ContractorDetailPage() {
   const fetchContractorDetails = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${getApiUrl()}/contractors/${contractorId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setContractor(data);
-      } else {
-        setError('Failed to load contractor details');
-      }
+      const response = await apiClient.get(`/contractors/${contractorId}`);
+      setContractor(response.data);
     } catch (err) {
       setError('Error connecting to server');
       console.error('Error fetching contractor:', err);
@@ -77,19 +66,8 @@ export default function ContractorDetailPage() {
 
   const fetchContractorProjects = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`${getApiUrl()}/projects/contractor/${contractorId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setProjects(data);
-      } else {
-        console.error('Failed to load contractor projects');
-      }
+      const response = await apiClient.get(`/projects/contractor/${contractorId}`);
+      setProjects(response.data);
     } catch (err) {
       console.error('Error fetching contractor projects:', err);
     }
