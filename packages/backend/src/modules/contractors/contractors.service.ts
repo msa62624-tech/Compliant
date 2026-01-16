@@ -129,7 +129,7 @@ export class ContractorsService {
       });
 
       return contractor;
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`Contractor with ID ${id} not found`);
       }
@@ -144,7 +144,7 @@ export class ContractorsService {
       });
 
       return { message: 'Contractor deleted successfully' };
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`Contractor with ID ${id} not found`);
       }

@@ -106,7 +106,7 @@ export class UsersService {
       });
 
       return user;
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`User with ID ${id} not found`);
       }
@@ -121,7 +121,7 @@ export class UsersService {
       });
 
       return { message: 'User deleted successfully' };
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`User with ID ${id} not found`);
       }
