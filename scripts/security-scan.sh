@@ -3,13 +3,6 @@
 # Security Scanning Script for Compliant Platform
 # This script runs security checks on dependencies and code
 
-set -e  # Exit on error
-
-echo "======================================"
-echo "Running Security Scans"
-echo "======================================"
-echo ""
-
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -38,22 +31,31 @@ check_result() {
     fi
 }
 
+echo "======================================"
+echo "Running Security Scans"
+echo "======================================"
+echo ""
+
 # 1. NPM Audit - Check for known vulnerabilities
 print_section "1. NPM Audit - Dependency Vulnerability Scan"
+AUDIT_FAILED=0
+
 echo "Scanning root workspace..."
-pnpm audit --audit-level=high || AUDIT_FAILED=1
+if ! pnpm audit --audit-level=high; then
+    AUDIT_FAILED=1
+fi
 
 echo ""
 echo "Scanning backend dependencies..."
-cd packages/backend
-pnpm audit --audit-level=high || AUDIT_FAILED=1
-cd ../..
+if ! (cd packages/backend && pnpm audit --audit-level=high); then
+    AUDIT_FAILED=1
+fi
 
 echo ""
 echo "Scanning frontend dependencies..."
-cd packages/frontend
-pnpm audit --audit-level=high || AUDIT_FAILED=1
-cd ../..
+if ! (cd packages/frontend && pnpm audit --audit-level=high); then
+    AUDIT_FAILED=1
+fi
 
 if [ "$AUDIT_FAILED" = "1" ]; then
     echo -e "${YELLOW}⚠ High or critical vulnerabilities found${NC}"
