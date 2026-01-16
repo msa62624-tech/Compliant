@@ -3,17 +3,17 @@ import { IsString, IsOptional, IsUrl } from 'class-validator';
 export class SignPoliciesDto {
   @IsOptional()
   @IsUrl()
-  signatureGlUrl?: string;
+  glBrokerSignatureUrl?: string;
 
   @IsOptional()
   @IsUrl()
-  signatureUmbrellaUrl?: string;
+  umbrellaBrokerSignatureUrl?: string;
 
   @IsOptional()
   @IsUrl()
-  signatureAutoUrl?: string;
+  autoBrokerSignatureUrl?: string;
 
   @IsOptional()
   @IsUrl()
-  signatureWcUrl?: string;
+  wcBrokerSignatureUrl?: string;
 }
