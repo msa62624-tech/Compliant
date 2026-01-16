@@ -26,7 +26,6 @@ run_audit() {
     
     # Run npm audit and capture exit code
     if ! pnpm audit --audit-level=high --json > /tmp/audit-${package_name}.json 2>&1; then
-        AUDIT_FAILED=1
         echo -e "${RED}✗ Security vulnerabilities found in ${package_name}${NC}"
         
         # Parse and display critical vulnerabilities
@@ -34,7 +33,7 @@ run_audit() {
             jq -r '.vulnerabilities | to_entries[] | select(.value.severity == "high" or .value.severity == "critical") | "  - \(.key): \(.value.severity) - \(.value.title)"' /tmp/audit-${package_name}.json 2>/dev/null || cat /tmp/audit-${package_name}.json
         fi
         
-        # FIX: Set global FAILED flag when AUDIT_FAILED is true
+        # FIX: Set global FAILED flag when audit fails
         FAILED=1
     else
         echo -e "${GREEN}✓ No high/critical vulnerabilities in ${package_name}${NC}"
@@ -54,10 +53,13 @@ if ! command -v jq &> /dev/null; then
     echo -e "${YELLOW}⚠ jq is not installed. Install it for better audit output parsing.${NC}"
 fi
 
+# Determine repository root (supports both CI and local environments)
+REPO_ROOT="${REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+
 # Run audit for each package
-run_audit "/home/runner/work/Compliant-/Compliant-/packages/backend" "backend"
-run_audit "/home/runner/work/Compliant-/Compliant-/packages/frontend" "frontend"
-run_audit "/home/runner/work/Compliant-/Compliant-/packages/shared" "shared"
+run_audit "${REPO_ROOT}/packages/backend" "backend"
+run_audit "${REPO_ROOT}/packages/frontend" "frontend"
+run_audit "${REPO_ROOT}/packages/shared" "shared"
 
 # Run additional security checks
 echo -e "${YELLOW}Running additional security checks...${NC}"
@@ -67,7 +69,7 @@ echo "Checking for hardcoded secrets..."
 if grep -r -E "(password|secret|api_key|apikey|token)\s*=\s*['\"][^'\"]{8,}" \
     --include="*.ts" --include="*.js" --include="*.json" \
     --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=.git \
-    packages/ 2>/dev/null | grep -v "\.example" | grep -v "test" | grep -v "mock"; then
+    "${REPO_ROOT}/packages/" 2>/dev/null | grep -v "\.example" | grep -v "test" | grep -v "mock"; then
     echo -e "${RED}✗ Potential hardcoded secrets found${NC}"
     FAILED=1
 else
@@ -76,7 +78,7 @@ fi
 
 # Check for proper environment variable usage
 echo "Checking .env.example files..."
-if [ ! -f "packages/backend/.env.example" ]; then
+if [ ! -f "${REPO_ROOT}/packages/backend/.env.example" ]; then
     echo -e "${YELLOW}⚠ packages/backend/.env.example not found${NC}"
 fi
 

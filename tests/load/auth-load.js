@@ -120,8 +120,16 @@ export default function(data) {
   sleep(1);
 
   // Test 3: Refresh token
+  let refreshToken;
+  try {
+    const loginBody = JSON.parse(loginRes.body);
+    refreshToken = loginBody.refreshToken || '';
+  } catch (e) {
+    refreshToken = '';
+  }
+
   const refreshPayload = JSON.stringify({
-    refreshToken: loginRes.json('refreshToken') || '',
+    refreshToken: refreshToken,
   });
 
   const refreshRes = http.post(`${data.baseUrl}/auth/refresh`, refreshPayload, loginParams);

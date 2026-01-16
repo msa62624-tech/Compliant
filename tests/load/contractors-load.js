@@ -40,7 +40,14 @@ export function setup() {
     throw new Error('Authentication failed during setup');
   }
 
-  const token = loginRes.json('accessToken');
+  let token;
+  try {
+    const body = JSON.parse(loginRes.body);
+    token = body.accessToken;
+  } catch (e) {
+    throw new Error('Failed to parse login response');
+  }
+
   return { baseUrl: BASE_URL, token: token };
 }
 
@@ -102,7 +109,8 @@ export default function(data) {
 
   let contractorId;
   try {
-    contractorId = createRes.json('id');
+    const body = JSON.parse(createRes.body);
+    contractorId = body.id;
   } catch (e) {
     console.error('Failed to get contractor ID from response');
   }
