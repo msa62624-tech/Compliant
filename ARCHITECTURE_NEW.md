@@ -2,6 +2,8 @@
 
 > **Enterprise-grade monorepo starter** with NestJS backend, Next.js 14 frontend, PostgreSQL database, and Prisma ORM.
 
+> **Note:** This documentation describes the new architecture implementation located in the `/new-architecture` directory of this repository.
+
 ## 🏗️ Architecture Overview
 
 This monorepo implements a professional, production-ready architecture following enterprise best practices:
@@ -64,7 +66,7 @@ This monorepo implements a professional, production-ready architecture following
 # Install pnpm if not already installed
 npm install -g pnpm
 
-# Clone and navigate to monorepo
+# Navigate to the new-architecture directory from repository root
 cd new-architecture
 
 # Install all dependencies
@@ -259,7 +261,7 @@ new-architecture/
 ├── turbo.json                      # Turborepo config
 ├── tsconfig.json                   # Base TypeScript config
 ├── .gitignore
-└── README.md                       # This file
+└── README.md                       # Monorepo documentation
 ```
 
 ## 🔧 Configuration
