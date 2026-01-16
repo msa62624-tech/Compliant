@@ -34,7 +34,8 @@ model User {
 }
 
 enum UserRole {
-  ADMIN
+  SUPER_ADMIN  // Full access, sees everything, no filtering
+  ADMIN        // Assistant admin, filtered by assigned_admin_email
   MANAGER
   USER
   CONTRACTOR
@@ -72,6 +73,9 @@ model Contractor {
   brokerWcName    String?
   brokerWcEmail   String?
   brokerWcPhone   String?
+  
+  // Admin assignment (for assistant admin filtering)
+  assignedAdminEmail String?
   
   createdById String
   createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
@@ -114,11 +118,16 @@ model Project {
   id          String        @id @default(uuid())
   name        String
   description String?
+  address     String?       // Project location/address
   startDate   DateTime
   endDate     DateTime?
   status      ProjectStatus @default(PLANNING)
   gcName      String?
   location    String?
+  
+  // Admin assignment (for assistant admin filtering)
+  assignedAdminEmail String?
+  
   createdById String
   createdBy   User          @relation(fields: [createdById], references: [id], onDelete: Cascade)
   createdAt   DateTime      @default(now())
