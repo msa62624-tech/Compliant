@@ -42,132 +42,57 @@ export class AuthService {
     
     // Generate refresh token
     const refreshTokenString = crypto.randomBytes(32).toString('hex');
-    const refreshTokenExpiration = this.getRefreshTokenExpiration();
 
-    // Store refresh token in RefreshToken table with rotation
-    const refreshToken = await this.prisma.refreshToken.create({
-      data: {
-        token: refreshTokenString,
-        userId: user.id,
-        expiresAt: refreshTokenExpiration,
-      },
+    // Store refresh token in User model
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: refreshTokenString },
     });
-
-    // Clean up old refresh tokens for this user (keep only last 5)
-    await this.cleanupOldRefreshTokens(user.id);
 
     return {
       user,
       accessToken,
-      refreshToken: refreshToken.token,
+      refreshToken: refreshTokenString,
     };
   }
 
   async refresh(refreshTokenString: string) {
     try {
-      // Find refresh token in database
-      const refreshToken = await this.prisma.refreshToken.findUnique({
-        where: { token: refreshTokenString },
-        include: { user: true },
+      // Find user with this refresh token
+      const user = await this.prisma.user.findFirst({
+        where: { refreshToken: refreshTokenString },
       });
 
-      if (!refreshToken || refreshToken.revoked) {
+      if (!user) {
         throw new UnauthorizedException('Invalid refresh token');
       }
 
-      // Check if token is expired
-      if (new Date() > refreshToken.expiresAt) {
-        // Revoke expired token
-        await this.prisma.refreshToken.update({
-          where: { id: refreshToken.id },
-          data: { revoked: true },
-        });
-        throw new UnauthorizedException('Refresh token expired');
-      }
-
-      const user = refreshToken.user;
       const newPayload = { email: user.email, sub: user.id, role: user.role };
       const accessToken = this.jwtService.sign(newPayload);
 
-      // Rotate refresh token - revoke old one and create new one
-      await this.prisma.refreshToken.update({
-        where: { id: refreshToken.id },
-        data: { revoked: true },
-      });
-
+      // Rotate refresh token - generate new one
       const newRefreshTokenString = crypto.randomBytes(32).toString('hex');
-      const newRefreshToken = await this.prisma.refreshToken.create({
-        data: {
-          token: newRefreshTokenString,
-          userId: user.id,
-          expiresAt: this.getRefreshTokenExpiration(),
-        },
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { refreshToken: newRefreshTokenString },
       });
 
       return {
         accessToken,
-        refreshToken: newRefreshToken.token,
+        refreshToken: newRefreshTokenString,
       };
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
 
-  async logout(userId: string, refreshToken?: string) {
-    // Revoke specific refresh token if provided
-    if (refreshToken) {
-      await this.prisma.refreshToken.updateMany({
-        where: {
-          userId,
-          token: refreshToken,
-        },
-        data: { revoked: true },
-      });
-    } else {
-      // Revoke all refresh tokens for user
-      await this.prisma.refreshToken.updateMany({
-        where: { userId },
-        data: { revoked: true },
-      });
-    }
+  async logout(userId: string) {
+    // Clear refresh token for user
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken: null },
+    });
 
     return { message: 'Logged out successfully' };
-  }
-
-  private getRefreshTokenExpiration(): Date {
-    const expirationDays = 7; // Default 7 days
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + expirationDays);
-    return expiresAt;
-  }
-
-  private async cleanupOldRefreshTokens(userId: string): Promise<void> {
-    // Get all refresh tokens for user, ordered by creation date
-    const tokens = await this.prisma.refreshToken.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    // Keep only the 5 most recent, revoke the rest
-    if (tokens.length > 5) {
-      const tokensToRevoke = tokens.slice(5);
-      await this.prisma.refreshToken.updateMany({
-        where: {
-          id: { in: tokensToRevoke.map((t) => t.id) },
-        },
-        data: { revoked: true },
-      });
-    }
-  }
-
-  async cleanupExpiredTokens(): Promise<void> {
-    await this.prisma.refreshToken.deleteMany({
-      where: {
-        OR: [
-          { expiresAt: { lt: new Date() } },
-          { revoked: true },
-        ],
-      },
-    });
   }
 }
