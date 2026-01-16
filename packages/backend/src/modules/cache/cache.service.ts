@@ -103,8 +103,8 @@ export class CacheService implements OnModuleInit {
   async delPattern(pattern: string): Promise<void> {
     try {
       if (this.redis) {
-        const keysToDelete: string[] = [];
         let cursor = '0';
+        let totalDeleted = 0;
         
         // Use SCAN to iterate through keys without blocking
         do {
@@ -117,22 +117,17 @@ export class CacheService implements OnModuleInit {
           );
           
           cursor = nextCursor;
-          keysToDelete.push(...keys);
           
-          // Delete in batches to avoid memory issues
-          if (keysToDelete.length >= 100) {
-            if (keysToDelete.length > 0) {
-              await this.redis.del(...keysToDelete);
-              this.logger.debug(`Deleted batch of ${keysToDelete.length} keys matching pattern ${pattern}`);
-              keysToDelete.length = 0; // Clear the array
-            }
+          // Delete keys immediately after each SCAN iteration
+          if (keys.length > 0) {
+            await this.redis.del(...keys);
+            totalDeleted += keys.length;
+            this.logger.debug(`Deleted batch of ${keys.length} keys matching pattern ${pattern}`);
           }
         } while (cursor !== '0');
         
-        // Delete any remaining keys
-        if (keysToDelete.length > 0) {
-          await this.redis.del(...keysToDelete);
-          this.logger.debug(`Deleted final batch of ${keysToDelete.length} keys matching pattern ${pattern}`);
+        if (totalDeleted > 0) {
+          this.logger.log(`Deleted total of ${totalDeleted} keys matching pattern ${pattern}`);
         }
       } else {
         // For memory cache, use simple pattern matching
