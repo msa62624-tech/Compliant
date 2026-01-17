@@ -15,15 +15,15 @@ datasource db {
 // ============================================
 
 model User {
-  id                     String    @id @default(uuid())
-  email                  String    @unique
-  password               String
-  firstName              String
-  lastName               String
-  role                   UserRole  @default(USER)
-  isActive               Boolean   @default(true)
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   contractorsCreated    Contractor[]   @relation("ContractorCreator")
   projects              Project[]
@@ -37,13 +37,13 @@ model User {
 // Separate table for refresh tokens - prevents timing attacks and DoS
 // Uses selector/verifier pattern for O(1) lookup with single bcrypt comparison
 model RefreshToken {
-  id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  selector    String   @unique // Unique constraint creates index automatically
-  verifier    String   // Hashed with bcrypt (for secure comparison)
-  expiresAt   DateTime
-  createdAt   DateTime @default(now())
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  selector  String   @unique // Unique constraint creates index automatically
+  verifier  String // Hashed with bcrypt (for secure comparison)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 
   @@index([userId, expiresAt]) // Composite index for user-specific and cleanup operations
   @@map("refresh_tokens")
@@ -142,16 +142,16 @@ model Project {
   location    String?
 
   // ACRIS Data Fields
-  borough             String?
-  block               String?
-  lot                 String?
-  buildingHeight      String?
-  structureType       String?
-  entity              String?
-  additionalInsureds  String?
-  contactPerson       String?
-  contactEmail        String?
-  contactPhone        String?
+  borough            String?
+  block              String?
+  lot                String?
+  buildingHeight     String?
+  structureType      String?
+  entity             String?
+  additionalInsureds String?
+  contactPerson      String?
+  contactEmail       String?
+  contactPhone       String?
 
   // Admin assignment (for assistant admin filtering)
   assignedAdminEmail String?
@@ -164,6 +164,7 @@ model Project {
   projectContractors    ProjectContractor[]
   projectSubcontractors ProjectSubcontractor[]
   generatedCOIs         GeneratedCOI[]
+  programs              ProjectProgram[]
 
   @@map("projects")
 }
@@ -260,6 +261,11 @@ model GeneratedCOI {
   firstCOIUploaded Boolean @default(false)
   firstCOIUrl      String?
 
+  // Hold Harmless Agreement
+  holdHarmlessDocumentUrl String?
+  holdHarmlessUploadedAt  DateTime?
+  holdHarmlessStatus      HoldHarmlessStatus @default(NOT_UPLOADED)
+
   // Admin review
   assignedAdminEmail String?
   assignedAdmin      User?   @relation("AssignedAdmin", fields: [assignedAdminEmail], references: [email], onDelete: SetNull)
@@ -272,10 +278,16 @@ model GeneratedCOI {
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @updatedAt
 
+  // Relations
+  reminders    ExpirationReminder[]
+  holdHarmless HoldHarmless?
+
   @@index([projectId])
   @@index([subcontractorId])
   @@index([status])
   @@index([assignedAdminEmail])
+  @@index([glExpirationDate])
+  @@index([umbrellaExpirationDate])
   @@map("generated_cois")
 }
 
@@ -331,11 +343,11 @@ model AuditLog {
   id         String   @id @default(uuid())
   userId     String
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  action     String   // CREATE, UPDATE, DELETE, LOGIN, LOGOUT, VIEW, etc.
-  resource   String   // USER, CONTRACTOR, PROJECT, INSURANCE_DOCUMENT, etc.
-  resourceId String?  // ID of the affected resource
-  changes    Json?    // JSON object with before/after values for updates
-  metadata   Json?    // Additional context (e.g., request headers, IP, etc.)
+  action     String // CREATE, UPDATE, DELETE, LOGIN, LOGOUT, VIEW, etc.
+  resource   String // USER, CONTRACTOR, PROJECT, INSURANCE_DOCUMENT, etc.
+  resourceId String? // ID of the affected resource
+  changes    Json? // JSON object with before/after values for updates
+  metadata   Json? // Additional context (e.g., request headers, IP, etc.)
   ipAddress  String?
   userAgent  String?
   timestamp  DateTime @default(now())
@@ -345,4 +357,139 @@ model AuditLog {
   @@index([timestamp])
   @@index([action])
   @@map("audit_logs")
+}
+
+// ============================================
+// NEW FEATURES: Reminders, Programs, Hold Harmless
+// ============================================
+
+// Expiration Reminder System (30d→14d→7d→2d→every 2d)
+model ExpirationReminder {
+  id               String       @id @default(uuid())
+  coiId            String
+  coi              GeneratedCOI @relation(fields: [coiId], references: [id], onDelete: Cascade)
+  policyType       String // GL, UMBRELLA, AUTO, WC
+  expirationDate   DateTime
+  daysBeforeExpiry Int // 30, 14, 7, 2
+  reminderType     ReminderType
+  sentAt           DateTime     @default(now())
+  sentTo           String[] // Email addresses
+  emailSubject     String?
+  emailBody        String?      @db.Text
+  acknowledged     Boolean      @default(false)
+  acknowledgedAt   DateTime?
+  acknowledgedBy   String?
+  createdAt        DateTime     @default(now())
+
+  @@index([coiId])
+  @@index([expirationDate])
+  @@index([daysBeforeExpiry])
+  @@index([sentAt])
+  @@map("expiration_reminders")
+}
+
+enum ReminderType {
+  DAYS_30 // 30 days before expiration
+  DAYS_14 // 14 days before expiration
+  DAYS_7 // 7 days before expiration
+  DAYS_2 // 2 days before expiration
+  EVERY_2_DAYS // Every 2 days after expiration
+  EXPIRED // Immediate notification when expired
+}
+
+enum HoldHarmlessStatus {
+  NOT_UPLOADED
+  UPLOADED
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+// Hold Harmless Agreement Tracking
+model HoldHarmless {
+  id          String             @id @default(uuid())
+  coiId       String             @unique
+  coi         GeneratedCOI       @relation(fields: [coiId], references: [id], onDelete: Cascade)
+  documentUrl String
+  uploadedAt  DateTime           @default(now())
+  uploadedBy  String? // Email of uploader (broker/admin)
+  status      HoldHarmlessStatus @default(UPLOADED)
+
+  // Agreement details
+  agreementType  String? // "Indemnification", "Waiver", "Combined"
+  parties        String[] // List of parties involved
+  effectiveDate  DateTime?
+  expirationDate DateTime?
+
+  // Review tracking
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  reviewNotes     String?   @db.Text
+  rejectionReason String?   @db.Text
+
+  // Compliance tracking
+  meetsRequirements Boolean  @default(false)
+  deficiencies      String[] // List of deficiencies if any
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([coiId])
+  @@index([status])
+  @@index([expirationDate])
+  @@map("hold_harmless")
+}
+
+// Insurance Program Templates
+model InsuranceProgram {
+  id          String  @id @default(uuid())
+  name        String
+  description String? @db.Text
+  isTemplate  Boolean @default(true)
+
+  // Requirements by policy type
+  glMinimum       Float? // General Liability minimum coverage
+  wcMinimum       Float? // Workers Comp minimum
+  autoMinimum     Float? // Auto Liability minimum
+  umbrellaMinimum Float? // Umbrella minimum
+
+  // Additional requirements
+  requiresHoldHarmless      Boolean @default(false)
+  requiresAdditionalInsured Boolean @default(true)
+  requiresWaiverSubrogation Boolean @default(true)
+
+  // Tier-based requirements (JSON for flexibility)
+  tierRequirements  Json? // { "tier1": {...}, "tier2": {...} }
+  tradeRequirements Json? // { "electrical": {...}, "plumbing": {...} }
+
+  // Workflow settings
+  autoApprovalRules Json? // Conditions for auto-approval
+
+  createdBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  projects ProjectProgram[]
+
+  @@index([name])
+  @@index([isTemplate])
+  @@map("insurance_programs")
+}
+
+// Junction table for Project <-> InsuranceProgram
+model ProjectProgram {
+  id         String           @id @default(uuid())
+  projectId  String
+  project    Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  programId  String
+  program    InsuranceProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  assignedAt DateTime         @default(now())
+  assignedBy String?
+
+  // Override program settings for this project
+  customRequirements Json?
+
+  @@unique([projectId, programId])
+  @@map("project_programs")
 }
