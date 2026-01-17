@@ -1,19 +1,24 @@
-import { IsString, IsOptional, IsUrl } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
+import { IsSafeUrl } from '../../../common/validators/safe-url.validator';
 
 export class UploadPoliciesDto {
   @IsOptional()
-  @IsUrl()
+  @IsString()
+  @IsSafeUrl()
   glPolicyUrl?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
+  @IsSafeUrl()
   umbrellaPolicyUrl?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
+  @IsSafeUrl()
   autoPolicyUrl?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
+  @IsSafeUrl()
   wcPolicyUrl?: string;
 }

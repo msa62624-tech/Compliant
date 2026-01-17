@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
 import { WinstonModule } from 'nest-winston';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
@@ -13,10 +13,12 @@ import { HealthModule } from './modules/health/health.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { CacheModule } from './modules/cache/cache.module';
 import { EmailModule } from './modules/email/email.module';
+import { TasksModule } from './modules/tasks/tasks.module';
 import { EncryptionModule } from './common/encryption/encryption.module';
 import { PrismaModule } from './config/prisma.module';
 import { winstonConfig } from './config/logger.config';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 
 @Module({
   imports: [
@@ -40,8 +42,13 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     ContractorsModule,
     GeneratedCOIModule,
     ProjectsModule,
+    TasksModule,
   ],
   providers: [
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

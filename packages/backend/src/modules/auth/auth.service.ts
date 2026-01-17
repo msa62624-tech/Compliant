@@ -1,7 +1,6 @@
 import { Injectable, UnauthorizedException, Inject, LoggerService } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { Cron } from '@nestjs/schedule';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
@@ -250,27 +249,5 @@ export class AuthService {
     });
 
     return result.count;
-  }
-
-  /**
-   * Automated token cleanup - runs daily at 2 AM
-   */
-  @Cron('0 2 * * *') // Daily at 2 AM
-  async handleTokenCleanup() {
-    try {
-      this.logger.log({
-        message: 'Starting automated token cleanup',
-        context: 'Auth',
-      });
-      
-      await this.cleanupExpiredTokens();
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      this.logger.error({
-        message: 'Automated token cleanup failed',
-        context: 'Auth',
-        error: errorMessage,
-      });
-    }
   }
 }

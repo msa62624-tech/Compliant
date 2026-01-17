@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import { WINSTON_MODULE_NEST_PROVIDER, WinstonModule } from 'nest-winston';
 import { AppModule } from './app.module';
 import { winstonConfig } from './config/logger.config';
+import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   // Create app with Winston logger
@@ -14,6 +15,9 @@ async function bootstrap() {
 
   // Use Winston logger as the application logger
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
+
+  // Global exception filter for error sanitization
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   // Enable cookie parser for secure token storage
   app.use(cookieParser());
