@@ -75,7 +75,7 @@ export class TradesService {
    * Validate if a trade exists
    */
   isValidTrade(trade: string): boolean {
-    return CONSTRUCTION_TRADES_ARRAY.includes(trade);
+    return (CONSTRUCTION_TRADES_ARRAY as string[]).includes(trade);
   }
 
   /**
@@ -85,7 +85,7 @@ export class TradesService {
     const categories = CONSTRUCTION_TRADE_CATEGORIES;
     const categoryCounts = Object.entries(categories).map(([category, trades]) => ({
       category,
-      count: trades.length,
+      count: (trades as string[]).length,
     }));
 
     return {
