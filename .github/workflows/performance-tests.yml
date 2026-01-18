@@ -102,8 +102,9 @@ jobs:
           JWT_REFRESH_SECRET: test-jwt-refresh-secret-key-performance-tests
           ENCRYPTION_KEY: dGVzdC1lbmNyeXB0aW9uLWtleS1mb3ItcGVyZm9ybWFuY2UtdGVzdHMxMg==
           ENCRYPTION_SALT: 0123456789abcdef0123456789abcdef
-          SMTP_USER: test-perf@example.com
-          SMTP_PASS: test-password-for-performance-tests
+          EMAIL_PROVIDER: test
+          EMAIL_FROM: test@example.com
+          ADMIN_EMAIL: admin@example.com
           NODE_ENV: production
           PORT: 3001
 

@@ -7,8 +7,7 @@ WORKDIR /app
 
 # Install system dependencies for building native modules
 # postgresql-client is NOT needed for build, only for runtime
-RUN for i in 1 2 3; do apk update && break || sleep 5; done && \
-    apk add --no-cache python3 make g++
+RUN apk update && apk add --no-cache python3 make g++
 
 # Install pnpm
 RUN npm install -g pnpm@8.15.0
