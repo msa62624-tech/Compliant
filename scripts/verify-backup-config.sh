@@ -296,7 +296,7 @@ check_cron_jobs() {
         fi
         
         # Check frequency
-        local backup_count=$(echo "$crontab_output" | grep -c "backup" || echo "0")
+        local backup_count=$(echo "$crontab_output" | grep "backup" | wc -l || echo "0")
         log_info "Found $backup_count backup-related cron job(s)"
         
         if [[ $backup_count -ge 1 ]]; then
