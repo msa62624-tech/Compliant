@@ -19,14 +19,17 @@ test.describe('Health Checks', () => {
     expect(body.status).toBe('ok');
   });
 
-  test('frontend should load successfully', async ({ page }) => {
+  test('frontend should load successfully', async ({ page, baseURL }) => {
     await page.goto('/');
     
     // Wait for the page to load
     await page.waitForLoadState('networkidle');
     
     // Verify the page loaded without critical errors
-    expect(page.url()).toContain('localhost:3000');
+    // Use baseURL from config to avoid hardcoding
+    if (baseURL) {
+      expect(page.url()).toContain(new URL(baseURL).hostname);
+    }
     
     // Take a screenshot for verification
     await page.screenshot({ path: 'test-results/homepage.png' });
