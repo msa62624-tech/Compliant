@@ -128,10 +128,7 @@ describe("EmailService", () => {
       process.env.EMAIL_FROM = "custom@example.com";
       const customService = new EmailService();
 
-      const sendMailSpy = jest.spyOn(
-        customService["transporter"],
-        "sendMail",
-      );
+      const sendMailSpy = jest.spyOn(customService["transporter"], "sendMail");
 
       await customService.sendEmail({
         to: "recipient@example.com",
