@@ -11,6 +11,12 @@ dist-ssr
 # Test coverage
 coverage
 
+# Test artifacts
+test-results/
+screenshots*/
+playwright-report/
+*.spec.ts.snap
+
 # Logs
 logs
 *.log
