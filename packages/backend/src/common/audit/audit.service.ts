@@ -1,29 +1,29 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../config/prisma.service';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../../config/prisma.service";
 
 export enum AuditAction {
-  CREATE = 'CREATE',
-  READ = 'READ',
-  UPDATE = 'UPDATE',
-  DELETE = 'DELETE',
-  LOGIN = 'LOGIN',
-  LOGOUT = 'LOGOUT',
-  APPROVE = 'APPROVE',
-  REJECT = 'REJECT',
-  UPLOAD = 'UPLOAD',
-  DOWNLOAD = 'DOWNLOAD',
-  EXPORT = 'EXPORT',
+  CREATE = "CREATE",
+  READ = "READ",
+  UPDATE = "UPDATE",
+  DELETE = "DELETE",
+  LOGIN = "LOGIN",
+  LOGOUT = "LOGOUT",
+  APPROVE = "APPROVE",
+  REJECT = "REJECT",
+  UPLOAD = "UPLOAD",
+  DOWNLOAD = "DOWNLOAD",
+  EXPORT = "EXPORT",
 }
 
 export enum AuditResourceType {
-  USER = 'USER',
-  CONTRACTOR = 'CONTRACTOR',
-  PROJECT = 'PROJECT',
-  PROGRAM = 'PROGRAM',
-  COI = 'COI',
-  HOLD_HARMLESS = 'HOLD_HARMLESS',
-  INSURANCE_DOCUMENT = 'INSURANCE_DOCUMENT',
-  REMINDER = 'REMINDER',
+  USER = "USER",
+  CONTRACTOR = "CONTRACTOR",
+  PROJECT = "PROJECT",
+  PROGRAM = "PROGRAM",
+  COI = "COI",
+  HOLD_HARMLESS = "HOLD_HARMLESS",
+  INSURANCE_DOCUMENT = "INSURANCE_DOCUMENT",
+  REMINDER = "REMINDER",
 }
 
 export interface AuditLogEntry {
@@ -39,13 +39,13 @@ export interface AuditLogEntry {
 
 /**
  * Audit Service for comprehensive activity tracking
- * 
+ *
  * Features:
  * - User action logging
  * - Data change tracking
  * - Security event logging
  * - Compliance audit trail
- * 
+ *
  * Usage:
  * ```typescript
  * await this.auditService.log({
@@ -66,7 +66,7 @@ export class AuditService {
   /**
    * Log an audit event
    */
-  async log(entry: Omit<AuditLogEntry, 'timestamp'>): Promise<void> {
+  async log(entry: Omit<AuditLogEntry, "timestamp">): Promise<void> {
     try {
       const auditLog = {
         userId: entry.userId || null,
@@ -97,10 +97,10 @@ export class AuditService {
       }
 
       // Also log to console for development/debugging
-      console.log('[AUDIT]', JSON.stringify(auditLog, null, 2));
+      console.log("[AUDIT]", JSON.stringify(auditLog, null, 2));
     } catch (error) {
       // Don't throw errors from audit logging to avoid disrupting main operations
-      console.error('[AUDIT ERROR]', error);
+      console.error("[AUDIT ERROR]", error);
     }
   }
 
@@ -205,7 +205,7 @@ export class AuditService {
         },
       },
       take: filter.limit || 100,
-      orderBy: { timestamp: 'desc' },
+      orderBy: { timestamp: "desc" },
     });
 
     // Map database records to AuditLogEntry format
@@ -227,7 +227,7 @@ export class AuditService {
   async exportLogs(filter: {
     startDate: Date;
     endDate: Date;
-    format?: 'json' | 'csv';
+    format?: "json" | "csv";
   }): Promise<string> {
     const logs = await this.queryLogs({
       startDate: filter.startDate,
@@ -235,15 +235,16 @@ export class AuditService {
       limit: 10000,
     });
 
-    if (filter.format === 'csv') {
+    if (filter.format === "csv") {
       // Convert to CSV format
-      const headers = 'timestamp,userId,action,resourceType,resourceId,details\n';
+      const headers =
+        "timestamp,userId,action,resourceType,resourceId,details\n";
       const rows = logs
         .map(
           (log) =>
             `${log.timestamp.toISOString()},${log.userId},${log.action},${log.resourceType},${log.resourceId},"${JSON.stringify(log.details)}"`,
         )
-        .join('\n');
+        .join("\n");
       return headers + rows;
     }
 
