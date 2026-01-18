@@ -270,11 +270,15 @@ export class RemindersService {
       policyType,
     });
 
-    await this.emailService.sendEmail({
+    const emailSent = await this.emailService.sendEmail({
       to: recipients,
       subject,
       html,
     });
+
+    if (!emailSent) {
+      throw new Error(`Failed to send reminder notification email for COI ${coiId}, policy ${policyType} to recipients: ${recipients.join(', ')}`);
+    }
   }
 
   /**

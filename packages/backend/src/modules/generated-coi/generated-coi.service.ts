@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { CreateCOIDto } from './dto/create-coi.dto';
 import { UpdateBrokerInfoDto } from './dto/update-broker-info.dto';
@@ -10,6 +10,8 @@ import { HoldHarmlessService } from '../hold-harmless/hold-harmless.service';
 
 @Injectable()
 export class GeneratedCOIService {
+  private readonly logger = new Logger(GeneratedCOIService.name);
+
   constructor(
     private prisma: PrismaService,
     private holdHarmlessService: HoldHarmlessService,
@@ -215,8 +217,34 @@ export class GeneratedCOIService {
       try {
         await this.holdHarmlessService.autoGenerateOnCOIApproval(id);
       } catch (error) {
-        // Log error but don't fail the COI approval
-        console.error(`Failed to auto-generate hold harmless for COI ${id}:`, error);
+        // Log error with detailed information for monitoring/alerting
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorStack = error instanceof Error ? error.stack : undefined;
+        
+        this.logger.error(
+          `CRITICAL: Failed to auto-generate hold harmless for COI ${id}. ` +
+          `This creates an inconsistent state where COI is ACTIVE but hold harmless record may be missing. ` +
+          `Error: ${errorMessage}`,
+          errorStack
+        );
+        
+        // Rollback COI status to prevent inconsistent state
+        this.logger.warn(`Rolling back COI ${id} status to AWAITING_ADMIN_REVIEW due to hold harmless generation failure`);
+        
+        await this.prisma.generatedCOI.update({
+          where: { id },
+          data: {
+            status: COIStatus.AWAITING_ADMIN_REVIEW,
+            deficiencyNotes: reviewCOIDto.deficiencyNotes 
+              ? `${reviewCOIDto.deficiencyNotes}\n\nAuto-rollback: Hold harmless generation failed - please retry approval.`
+              : 'Auto-rollback: Hold harmless generation failed - please retry approval.',
+          },
+        });
+        
+        // Re-throw the error to inform the caller of the failure
+        throw new BadRequestException(
+          `COI approval failed: Unable to generate hold harmless agreement. ${errorMessage}`
+        );
       }
     }
 
