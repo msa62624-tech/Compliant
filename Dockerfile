@@ -60,19 +60,18 @@ COPY --from=builder /app/packages/backend/package.json ./packages/backend/
 COPY --from=builder /app/packages/frontend/package.json ./packages/frontend/
 COPY --from=builder /app/packages/shared/package.json ./packages/shared/
 
+# Copy Prisma schema BEFORE installing dependencies
+# This ensures the schema is available when Prisma's postinstall runs
+COPY --from=builder /app/packages/backend/prisma ./packages/backend/prisma
+
 # Install production dependencies only
+# Prisma will automatically generate the client during postinstall
 RUN pnpm install --frozen-lockfile --prod
 
 # Copy built artifacts
 COPY --from=builder /app/packages/backend/dist ./packages/backend/dist
 COPY --from=builder /app/packages/frontend/.next ./packages/frontend/.next
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
-COPY --from=builder /app/packages/backend/prisma ./packages/backend/prisma
-
-# Copy generated Prisma client from builder stage
-# This is critical for runtime database access
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
 
 # Set production environment
 ENV NODE_ENV=production
