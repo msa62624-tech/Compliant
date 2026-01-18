@@ -17,7 +17,8 @@ export class EmailService {
 
   constructor() {
     this.emailProvider = process.env.EMAIL_PROVIDER || "smtp";
-    this.fromAddress = process.env.EMAIL_FROM || process.env.SMTP_USER || "noreply@example.com";
+    this.fromAddress =
+      process.env.EMAIL_FROM || process.env.SMTP_USER || "noreply@example.com";
 
     // Use test transporter if EMAIL_PROVIDER is set to 'test'
     if (this.emailProvider === "test") {
@@ -65,9 +66,11 @@ export class EmailService {
       };
 
       const info = await this.transporter.sendMail(mailOptions);
-      
+
       if (this.emailProvider === "test") {
-        this.logger.log(`Test email captured: ${options.subject} to ${mailOptions.to}`);
+        this.logger.log(
+          `Test email captured: ${options.subject} to ${mailOptions.to}`,
+        );
       } else {
         this.logger.log(`Email sent successfully: ${info.messageId}`);
       }
