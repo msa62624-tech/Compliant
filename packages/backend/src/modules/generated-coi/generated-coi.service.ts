@@ -231,13 +231,14 @@ export class GeneratedCOIService {
         // Rollback COI status to prevent inconsistent state
         this.logger.warn(`Rolling back COI ${id} status to AWAITING_ADMIN_REVIEW due to hold harmless generation failure`);
         
+        const rollbackMessage = 'Auto-rollback: Hold harmless generation failed - please retry approval.';
         await this.prisma.generatedCOI.update({
           where: { id },
           data: {
             status: COIStatus.AWAITING_ADMIN_REVIEW,
             deficiencyNotes: reviewCOIDto.deficiencyNotes 
-              ? `${reviewCOIDto.deficiencyNotes}\n\nAuto-rollback: Hold harmless generation failed - please retry approval.`
-              : 'Auto-rollback: Hold harmless generation failed - please retry approval.',
+              ? `${reviewCOIDto.deficiencyNotes}\n\n${rollbackMessage}`
+              : rollbackMessage,
           },
         });
         
