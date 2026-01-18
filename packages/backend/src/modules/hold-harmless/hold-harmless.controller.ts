@@ -29,31 +29,39 @@ export class HoldHarmlessController {
     return this.holdHarmlessService.autoGenerateOnCOIApproval(coiId);
   }
 
-  @Get('by-token/:token')
-  @ApiOperation({ summary: 'Get hold harmless by signature token (public endpoint for signature page)' })
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get hold harmless by ID (authenticated)' })
   @ApiResponse({ status: 200, description: 'Returns hold harmless details for signing' })
-  async getByToken(@Param('token') token: string) {
-    return this.holdHarmlessService.getByToken(token);
+  async getById(@Param('id') id: string) {
+    return this.holdHarmlessService.getById(id);
   }
 
-  @Post('sign/subcontractor/:token')
-  @ApiOperation({ summary: 'Process subcontractor signature (public endpoint)' })
-  @ApiResponse({ status: 200, description: 'Subcontractor signature recorded, GC link sent' })
+  @Post(':id/sign/subcontractor')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUBCONTRACTOR, UserRole.SUPER_ADMIN, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Process subcontractor signature (authenticated)' })
+  @ApiResponse({ status: 200, description: 'Subcontractor signature recorded, GC notified' })
   async signSubcontractor(
-    @Param('token') token: string,
+    @Param('id') id: string,
     @Body() signatureData: { signatureUrl: string; signedBy: string }
   ) {
-    return this.holdHarmlessService.processSubcontractorSignature(token, signatureData);
+    return this.holdHarmlessService.processSubcontractorSignature(id, signatureData);
   }
 
-  @Post('sign/gc/:token')
-  @ApiOperation({ summary: 'Process GC signature (public endpoint)' })
+  @Post(':id/sign/gc')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.CONTRACTOR, UserRole.SUPER_ADMIN, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Process GC signature (authenticated)' })
   @ApiResponse({ status: 200, description: 'GC signature recorded, hold harmless completed' })
   async signGC(
-    @Param('token') token: string,
+    @Param('id') id: string,
     @Body() signatureData: { signatureUrl: string; signedBy: string; finalDocUrl: string }
   ) {
-    return this.holdHarmlessService.processGCSignature(token, signatureData);
+    return this.holdHarmlessService.processGCSignature(id, signatureData);
   }
 
   @Get('coi/:coiId')

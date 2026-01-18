@@ -32,16 +32,23 @@ export class ContractorsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all contractors' })
+  @ApiOperation({ summary: 'Get all contractors (filtered by user role) with search' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiQuery({ name: 'status', required: false, type: String })
+  @ApiQuery({ name: 'status', required: false, type: String, description: 'Filter by contractor status' })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search by name, email, or company' })
+  @ApiQuery({ name: 'trade', required: false, type: String, description: 'Filter by trade type' })
+  @ApiQuery({ name: 'insuranceStatus', required: false, type: String, description: 'Filter by insurance status' })
   @ApiResponse({ status: 200, description: 'Contractors retrieved successfully' })
   @ApiResponse({ status: 400, description: 'Invalid pagination parameters' })
   findAll(
-    @Query('page') page?: string,  // Query params are always strings from HTTP requests
-    @Query('limit') limit?: string,  // Query params are always strings from HTTP requests
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
     @Query('status') status?: string,
+    @Query('search') search?: string,
+    @Query('trade') trade?: string,
+    @Query('insuranceStatus') insuranceStatus?: string,
+    @GetUser() user?: any, // Get current user for filtering
   ) {
     // Validate and convert pagination parameters
     const pageNum = page ? parseInt(page, 10) : 1;
@@ -55,7 +62,8 @@ export class ContractorsController {
       throw new BadRequestException('Invalid limit parameter: must be a positive number between 1 and 100');
     }
 
-    return this.contractorsService.findAll(pageNum, limitNum, status);
+    // Pass current user and search parameters for role-based filtering
+    return this.contractorsService.findAll(pageNum, limitNum, status, user, search, trade, insuranceStatus);
   }
 
   @Get(':id')

@@ -6,6 +6,23 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding database...');
 
+  // Create SUPER_ADMIN user with specified credentials
+  const superAdminPassword = await bcrypt.hash('260Hooper', 10);
+  const superAdmin = await prisma.user.upsert({
+    where: { email: 'miriamsabel@insuretrack.onmicrosoft.com' },
+    update: {},
+    create: {
+      email: 'miriamsabel@insuretrack.onmicrosoft.com',
+      password: superAdminPassword,
+      firstName: 'Miriam',
+      lastName: 'Sabel',
+      role: 'SUPER_ADMIN',
+      isActive: true,
+    },
+  });
+
+  console.log('✓ Created super admin user:', superAdmin.email);
+
   // Create admin user
   const adminPassword = await bcrypt.hash('Admin123!@#', 10);
   const admin = await prisma.user.upsert({
@@ -208,6 +225,7 @@ async function main() {
   console.log('✅ Database seeding completed!');
   console.log('');
   console.log('📧 Login credentials:');
+  console.log('   Super Admin: miriamsabel@insuretrack.onmicrosoft.com / 260Hooper');
   console.log('   Admin: admin@compliant.com / Admin123!@#');
   console.log('   Manager: manager@compliant.com / Manager123!@#');
   console.log('   Contractor: contractor@compliant.com / Contractor123!@#');

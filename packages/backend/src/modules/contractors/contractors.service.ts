@@ -4,7 +4,9 @@ import { CacheService } from '../cache/cache.service';
 import { CreateContractorDto } from './dto/create-contractor.dto';
 import { UpdateContractorDto } from './dto/update-contractor.dto';
 import { InsuranceStatus } from '@compliant/shared';
-import { Prisma } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+import { randomBytes } from 'crypto';
 
 // Define the return type for findOne including all relations
 type ContractorWithRelations = Prisma.ContractorGetPayload<{
@@ -42,7 +44,89 @@ export class ContractorsService {
     private cacheService: CacheService,
   ) {}
 
+  /**
+   * Generate a secure permanent password
+   * PRODUCTION: This password is permanent (not temporary)
+   * Users can change it later if needed via password reset
+   */
+  private generateSecurePassword(): string {
+    // Generate a secure random password: 12 characters with uppercase, lowercase, numbers, special chars
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%';
+    const bytes = randomBytes(12);
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+      password += chars[bytes[i] % chars.length];
+    }
+    return password;
+  }
+
+  /**
+   * Auto-create user account for contractor/subcontractor
+   * PRODUCTION: This happens automatically when contractor is added
+   * Password is PERMANENT - user receives it once and keeps using it
+   * Same credentials work for all links/emails sent to this user
+   */
+  private async autoCreateUserAccount(
+    email: string,
+    name: string,
+    contractorType: string,
+  ): Promise<{ email: string; password: string; created: boolean }> {
+    try {
+      // Check if user already exists
+      const existingUser = await this.prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (existingUser) {
+        console.log(`User account already exists for ${email} - using existing credentials`);
+        return { email, password: '', created: false };
+      }
+
+      // Generate PERMANENT password
+      const password = this.generateSecurePassword();
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Determine role based on contractor type
+      const role: UserRole = contractorType === 'SUBCONTRACTOR' 
+        ? UserRole.SUBCONTRACTOR 
+        : UserRole.CONTRACTOR;
+
+      // Extract first/last name from full name
+      const nameParts = name.split(' ');
+      const firstName = nameParts[0] || 'User';
+      const lastName = nameParts.slice(1).join(' ') || 'Account';
+
+      // Create user account with PERMANENT password
+      await this.prisma.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          firstName,
+          lastName,
+          role,
+          isActive: true,
+        },
+      });
+
+      console.log(`✓ Auto-created user account for ${email} with role ${role}`);
+      console.log(`  Email: ${email}`);
+      console.log(`  Password: ${password} (PERMANENT - save this!)`);
+      console.log(`  Note: User can change password later if forgotten`);
+      
+      // TODO: Send welcome email with permanent credentials
+      // await this.emailService.sendWelcomeEmail(email, firstName, password);
+      // Email should say: "These are your permanent credentials. Keep them safe. You can change your password anytime."
+
+      return { email, password, created: true };
+    } catch (error) {
+      console.error(`Failed to auto-create user account for ${email}:`, error);
+      // Don't throw - contractor creation should succeed even if user creation fails
+      return { email, password: '', created: false };
+    }
+  }
+
   async create(createContractorDto: CreateContractorDto, userId: string) {
+    // Create contractor record
     const contractor = await this.prisma.contractor.create({
       data: {
         ...createContractorDto,
@@ -60,14 +144,136 @@ export class ContractorsService {
       },
     });
 
+    // PRODUCTION: Automatically create user account
+    const userCreationResult = await this.autoCreateUserAccount(
+      contractor.email,
+      contractor.name,
+      contractor.contractorType,
+    );
+
     // Invalidate list cache when creating a new contractor
     await this.cacheService.delPattern(`${this.CACHE_PREFIX}list:*`);
 
-    return contractor;
+    return {
+      ...contractor,
+      userAccount: userCreationResult,
+    };
   }
 
-  async findAll(page = 1, limit = 10, status?: string) {
-    const cacheKey = `${this.CACHE_PREFIX}list:${page}:${limit}:${status || 'all'}`;
+  /**
+   * Find all contractors with role-based filtering and search
+   * PRODUCTION: Data isolation + PRIVACY + search functionality
+   * - SUPER_ADMIN: sees everything
+   * - ADMIN: sees contractors assigned to them
+   * - CONTRACTOR/GC: sees only themselves + can search their subs
+   * - SUBCONTRACTOR: sees ONLY themselves (PRIVACY: NOT other subs)
+   * - BROKER: sees ONLY subs that entered their broker info (PRIVACY: NOT all subs)
+   * 
+   * PRIVACY RULES:
+   * ✓ Subs CANNOT see other subs on the same project
+   * ✓ Brokers can ONLY see subs that listed them as broker
+   * 
+   * Search parameters:
+   * - search: search by name, email, company
+   * - trade: filter by trade type
+   * - insuranceStatus: filter by insurance status
+   * - status: filter by contractor status
+   */
+  async findAll(
+    page = 1, 
+    limit = 10, 
+    status?: string, 
+    user?: any,
+    search?: string,
+    trade?: string,
+    insuranceStatus?: string,
+  ) {
+    // Build where clause based on user role
+    const where: any = status ? { status: status as any } : {};
+    
+    if (user) {
+      switch (user.role) {
+        case 'SUPER_ADMIN':
+          // Super admin sees everything - no filter
+          break;
+          
+        case 'ADMIN':
+          // Admin sees only contractors assigned to them
+          if (user.email) {
+            where.assignedAdminEmail = user.email;
+          }
+          break;
+          
+        case 'CONTRACTOR':
+          // GC/Contractor sees only their own record OR subcontractors they created
+          if (user.id) {
+            where.OR = [
+              { email: user.email }, // Their own record
+              { createdById: user.id }, // Subs they created
+            ];
+          }
+          break;
+          
+        case 'SUBCONTRACTOR':
+          // PRIVACY: Subcontractor sees ONLY their own record
+          // CANNOT see other subs on the same project
+          where.email = user.email;
+          break;
+          
+        case 'BROKER':
+          // PRIVACY: Broker sees ONLY contractors that entered their broker info
+          // where broker email matches ANY broker field (global or per-policy)
+          where.OR = [
+            { brokerEmail: user.email },
+            { brokerGlEmail: user.email },
+            { brokerAutoEmail: user.email },
+            { brokerUmbrellaEmail: user.email },
+            { brokerWcEmail: user.email },
+          ];
+          break;
+          
+        default:
+          // Default: see nothing
+          where.id = 'non-existent-id';
+      }
+    }
+
+    // Add search filter
+    if (search) {
+      const searchCondition = {
+        OR: [
+          { name: { contains: search, mode: 'insensitive' as any } },
+          { email: { contains: search, mode: 'insensitive' as any } },
+          { company: { contains: search, mode: 'insensitive' as any } },
+        ],
+      };
+      
+      if (where.OR) {
+        // If there's already an OR condition (like for CONTRACTOR), combine them
+        where.AND = [
+          { OR: where.OR },
+          searchCondition,
+        ];
+        delete where.OR;
+      } else {
+        where.OR = searchCondition.OR;
+      }
+    }
+
+    // Add trade filter
+    if (trade) {
+      where.trades = {
+        has: trade,
+      };
+    }
+
+    // Add insurance status filter
+    if (insuranceStatus) {
+      where.insuranceStatus = insuranceStatus;
+    }
+
+    // Cache key includes all filter parameters
+    const cacheKey = `${this.CACHE_PREFIX}list:${page}:${limit}:${status || 'all'}:${user?.role}:${user?.email}:${search || ''}:${trade || ''}:${insuranceStatus || ''}`;
     
     // Try to get from cache first
     const cached = await this.cacheService.get(cacheKey);
@@ -76,7 +282,6 @@ export class ContractorsService {
     }
 
     const skip = (page - 1) * limit;
-    const where = status ? { status: status as any } : {};
 
     const [contractors, total] = await Promise.all([
       this.prisma.contractor.findMany({
