@@ -94,6 +94,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build shared package
+        run: cd packages/shared && pnpm build
+
+      - name: Generate Prisma Client
+        run: cd packages/backend && pnpm db:generate
+
       - name: Build production bundles
         run: pnpm build
 
