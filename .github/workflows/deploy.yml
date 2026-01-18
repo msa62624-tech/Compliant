@@ -18,6 +18,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/compliant_test
+    
     services:
       postgres:
         image: postgres:15
@@ -56,8 +59,6 @@ jobs:
 
       - name: Generate Prisma Client
         run: cd packages/backend && pnpm db:generate
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/compliant_test
 
       - name: Run linting
         run: pnpm lint
@@ -68,7 +69,6 @@ jobs:
       - name: Run automated tests
         run: pnpm test
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/compliant_test
           JWT_SECRET: test-jwt-secret-key
           JWT_REFRESH_SECRET: test-jwt-refresh-secret-key
           NODE_ENV: test
@@ -76,6 +76,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: test
+    
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/compliant_test
     
     steps:
       - name: Checkout code
@@ -100,8 +103,6 @@ jobs:
 
       - name: Generate Prisma Client
         run: cd packages/backend && pnpm db:generate
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/compliant_test
 
       - name: Build production bundles
         run: pnpm build
