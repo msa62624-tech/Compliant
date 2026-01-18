@@ -239,4 +239,175 @@ export class ContractorsService {
       documents: insuranceDocs,
     };
   }
+
+  /**
+   * Search contractors by name, company, or email
+   */
+  async searchContractors(query: string, limit = 10) {
+    const contractors = await this.prisma.contractor.findMany({
+      where: {
+        OR: [
+          { name: { contains: query, mode: 'insensitive' } },
+          { company: { contains: query, mode: 'insensitive' } },
+          { email: { contains: query, mode: 'insensitive' } },
+        ],
+        contractorType: 'SUBCONTRACTOR', // Only search subcontractors
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        company: true,
+        trades: true,
+        insuranceStatus: true,
+        contractorType: true,
+      },
+      take: limit,
+      orderBy: {
+        name: 'asc',
+      },
+    });
+
+    return { contractors };
+  }
+
+  /**
+   * Search brokers from all contractors
+   * Extracts broker information from contractors who have broker details
+   */
+  async searchBrokers(query: string, policyType: string = 'GLOBAL', limit = 10) {
+    const contractors = await this.prisma.contractor.findMany({
+      where: {
+        OR: [
+          // Global broker search
+          { brokerName: { contains: query, mode: 'insensitive' } },
+          { brokerEmail: { contains: query, mode: 'insensitive' } },
+          { brokerCompany: { contains: query, mode: 'insensitive' } },
+          // Per-policy broker search
+          { brokerGlName: { contains: query, mode: 'insensitive' } },
+          { brokerGlEmail: { contains: query, mode: 'insensitive' } },
+          { brokerAutoName: { contains: query, mode: 'insensitive' } },
+          { brokerAutoEmail: { contains: query, mode: 'insensitive' } },
+          { brokerUmbrellaName: { contains: query, mode: 'insensitive' } },
+          { brokerUmbrellaEmail: { contains: query, mode: 'insensitive' } },
+          { brokerWcName: { contains: query, mode: 'insensitive' } },
+          { brokerWcEmail: { contains: query, mode: 'insensitive' } },
+        ],
+      },
+      select: {
+        id: true,
+        brokerType: true,
+        brokerName: true,
+        brokerEmail: true,
+        brokerPhone: true,
+        brokerCompany: true,
+        brokerGlName: true,
+        brokerGlEmail: true,
+        brokerGlPhone: true,
+        brokerAutoName: true,
+        brokerAutoEmail: true,
+        brokerAutoPhone: true,
+        brokerUmbrellaName: true,
+        brokerUmbrellaEmail: true,
+        brokerUmbrellaPhone: true,
+        brokerWcName: true,
+        brokerWcEmail: true,
+        brokerWcPhone: true,
+      },
+      take: limit * 3, // Get more to deduplicate
+    });
+
+    // Extract unique brokers
+    const brokersMap = new Map();
+
+    contractors.forEach((contractor) => {
+      // Add global broker if exists
+      if (contractor.brokerEmail && (policyType === 'GLOBAL' || !policyType)) {
+        const key = contractor.brokerEmail.toLowerCase();
+        if (!brokersMap.has(key)) {
+          brokersMap.set(key, {
+            id: `${contractor.id}-global`,
+            name: contractor.brokerName,
+            email: contractor.brokerEmail,
+            phone: contractor.brokerPhone,
+            company: contractor.brokerCompany,
+            brokerType: contractor.brokerType || 'GLOBAL',
+          });
+        }
+      }
+
+      // Add per-policy brokers if requested
+      if (policyType === 'GL' || policyType === 'PER_POLICY') {
+        if (contractor.brokerGlEmail) {
+          const key = contractor.brokerGlEmail.toLowerCase();
+          if (!brokersMap.has(key)) {
+            brokersMap.set(key, {
+              id: `${contractor.id}-gl`,
+              name: contractor.brokerGlName,
+              email: contractor.brokerGlEmail,
+              phone: contractor.brokerGlPhone,
+              company: contractor.brokerCompany,
+              brokerType: 'PER_POLICY',
+            });
+          }
+        }
+      }
+
+      if (policyType === 'AUTO' || policyType === 'PER_POLICY') {
+        if (contractor.brokerAutoEmail) {
+          const key = contractor.brokerAutoEmail.toLowerCase();
+          if (!brokersMap.has(key)) {
+            brokersMap.set(key, {
+              id: `${contractor.id}-auto`,
+              name: contractor.brokerAutoName,
+              email: contractor.brokerAutoEmail,
+              phone: contractor.brokerAutoPhone,
+              company: contractor.brokerCompany,
+              brokerType: 'PER_POLICY',
+            });
+          }
+        }
+      }
+
+      if (policyType === 'UMBRELLA' || policyType === 'PER_POLICY') {
+        if (contractor.brokerUmbrellaEmail) {
+          const key = contractor.brokerUmbrellaEmail.toLowerCase();
+          if (!brokersMap.has(key)) {
+            brokersMap.set(key, {
+              id: `${contractor.id}-umbrella`,
+              name: contractor.brokerUmbrellaName,
+              email: contractor.brokerUmbrellaEmail,
+              phone: contractor.brokerUmbrellaPhone,
+              company: contractor.brokerCompany,
+              brokerType: 'PER_POLICY',
+            });
+          }
+        }
+      }
+
+      if (policyType === 'WC' || policyType === 'PER_POLICY') {
+        if (contractor.brokerWcEmail) {
+          const key = contractor.brokerWcEmail.toLowerCase();
+          if (!brokersMap.has(key)) {
+            brokersMap.set(key, {
+              id: `${contractor.id}-wc`,
+              name: contractor.brokerWcName,
+              email: contractor.brokerWcEmail,
+              phone: contractor.brokerWcPhone,
+              company: contractor.brokerCompany,
+              brokerType: 'PER_POLICY',
+            });
+          }
+        }
+      }
+    });
+
+    // Convert map to array and limit results
+    const brokers = Array.from(brokersMap.values())
+      .filter(broker => broker.name && broker.email) // Only valid brokers
+      .slice(0, limit);
+
+    return { brokers };
+  }
 }

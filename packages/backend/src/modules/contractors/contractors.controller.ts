@@ -89,4 +89,38 @@ export class ContractorsController {
   remove(@Param('id') id: string) {
     return this.contractorsService.remove(id);
   }
+
+  @Get('search/contractors')
+  @ApiOperation({ summary: 'Search contractors by name, company, or email' })
+  @ApiQuery({ name: 'q', required: true, type: String, description: 'Search query' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Maximum results (default: 10)' })
+  @ApiResponse({ status: 200, description: 'Search results returned successfully' })
+  async searchContractors(
+    @Query('q') query: string,
+    @Query('limit') limit?: string,
+  ) {
+    if (!query || query.length < 2) {
+      throw new BadRequestException('Search query must be at least 2 characters');
+    }
+    const limitNum = limit ? parseInt(limit, 10) : 10;
+    return this.contractorsService.searchContractors(query, limitNum);
+  }
+
+  @Get('search-brokers/all')
+  @ApiOperation({ summary: 'Search brokers from all contractors' })
+  @ApiQuery({ name: 'q', required: true, type: String, description: 'Search query for broker name or email' })
+  @ApiQuery({ name: 'policyType', required: false, type: String, description: 'Policy type (GL, AUTO, UMBRELLA, WC, GLOBAL)' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Maximum results (default: 10)' })
+  @ApiResponse({ status: 200, description: 'Broker search results returned successfully' })
+  async searchBrokers(
+    @Query('q') query: string,
+    @Query('policyType') policyType?: string,
+    @Query('limit') limit?: string,
+  ) {
+    if (!query || query.length < 2) {
+      throw new BadRequestException('Search query must be at least 2 characters');
+    }
+    const limitNum = limit ? parseInt(limit, 10) : 10;
+    return this.contractorsService.searchBrokers(query, policyType, limitNum);
+  }
 }
