@@ -89,7 +89,7 @@ jobs:
           echo $! > backend.pid
           # Wait for backend using liveness probe
           echo "Waiting for backend to start..."
-          timeout 60 bash -c 'until curl -f http://localhost:3001/api/health/liveness 2>/dev/null; do sleep 2; done' || {
+          timeout 60 bash -c 'until curl -f -H "X-API-Version: 1" http://localhost:3001/api/health/liveness 2>/dev/null; do sleep 2; done' || {
             echo "Backend failed to start. Logs:"
             cat backend.log
             exit 1

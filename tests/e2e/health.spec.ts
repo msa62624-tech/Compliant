@@ -9,8 +9,12 @@ test.describe('Health Checks', () => {
   test('backend health endpoint should be accessible', async ({ request }) => {
     const apiBaseUrl = process.env.API_BASE_URL || 'http://localhost:3001';
     
-    // Note: Backend uses /api prefix, so health endpoint is at /api/health
-    const response = await request.get(`${apiBaseUrl}/api/health`);
+    // Note: Backend uses /api prefix and requires X-API-Version header
+    const response = await request.get(`${apiBaseUrl}/api/health`, {
+      headers: {
+        'X-API-Version': '1',
+      },
+    });
     
     expect(response.ok()).toBeTruthy();
     expect(response.status()).toBe(200);
