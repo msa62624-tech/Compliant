@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compliant Platform - Visual Documentation Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        nav {
+            background: #f8f9fa;
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        nav button {
+            padding: 12px 24px;
+            border: none;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        
+        nav button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        nav button.active {
+            background: #764ba2;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .section-title {
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .gallery-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: pointer;
+            border-bottom: 2px solid #f8f9fa;
+        }
+        
+        .gallery-item-info {
+            padding: 20px;
+        }
+        
+        .gallery-item-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .gallery-item-description {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            max-width: 95%;
+            max-height: 95%;
+            position: relative;
+        }
+        
+        .modal img {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 8px;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+        
+        .email-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .email-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .email-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .email-subject {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+        
+        .email-preview {
+            padding: 20px;
+        }
+        
+        .email-preview img {
+            width: 100%;
+            height: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .download-links {
+            padding: 20px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .download-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .download-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📸 Compliant Platform Visual Documentation</h1>
+            <p>Complete Gallery of Screenshots and Email Templates</p>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number">27</div>
+                    <div class="stat-label">Page Screenshots</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">Email Templates</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">✅</div>
+                    <div class="stat-label">Complete</div>
+                </div>
+            </div>
+        </header>
+        
+        <nav>
+            <button onclick="showSection('all')" class="active">All Screenshots</button>
+            <button onclick="showSection('public')">Public Pages</button>
+            <button onclick="showSection('api')">API Docs</button>
+            <button onclick="showSection('admin')">Admin Portal</button>
+            <button onclick="showSection('roles')">Role Dashboards</button>
+            <button onclick="showSection('emails')">Email Templates</button>
+        </nav>
+        
+        <div class="content">
+            <!-- All Screenshots Section -->
+            <div id="all" class="section active">
+                <h2 class="section-title">All Page Screenshots (27)</h2>
+                <div class="gallery" id="all-gallery"></div>
+            </div>
+            
+            <!-- Public Pages Section -->
+            <div id="public" class="section">
+                <h2 class="section-title">Public Pages (2)</h2>
+                <div class="gallery" id="public-gallery"></div>
+            </div>
+            
+            <!-- API Docs Section -->
+            <div id="api" class="section">
+                <h2 class="section-title">API Documentation (4)</h2>
+                <div class="gallery" id="api-gallery"></div>
+            </div>
+            
+            <!-- Admin Section -->
+            <div id="admin" class="section">
+                <h2 class="section-title">Admin Portal (10)</h2>
+                <div class="gallery" id="admin-gallery"></div>
+            </div>
+            
+            <!-- Roles Section -->
+            <div id="roles" class="section">
+                <h2 class="section-title">Role-Based Dashboards (11)</h2>
+                <div class="gallery" id="roles-gallery"></div>
+            </div>
+            
+            <!-- Emails Section -->
+            <div id="emails" class="section">
+                <h2 class="section-title">Email Templates (6)</h2>
+                <div id="emails-container"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="modal" class="modal" onclick="closeModal()">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">✕ Close</button>
+            <img id="modal-image" src="" alt="Full size image">
+        </div>
+    </div>
+    
+    <script>
+        const screenshots = [
+            { file: '01-homepage.png', title: 'Homepage', description: 'Landing page with call-to-action', category: 'public' },
+            { file: '02-login-page.png', title: 'Login Page', description: 'User authentication interface', category: 'public' },
+            { file: '03-api-docs-overview.png', title: 'API Docs - Overview', description: 'Swagger UI main page', category: 'api' },
+            { file: '04-api-docs-authentication.png', title: 'API Docs - Authentication', description: 'Auth endpoints documentation', category: 'api' },
+            { file: '05-api-docs-users.png', title: 'API Docs - Users', description: 'User management endpoints', category: 'api' },
+            { file: '06-api-docs-contractors.png', title: 'API Docs - Contractors', description: 'Contractor endpoints', category: 'api' },
+            { file: '08-admin-dashboard.png', title: 'Admin Dashboard', description: 'Admin overview with statistics', category: 'admin' },
+            { file: '09-admin-general-contractors.png', title: 'General Contractors', description: 'GC management page', category: 'admin' },
+            { file: '10-admin-contractors.png', title: 'Contractors List', description: 'All contractors overview', category: 'admin' },
+            { file: '11-admin-projects.png', title: 'Projects Management', description: 'Project tracking and assignments', category: 'admin' },
+            { file: '12-admin-coi-reviews.png', title: 'COI Reviews', description: 'Insurance document review workflow', category: 'admin' },
+            { file: '13-admin-coi.png', title: 'COI Management', description: 'Certificate of Insurance tracking', category: 'admin' },
+            { file: '14-admin-programs.png', title: 'Insurance Programs', description: 'Program configuration', category: 'admin' },
+            { file: '15-admin-reports.png', title: 'Reports', description: 'Compliance and analytics reports', category: 'admin' },
+            { file: '16-admin-users.png', title: 'User Management', description: 'System user administration', category: 'admin' },
+            { file: '17-admin-settings.png', title: 'System Settings', description: 'Configuration and preferences', category: 'admin' },
+            { file: '18-manager-dashboard.png', title: 'Manager Dashboard', description: 'Manager role overview', category: 'roles' },
+            { file: '19-contractor-dashboard.png', title: 'Contractor Dashboard', description: 'GC project management view', category: 'roles' },
+            { file: '20-contractor-projects.png', title: 'Contractor Projects', description: 'GC project list', category: 'roles' },
+            { file: '21-subcontractor-dashboard.png', title: 'Subcontractor Dashboard', description: 'Sub overview and assignments', category: 'roles' },
+            { file: '22-subcontractor-projects.png', title: 'Subcontractor Projects', description: 'Assigned project list', category: 'roles' },
+            { file: '23-subcontractor-broker.png', title: 'Broker Assignment', description: 'Insurance broker management', category: 'roles' },
+            { file: '24-subcontractor-documents.png', title: 'Documents', description: 'Insurance document tracking', category: 'roles' },
+            { file: '25-subcontractor-compliance.png', title: 'Compliance Status', description: 'Insurance compliance overview', category: 'roles' },
+            { file: '26-broker-dashboard.png', title: 'Broker Dashboard', description: 'Insurance broker overview', category: 'roles' },
+            { file: '27-broker-upload.png', title: 'COI Upload', description: 'Document upload interface', category: 'roles' },
+            { file: '28-broker-projects.png', title: 'Broker Projects', description: 'Broker project assignments', category: 'roles' }
+        ];
+        
+        const emails = [
+            { 
+                file: '01-subcontractor-welcome-email.png',
+                html: '01-subcontractor-welcome-email.html',
+                title: 'Subcontractor Welcome Email',
+                subject: 'Welcome to Compliant Platform - Set Your Password',
+                description: 'Purple branding, password reset link, onboarding steps'
+            },
+            { 
+                file: '02-broker-welcome-email.png',
+                html: '02-broker-welcome-email.html',
+                title: 'Broker Welcome Email',
+                subject: 'Broker Account Created - Set Your Password',
+                description: 'Green branding, broker assignment, responsibilities outlined'
+            },
+            { 
+                file: '03-compliance-confirmation-email.png',
+                html: '03-compliance-confirmation-email.html',
+                title: 'Compliance Confirmation',
+                subject: '✓ Insurance Compliance Approved',
+                description: 'Green success theme, approval notification for all parties'
+            },
+            { 
+                file: '04-non-compliance-alert-email.png',
+                html: '04-non-compliance-alert-email.html',
+                title: 'Non-Compliance Alert',
+                subject: '⚠️ URGENT: Insurance Non-Compliance',
+                description: 'Red alert theme, urgent action required notification'
+            },
+            { 
+                file: '05-document-upload-notification-email.png',
+                html: '05-document-upload-notification-email.html',
+                title: 'Document Upload Notification',
+                subject: '📄 COI Review Required',
+                description: 'Blue professional theme, admin review request'
+            },
+            { 
+                file: '06-hold-harmless-signature-email.png',
+                html: '06-hold-harmless-signature-email.html',
+                title: 'Hold Harmless Signature',
+                subject: 'Hold Harmless Agreement - Signature Required',
+                description: 'Purple legal theme, signature workflow notification'
+            }
+        ];
+        
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(section).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function openImage(src) {
+            document.getElementById('modal-image').src = src;
+            document.getElementById('modal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        
+        function createGalleryItem(item, basePath) {
+            return `
+                <div class="gallery-item">
+                    <img src="${basePath}/${item.file}" alt="${item.title}" onclick="openImage('${basePath}/${item.file}')">
+                    <div class="gallery-item-info">
+                        <div class="gallery-item-title">${item.title}</div>
+                        <div class="gallery-item-description">${item.description}</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function createEmailItem(email) {
+            return `
+                <div class="email-item">
+                    <div class="email-header">
+                        <div class="email-title">${email.title}</div>
+                        <div class="email-subject">${email.subject}</div>
+                    </div>
+                    <div class="email-preview">
+                        <img src="email-templates/${email.file}" alt="${email.title}" onclick="openImage('email-templates/${email.file}')">
+                    </div>
+                    <div class="download-links">
+                        <a href="email-templates/${email.html}" class="download-btn" download>📄 Download HTML</a>
+                        <a href="email-templates/${email.file}" class="download-btn" download>🖼️ Download PNG</a>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Populate galleries
+        document.getElementById('all-gallery').innerHTML = screenshots.map(s => createGalleryItem(s, 'screenshots')).join('');
+        document.getElementById('public-gallery').innerHTML = screenshots.filter(s => s.category === 'public').map(s => createGalleryItem(s, 'screenshots')).join('');
+        document.getElementById('api-gallery').innerHTML = screenshots.filter(s => s.category === 'api').map(s => createGalleryItem(s, 'screenshots')).join('');
+        document.getElementById('admin-gallery').innerHTML = screenshots.filter(s => s.category === 'admin').map(s => createGalleryItem(s, 'screenshots')).join('');
+        document.getElementById('roles-gallery').innerHTML = screenshots.filter(s => s.category === 'roles').map(s => createGalleryItem(s, 'screenshots')).join('');
+        document.getElementById('emails-container').innerHTML = emails.map(e => createEmailItem(e)).join('');
+    </script>
+</body>
+</html>
