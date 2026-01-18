@@ -329,7 +329,7 @@ check_cron_jobs() {
     # Check cron logs (if available)
     if [[ -f /var/log/cron ]]; then
         log_detail "Checking recent cron activity..."
-        local recent_backups=$(grep -c "backup" /var/log/cron 2>/dev/null | tail -20 || echo "0")
+        local recent_backups=$(grep "backup" /var/log/cron 2>/dev/null | tail -20 | wc -l || echo "0")
         if [[ $recent_backups -gt 0 ]]; then
             log_success "Recent backup executions found in cron logs"
         else
@@ -423,19 +423,33 @@ check_s3_configuration() {
             log_info "Latest backup: $backup_date"
             
             # Calculate age
-            local backup_timestamp=$(date -d "$backup_date" +%s 2>/dev/null || date -j -f "%Y-%m-%d %H:%M:%S" "$backup_date" +%s 2>/dev/null || echo "0")
-            local now=$(date +%s)
-            local age_hours=$(( (now - backup_timestamp) / 3600 ))
+            local backup_timestamp
+            local age_hours=0
             
-            if [[ $age_hours -lt 24 ]]; then
-                log_success "Latest backup is recent (${age_hours}h old)"
-            elif [[ $age_hours -lt 48 ]]; then
-                log_warning "Latest backup is ${age_hours}h old (older than 24h)"
-                add_recommendation "Verify backup cron job is running"
+            # Try Linux date format first, then macOS
+            if backup_timestamp=$(date -d "$backup_date" +%s 2>/dev/null); then
+                # Linux/GNU date
+                local now=$(date +%s)
+                age_hours=$(( (now - backup_timestamp) / 3600 ))
+            elif backup_timestamp=$(date -j -f "%Y-%m-%d %H:%M:%S" "$backup_date" +%s 2>/dev/null); then
+                # macOS/BSD date
+                local now=$(date +%s)
+                age_hours=$(( (now - backup_timestamp) / 3600 ))
             else
-                log_error "Latest backup is ${age_hours}h old (older than 48h)"
-                add_issue "Backups appear to be stale"
-                add_recommendation "Check backup cron job and script execution"
+                log_warning "Cannot parse backup date, skipping age check"
+            fi
+            
+            if [[ $age_hours -gt 0 ]]; then
+                if [[ $age_hours -lt 24 ]]; then
+                    log_success "Latest backup is recent (${age_hours}h old)"
+                elif [[ $age_hours -lt 48 ]]; then
+                    log_warning "Latest backup is ${age_hours}h old (older than 24h)"
+                    add_recommendation "Verify backup cron job is running"
+                else
+                    log_error "Latest backup is ${age_hours}h old (older than 48h)"
+                    add_issue "Backups appear to be stale"
+                    add_recommendation "Check backup cron job and script execution"
+                fi
             fi
         fi
     else

@@ -582,7 +582,9 @@ validate_thresholds() {
     log_info "Threshold Configuration:"
     echo -e "  ${BOLD}P95:${NC}        < ${THRESHOLD_P95}ms"
     echo -e "  ${BOLD}P99:${NC}        < ${THRESHOLD_P99}ms"
-    echo -e "  ${BOLD}Error Rate:${NC} < $(echo "$THRESHOLD_ERROR_RATE * 100" | bc)%"
+    # Use awk for arithmetic instead of bc
+    local error_rate_percent=$(awk "BEGIN {print $THRESHOLD_ERROR_RATE * 100}")
+    echo -e "  ${BOLD}Error Rate:${NC} < ${error_rate_percent}%"
     echo ""
     
     log_info "Actual Results:"

@@ -270,7 +270,18 @@ verify_backup_integrity() {
     fi
     
     # Check file size
-    local file_size=$(stat -f%z "$BACKUP_FILE" 2>/dev/null || stat -c%s "$BACKUP_FILE" 2>/dev/null)
+    local file_size
+    if stat -f%z "$BACKUP_FILE" &>/dev/null; then
+        # macOS/BSD
+        file_size=$(stat -f%z "$BACKUP_FILE")
+    elif stat -c%s "$BACKUP_FILE" &>/dev/null; then
+        # Linux/GNU
+        file_size=$(stat -c%s "$BACKUP_FILE")
+    else
+        log_error "Cannot determine file size (stat command failed)"
+        return 3
+    fi
+    
     local size_mb=$((file_size / 1024 / 1024))
     log_info "Backup file size: ${size_mb}MB"
     
@@ -439,7 +450,8 @@ test_query_performance() {
     
     if [[ -n "$query_time" ]]; then
         log_info "Sample query time: ${query_time}ms"
-        if (( $(echo "$query_time < 1000" | bc -l 2>/dev/null || echo "1") )); then
+        # Use awk for comparison instead of bc
+        if [[ $(awk "BEGIN {print ($query_time < 1000)}") == "1" ]]; then
             log_detail "✓ Query performance acceptable"
         else
             log_warning "Query performance may be degraded: ${query_time}ms"
