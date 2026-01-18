@@ -57,6 +57,37 @@ describe("AuditService", () => {
       consoleSpy.mockRestore();
     });
 
+    it("should log anonymous events to database", async () => {
+      const consoleSpy = jest.spyOn(console, "log").mockImplementation();
+      const createSpy = jest
+        .spyOn(prismaService.auditLog, "create")
+        .mockResolvedValue({} as any);
+
+      await service.log({
+        action: AuditAction.LOGIN,
+        resourceType: AuditResourceType.USER,
+        details: {
+          attemptCount: 1,
+          success: false,
+          reason: "Invalid credentials",
+        },
+        ipAddress: "192.168.1.100",
+        userAgent: "Mozilla/5.0",
+      });
+
+      expect(createSpy).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          userId: null,
+          action: AuditAction.LOGIN,
+          resource: AuditResourceType.USER,
+          ipAddress: "192.168.1.100",
+          userAgent: "Mozilla/5.0",
+        }),
+      });
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+
     it("should handle errors gracefully", async () => {
       const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
       const createSpy = jest
@@ -165,6 +196,34 @@ describe("AuditService", () => {
         details: { attemptCount: 3, success: false, securityEvent: true },
         ipAddress: "127.0.0.1",
         userAgent: "Test Agent",
+      });
+
+      logSpy.mockRestore();
+    });
+
+    it("should log anonymous security events (failed login attempts)", async () => {
+      const logSpy = jest.spyOn(service, "log").mockResolvedValue();
+
+      await service.logSecurityEvent(
+        undefined,
+        AuditAction.LOGIN,
+        { attemptCount: 5, success: false, reason: "Invalid credentials" },
+        "192.168.1.100",
+        "Mozilla/5.0",
+      );
+
+      expect(logSpy).toHaveBeenCalledWith({
+        userId: undefined,
+        action: AuditAction.LOGIN,
+        resourceType: AuditResourceType.USER,
+        details: {
+          attemptCount: 5,
+          success: false,
+          reason: "Invalid credentials",
+          securityEvent: true,
+        },
+        ipAddress: "192.168.1.100",
+        userAgent: "Mozilla/5.0",
       });
 
       logSpy.mockRestore();
