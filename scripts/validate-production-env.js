@@ -159,11 +159,11 @@ const requiredVars = [
     name: 'ENCRYPTION_KEY',
     required: true,
     validate: (val) => {
-      if (val.length < 32) {
-        return 'Must be at least 32 characters';
-      }
       if (!val || val === '') {
         return 'Required for field-level encryption';
+      }
+      if (val.length < 32) {
+        return 'Must be at least 32 characters';
       }
       return null;
     },
@@ -173,11 +173,11 @@ const requiredVars = [
     name: 'ENCRYPTION_SALT',
     required: true,
     validate: (val) => {
-      if (val.length < 16) {
-        return 'Must be at least 16 characters';
-      }
       if (!val || val === '') {
         return 'Required for field-level encryption';
+      }
+      if (val.length < 16) {
+        return 'Must be at least 16 characters';
       }
       return null;
     },
