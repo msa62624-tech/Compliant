@@ -217,6 +217,8 @@ CREATE TABLE "insurance_documents" (
 );
 
 -- CreateTable
+-- Note: userId is nullable to support anonymous/unauthenticated audit events
+-- such as failed login attempts, public API access, or system-generated events
 CREATE TABLE "audit_logs" (
     "id" TEXT NOT NULL,
     "userId" TEXT,

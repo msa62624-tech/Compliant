@@ -773,8 +773,9 @@ Contact admin if you have questions: admin@compliant.com`,
       // Renewal should skip AWAITING_BROKER_INFO since broker info is copied
       expect(renewedCoi.status).toBe('AWAITING_BROKER_UPLOAD');
       
-      // Note: originalCoiId field not yet implemented in schema
-      // expect(renewedCoi.originalCoiId).toBe(originalCoiId);
+      // TODO: Implement originalCoiId field in GeneratedCOI model to track renewal relationships
+      // See: packages/backend/prisma/schema.prisma - GeneratedCOI model
+      // When implemented, uncomment: expect(renewedCoi.originalCoiId).toBe(originalCoiId);
       
       console.log(`✓ Renewal COI created (ID: ${renewedCoiId})`);
       console.log(`  Status: ${renewedCoi.status} ← Broker info auto-populated from original`);
@@ -888,7 +889,8 @@ Contact admin if you have questions: admin@compliant.com`,
       
       expect(renewedCoi.id).toBe(renewedCoiId);
       expect(renewedCoi.status).toBe('ACTIVE');
-      // Note: originalCoiId field not implemented in schema yet
+      // TODO: Implement originalCoiId field to track COI renewal relationships
+      // When implemented, uncomment: expect(renewedCoi.originalCoiId).toBe(originalCoiId);
       
       // Policy numbers should be different
       expect(renewedCoi.glPolicyNumber).not.toBe(originalCoi.glPolicyNumber);
