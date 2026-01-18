@@ -168,7 +168,7 @@ export default function ContractorDashboard({ user, onLogout }: ContractorDashbo
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <a
+              <Link
                 href="/gc/projects"
                 className="block p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow transition"
               >
@@ -176,8 +176,8 @@ export default function ContractorDashboard({ user, onLogout }: ContractorDashbo
                 <p className="text-sm text-gray-600 mt-1">
                   View and manage your construction projects
                 </p>
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/gc/subcontractors"
                 className="block p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow transition"
               >
@@ -185,21 +185,21 @@ export default function ContractorDashboard({ user, onLogout }: ContractorDashbo
                 <p className="text-sm text-gray-600 mt-1">
                   Add subcontractors to your projects
                 </p>
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/gc/compliance"
                 className="block p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow transition"
               >
                 <h4 className="font-semibold text-gray-900">Compliance Status</h4>
                 <p className="text-sm text-gray-600 mt-1">Monitor subcontractor insurance compliance</p>
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/gc/reports"
                 className="block p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow transition"
               >
                 <h4 className="font-semibold text-gray-900">Project Reports</h4>
                 <p className="text-sm text-gray-600 mt-1">Generate project compliance reports</p>
-              </a>
+              </Link>
             </div>
           </div>
         </div>
