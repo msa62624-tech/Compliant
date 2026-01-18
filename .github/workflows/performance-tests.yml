@@ -201,11 +201,11 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             
             # Check thresholds using awk
-            if awk -v p95="$HTTP_REQ_DURATION_P95" 'BEGIN {exit (p95 > 500)}'; then
+            if awk -v p95="$HTTP_REQ_DURATION_P95" 'BEGIN {exit !(p95 > 500)}'; then
               echo "⚠️ **Warning**: 95th percentile response time exceeds 500ms" >> $GITHUB_STEP_SUMMARY
             fi
             
-            if awk -v rate="$HTTP_REQ_FAILED_RATE" 'BEGIN {exit (rate > 0.05)}'; then
+            if awk -v rate="$HTTP_REQ_FAILED_RATE" 'BEGIN {exit !(rate > 0.05)}'; then
               echo "❌ **Error**: Error rate exceeds 5%" >> $GITHUB_STEP_SUMMARY
             fi
           else
