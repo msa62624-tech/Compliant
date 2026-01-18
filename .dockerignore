@@ -80,7 +80,8 @@ docs/
 .eslintrc*
 .prettierrc*
 .editorconfig
-tsconfig*.json
+# NOTE: tsconfig*.json files are needed for building TypeScript in Docker
+# tsconfig*.json
 jest.config.*
 playwright.config.*
 
