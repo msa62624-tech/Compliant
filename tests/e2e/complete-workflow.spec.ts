@@ -188,12 +188,11 @@ test.describe('Complete COI Workflow Tests', () => {
           brokerGlName: 'John Smith',
           brokerGlEmail: 'john.smith@insurancepro.com',
           brokerGlPhone: '(555) 100-0001',
-          brokerGlCompany: 'Insurance Pro LLC',
+          brokerCompany: 'Insurance Pro LLC',
           
           brokerAutoName: 'Jane Doe',
           brokerAutoEmail: 'jane.doe@insurancepro.com',
           brokerAutoPhone: '(555) 100-0002',
-          brokerAutoCompany: 'Insurance Pro LLC',
           
           brokerUmbrellaName: 'Bob Johnson',
           brokerUmbrellaEmail: 'bob.johnson@insurancepro.com',
@@ -677,12 +676,11 @@ Contact admin if you have questions: admin@compliant.com`,
           brokerGlName: 'Sarah Johnson',
           brokerGlEmail: 'sarah.johnson@premiuminsurance.com',
           brokerGlPhone: '(555) 300-0001',
-          brokerGlCompany: 'Premium Insurance Group',
+          brokerCompany: 'Premium Insurance Group',
           
           brokerAutoName: 'Sarah Johnson',
           brokerAutoEmail: 'sarah.johnson@premiuminsurance.com',
           brokerAutoPhone: '(555) 300-0001',
-          brokerAutoCompany: 'Premium Insurance Group',
           
           brokerUmbrellaName: 'Sarah Johnson',
           brokerUmbrellaEmail: 'sarah.johnson@premiuminsurance.com',
@@ -768,7 +766,7 @@ Contact admin if you have questions: admin@compliant.com`,
       // Verify broker information was copied from original
       expect(renewedCoi.brokerGlName).toBe('Sarah Johnson');
       expect(renewedCoi.brokerGlEmail).toBe('sarah.johnson@premiuminsurance.com');
-      expect(renewedCoi.brokerGlCompany).toBe('Premium Insurance Group');
+      expect(renewedCoi.brokerCompany).toBe('Premium Insurance Group');
       
       // Renewal should skip AWAITING_BROKER_INFO since broker info is copied
       expect(renewedCoi.status).toBe('AWAITING_BROKER_UPLOAD');
