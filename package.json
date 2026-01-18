@@ -17,10 +17,7 @@
     "db:migrate": "cd packages/backend && pnpm db:migrate",
     "db:push": "cd packages/backend && pnpm db:push",
     "backend": "cd packages/backend && pnpm dev",
-    "frontend": "cd packages/frontend && pnpm dev",
-    "capture:screenshots": "ts-node scripts/capture-screenshots.ts",
-    "render:emails": "ts-node scripts/render-email-templates.ts",
-    "generate:docs": "pnpm render:emails && pnpm capture:screenshots"
+    "frontend": "cd packages/frontend && pnpm dev"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
