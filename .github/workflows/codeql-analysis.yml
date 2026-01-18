@@ -103,11 +103,40 @@ jobs:
             p/typescript
             p/react
             p/nextjs
+          generateSarif: true
         env:
           SEMGREP_RULES: auto
 
+      - name: Check if SARIF file exists
+        id: check_sarif
+        run: |
+          if [ -f semgrep.sarif ]; then
+            echo "has_findings=true" >> $GITHUB_OUTPUT
+            echo "SARIF file exists with findings"
+          else
+            echo "has_findings=false" >> $GITHUB_OUTPUT
+            echo "No SARIF file generated - creating empty one for completeness"
+            cat > semgrep.sarif << 'EOF'
+          {
+            "version": "2.1.0",
+            "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+            "runs": [
+              {
+                "tool": {
+                  "driver": {
+                    "name": "Semgrep",
+                    "informationUri": "https://semgrep.dev"
+                  }
+                },
+                "results": []
+              }
+            ]
+          }
+          EOF
+          fi
+
       - name: Upload Semgrep results to GitHub Security
-        if: always()
+        if: always() && steps.check_sarif.outputs.has_findings == 'true'
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: semgrep.sarif
