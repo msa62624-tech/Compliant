@@ -230,7 +230,7 @@ export class ContractorsService {
     if (insuranceStatus !== contractor.insuranceStatus) {
       await this.prisma.contractor.update({
         where: { id },
-        data: { insuranceStatus: insuranceStatus as any },
+        data: { insuranceStatus },
       });
     }
 

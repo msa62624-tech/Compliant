@@ -39,8 +39,8 @@ export class ContractorsController {
   @ApiResponse({ status: 200, description: 'Contractors retrieved successfully' })
   @ApiResponse({ status: 400, description: 'Invalid pagination parameters' })
   findAll(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
+    @Query('page') page?: string,  // Query params are always strings from HTTP requests
+    @Query('limit') limit?: string,  // Query params are always strings from HTTP requests
     @Query('status') status?: string,
   ) {
     // Validate and convert pagination parameters
