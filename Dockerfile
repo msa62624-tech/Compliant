@@ -50,19 +50,13 @@ FROM node:20-alpine AS production
 
 WORKDIR /app
 
-# Install runtime dependencies (optional postgresql-client for debugging)
+# Install runtime dependencies
 # Note: Prisma Client doesn't require postgresql-client binaries
 # They're only useful for manual database operations/debugging
-RUN set -e; \
-    echo "Updating package repository..." && \
-    for i in 1 2 3 4 5; do \
-      apk update && break || { echo "Retry $i/5: apk update failed, waiting..."; sleep 10; }; \
-    done && \
-    echo "Installing optional postgresql-client (not critical)..." && \
-    (apk add --no-cache postgresql16-client 2>/dev/null || \
-     apk add --no-cache postgresql15-client 2>/dev/null || \
-     apk add --no-cache postgresql14-client 2>/dev/null || \
-     { echo "Note: postgresql-client not installed (optional dependency)"; true; })
+# Security: Install only if absolutely needed for production operations
+RUN apk update && \
+    apk add --no-cache ca-certificates && \
+    rm -rf /var/cache/apk/*
 
 # Install pnpm
 RUN npm install -g pnpm@8.15.0
@@ -95,6 +89,10 @@ RUN addgroup -g 1001 -S nodejs && \
     chown -R nodejs:nodejs /app
 
 USER nodejs
+
+# Add healthcheck for container orchestration
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3001/api/health/liveness', {headers: {'X-API-Version': '1'}}, (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Expose ports for backend and frontend
 EXPOSE 3000 3001
