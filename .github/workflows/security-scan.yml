@@ -76,8 +76,8 @@ jobs:
           COPY packages/frontend/package.json ./packages/frontend/
           COPY packages/shared/package.json ./packages/shared/
           
-          # Install dependencies
-          RUN pnpm install --frozen-lockfile --prod
+          # Install dependencies (including devDependencies needed for build)
+          RUN pnpm install --frozen-lockfile
           
           # Copy only necessary application files (excluding .env, secrets, etc.)
           COPY packages/backend/src ./packages/backend/src
