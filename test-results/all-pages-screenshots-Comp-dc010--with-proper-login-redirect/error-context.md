@@ -1,0 +1,105 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - alert [ref=e2]
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - generic [ref=e6]:
+        - heading "Contractor Portal" [level=1] [ref=e8]
+        - generic [ref=e9]:
+          - generic [ref=e10]: General Contractor
+          - generic [ref=e11]: CONTRACTOR
+          - button "Logout" [ref=e12] [cursor=pointer]
+    - main [ref=e13]:
+      - generic [ref=e14]:
+        - heading "General Contractor Dashboard" [level=2] [ref=e15]
+        - generic [ref=e16]:
+          - generic [ref=e17]:
+            - heading "My Projects" [level=3] [ref=e18]
+            - paragraph [ref=e19]: "5"
+            - paragraph [ref=e20]: Active jobs
+          - generic [ref=e21]:
+            - heading "Total Subcontractors" [level=3] [ref=e22]
+            - paragraph [ref=e23]: "18"
+            - paragraph [ref=e24]: Across all projects
+          - generic [ref=e25]:
+            - heading "✓ Compliant" [level=3] [ref=e26]
+            - paragraph [ref=e27]: "16"
+            - paragraph [ref=e28]: Verified & active
+          - generic [ref=e29]:
+            - heading "⚠ Issues" [level=3] [ref=e30]
+            - paragraph [ref=e31]: "2"
+            - paragraph [ref=e32]: Need attention now
+        - generic [ref=e34]:
+          - img [ref=e36]
+          - generic [ref=e38]:
+            - heading "⚠️ Non-Compliant Subcontractors - Action Required" [level=3] [ref=e39]
+            - generic [ref=e40]:
+              - generic [ref=e41]:
+                - generic [ref=e42]:
+                  - paragraph [ref=e43]: Smith & Sons HVAC
+                  - paragraph [ref=e44]: "Project: Downtown Office Building"
+                  - paragraph [ref=e45]: ⏰ Insurance EXPIRED 5 days ago
+                - generic [ref=e46]:
+                  - generic [ref=e47]: EXPIRED
+                  - paragraph [ref=e48]: Email sent to GC, Sub, Broker
+              - generic [ref=e49]:
+                - generic [ref=e50]:
+                  - paragraph [ref=e51]: BuildRight Contractors
+                  - paragraph [ref=e52]: "Project: Residential Complex Phase 2"
+                  - paragraph [ref=e53]: 📋 Documents pending review
+                - generic [ref=e54]:
+                  - generic [ref=e55]: PENDING
+                  - paragraph [ref=e56]: Reminder sent to GC, Sub, Broker
+            - generic [ref=e57]:
+              - link "View All Issues →" [ref=e58] [cursor=pointer]:
+                - /url: /gc/compliance?filter=issues
+              - button "Send Reminders" [ref=e59] [cursor=pointer]
+        - generic [ref=e61]:
+          - img [ref=e63]
+          - generic [ref=e65]:
+            - generic [ref=e66]:
+              - heading "✓ Recently Verified Compliant" [level=3] [ref=e67]
+              - generic [ref=e68]: Last 2 days
+            - generic [ref=e69]:
+              - generic [ref=e70]:
+                - generic [ref=e71]:
+                  - paragraph [ref=e72]: ABC Electrical Services
+                  - paragraph [ref=e73]: "Project: Downtown Office Building"
+                  - paragraph [ref=e74]: ✓ All insurance documents verified
+                - generic [ref=e75]:
+                  - generic [ref=e76]: COMPLIANT
+                  - paragraph [ref=e77]: Confirmed 1 day ago
+                  - paragraph [ref=e78]: ✉ Confirmation sent to all parties
+              - generic [ref=e79]:
+                - generic [ref=e80]:
+                  - paragraph [ref=e81]: XYZ Plumbing Co.
+                  - paragraph [ref=e82]: "Project: Residential Complex Phase 2"
+                  - paragraph [ref=e83]: ✓ Insurance renewed and verified
+                - generic [ref=e84]:
+                  - generic [ref=e85]: COMPLIANT
+                  - paragraph [ref=e86]: Confirmed 2 days ago
+                  - paragraph [ref=e87]: ✉ Confirmation sent to all parties
+            - link "View All Compliant Subs →" [ref=e89] [cursor=pointer]:
+              - /url: /gc/compliance?filter=compliant
+        - generic [ref=e90]:
+          - heading "Quick Actions" [level=3] [ref=e91]
+          - generic [ref=e92]:
+            - link "My Projects View and manage your construction projects" [ref=e93] [cursor=pointer]:
+              - /url: /gc/projects
+              - heading "My Projects" [level=4] [ref=e94]
+              - paragraph [ref=e95]: View and manage your construction projects
+            - link "Add Subcontractors Add subcontractors to your projects" [ref=e96] [cursor=pointer]:
+              - /url: /gc/subcontractors
+              - heading "Add Subcontractors" [level=4] [ref=e97]
+              - paragraph [ref=e98]: Add subcontractors to your projects
+            - link "Compliance Status Monitor subcontractor insurance compliance" [ref=e99] [cursor=pointer]:
+              - /url: /gc/compliance
+              - heading "Compliance Status" [level=4] [ref=e100]
+              - paragraph [ref=e101]: Monitor subcontractor insurance compliance
+            - link "Project Reports Generate project compliance reports" [ref=e102] [cursor=pointer]:
+              - /url: /gc/reports
+              - heading "Project Reports" [level=4] [ref=e103]
+              - paragraph [ref=e104]: Generate project compliance reports
+```
