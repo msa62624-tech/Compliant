@@ -127,10 +127,10 @@ jobs:
           # Install Grype for additional vulnerability scanning
           curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
           
-          # Run Grype scan with critical threshold only
-          # This will fail the build if critical vulnerabilities are found
-          # High-severity vulnerabilities will be reported but won't fail the build
-          grype compliant-app:scan --fail-on critical --output table
+          # Run Grype scan with high severity threshold
+          # This will fail the build if critical or high severity vulnerabilities are found
+          # Ensures better security coverage by catching high-severity issues
+          grype compliant-app:scan --fail-on high --output table
 
       - name: Security scan summary
         if: always()
