@@ -7,8 +7,7 @@ WORKDIR /app
 
 # Install system dependencies for building native modules
 # postgresql-client is NOT needed for build, only for runtime
-RUN for i in 1 2 3; do apk update && break || sleep 5; done && \
-    apk add --no-cache python3 make g++
+RUN apk update && apk add --no-cache python3 make g++
 
 # Install pnpm
 RUN npm install -g pnpm@8.15.0
@@ -53,16 +52,11 @@ WORKDIR /app
 # Install runtime dependencies (optional postgresql-client for debugging)
 # Note: Prisma Client doesn't require postgresql-client binaries
 # They're only useful for manual database operations/debugging
-RUN set -e; \
-    echo "Updating package repository..." && \
-    for i in 1 2 3 4 5; do \
-      apk update && break || { echo "Retry $i/5: apk update failed, waiting..."; sleep 10; }; \
-    done && \
-    echo "Installing optional postgresql-client (not critical)..." && \
-    (apk add --no-cache postgresql16-client 2>/dev/null || \
-     apk add --no-cache postgresql15-client 2>/dev/null || \
-     apk add --no-cache postgresql14-client 2>/dev/null || \
-     { echo "Note: postgresql-client not installed (optional dependency)"; true; })
+RUN apk update && \
+    (apk add --no-cache postgresql16-client || \
+     apk add --no-cache postgresql15-client || \
+     apk add --no-cache postgresql14-client || \
+     echo "Note: postgresql-client not installed (optional dependency)")
 
 # Install pnpm
 RUN npm install -g pnpm@8.15.0

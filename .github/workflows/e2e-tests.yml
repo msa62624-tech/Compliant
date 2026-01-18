@@ -301,6 +301,9 @@ jobs:
           JWT_REFRESH_SECRET: test-jwt-refresh-secret-key-e2e-matrix-tests
           ENCRYPTION_KEY: dGVzdC1lbmNyeXB0aW9uLWtleS1mb3ItZTJlLW1hdHJpeC10ZXN0czEyMzQ1
           ENCRYPTION_SALT: 0123456789abcdef0123456789abcdef
+          EMAIL_PROVIDER: test
+          EMAIL_FROM: test@example.com
+          ADMIN_EMAIL: admin@example.com
           NODE_ENV: test
           PLAYWRIGHT_BASE_URL: http://localhost:3000
           VIEWPORT_WIDTH: ${{ matrix.width }}
