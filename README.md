@@ -29,9 +29,6 @@ Enterprise-grade insurance tracking application for General Contractors and thei
 ![Code Architecture](https://img.shields.io/badge/Code%20Architecture-100%25-success)
 ![Monitoring & Observability](https://img.shields.io/badge/Monitoring%20%26%20Observability-100%25-success)
 
-**📋 [View Enterprise Readiness Assessment](./ENTERPRISE_READINESS_ASSESSMENT.md)** - Comprehensive validation report  
-**✅ [Run Validation Script](./scripts/validate-enterprise-readiness.js)** - Automated readiness verification
-
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -148,22 +145,9 @@ pnpm lint       # Lint code
 ### Development
 - **API Documentation**: Visit http://localhost:3001/api/docs when backend is running
 - **Database Schema**: See `packages/backend/prisma/schema.prisma`
-- **Getting Started Guide**: See [GETTING_STARTED.md](./GETTING_STARTED.md)
-- **Implementation Guidelines**: See [docs/IMPLEMENTATION_GUIDELINES.md](./docs/IMPLEMENTATION_GUIDELINES.md)
-- **Additional Documentation**: See [docs/](./docs/) directory for feature requirements and workflow details
-
-### Production Deployment 🚀
-- **Quick Start (30 min)**: [QUICK_START_PRODUCTION.md](./QUICK_START_PRODUCTION.md) - Fast production deployment
-- **Complete Guide**: [PRODUCTION_READINESS_GUIDE.md](./PRODUCTION_READINESS_GUIDE.md) - Comprehensive deployment documentation
-- **Deployment Guide**: [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) - Enterprise deployment strategies
-- **Configuration Template**: `packages/backend/.env.production.template` - Production environment template
-
-### Tools & Scripts
-- **Validate Config**: `node scripts/validate-production-env.js` - Verify environment variables
-- **Deployment Checklist**: `./scripts/production-deployment-checklist.sh` - Interactive deployment guide
-
-### Business Logic Status
-- **Implementation Status**: [BUSINESS_LOGIC_STATUS.md](./BUSINESS_LOGIC_STATUS.md) - Current feature implementation status
+- **Implementation Guide**: See [docs/IMPLEMENTATION_GUIDELINES.md](./docs/IMPLEMENTATION_GUIDELINES.md)
+- **Testing Guide**: See [docs/TESTING_GUIDE.md](./docs/TESTING_GUIDE.md)
+- **Workflows**: See [docs/WORKFLOW_IMPLEMENTATION.md](./docs/WORKFLOW_IMPLEMENTATION.md)
 
 ## 🔧 Configuration
 
