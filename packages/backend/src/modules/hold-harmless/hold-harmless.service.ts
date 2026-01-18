@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Logger,
 } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import {
@@ -25,6 +26,8 @@ import { EmailService } from "../email/email.service";
  */
 @Injectable()
 export class HoldHarmlessService {
+  private readonly logger = new Logger(HoldHarmlessService.name);
+
   constructor(
     private prisma: PrismaService,
     private emailService: EmailService,
@@ -125,7 +128,7 @@ export class HoldHarmlessService {
    * Extract additional insureds from project data
    */
   private extractAdditionalInsureds(
-    project: Project & { additionalInsureds?: string | string[] },
+    project: { gcName?: string | null; entity?: string | null; additionalInsureds?: string | null },
   ): string[] {
     const insureds: string[] = [];
 
@@ -156,6 +159,10 @@ export class HoldHarmlessService {
    * Send signature notification to subcontractor (authenticated access)
    */
   private async sendSignatureLinkToSubcontractor(holdHarmless: HoldHarmless) {
+    if (!holdHarmless.subcontractorEmail) {
+      throw new Error('Subcontractor email is required');
+    }
+
     const signatureUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/subcontractor/hold-harmless/${holdHarmless.id}`;
 
     const html = `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -265,6 +272,10 @@ export class HoldHarmlessService {
    * Notify GC to sign (without token link)
    */
   private async notifyGCToSign(holdHarmless: HoldHarmless) {
+    if (!holdHarmless.gcEmail) {
+      throw new Error('GC email is required');
+    }
+
     const signatureUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/gc/hold-harmless/${holdHarmless.id}`;
 
     const html = `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -369,7 +380,12 @@ export class HoldHarmlessService {
     const recipients = [
       holdHarmless.subcontractorEmail,
       holdHarmless.gcEmail,
-    ].filter(Boolean);
+    ].filter((email): email is string => email !== null && email !== undefined);
+
+    if (recipients.length === 0) {
+      this.logger.warn('No valid recipient emails for hold harmless notification');
+      return;
+    }
 
     // Send completion notification email to all parties
     const subSignedDate = holdHarmless.subSignedAt

@@ -14,6 +14,10 @@ import { EmailService } from "../email/email.service";
 type COIWithRelations = GeneratedCOI & {
   project?: Project | null;
   subcontractor?: Contractor | null;
+  glExpirationDate?: Date | null;
+  autoExpirationDate?: Date | null;
+  umbrellaExpirationDate?: Date | null;
+  wcExpirationDate?: Date | null;
 };
 
 /**
@@ -428,13 +432,19 @@ export class RemindersService {
         break;
     }
 
+    const policyExpirationDate = (() => {
+      const fieldName = `${policyType.toLowerCase()}ExpirationDate` as keyof COIWithRelations;
+      const value = coiData[fieldName];
+      return value instanceof Date ? value : new Date();
+    })();
+
     return `
 ${urgencyLevel}: ${policyName} Policy Expiration Reminder
 
 Project: ${projectName}
 Subcontractor: ${subcontractorName}
 Policy Type: ${policyName}
-Expiration Date: ${new Date(coiData[`${policyType.toLowerCase()}ExpirationDate`] || new Date()).toLocaleDateString()}
+Expiration Date: ${policyExpirationDate.toLocaleDateString()}
 Days Until Expiry: ${daysUntilExpiry}
 
 ${actionRequired}

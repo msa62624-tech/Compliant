@@ -176,7 +176,7 @@ export class ProjectsService {
 
     // Add status filter
     if (status) {
-      where.status = status;
+      where.status = status as Prisma.EnumProjectStatusFilter;
     }
 
     return this.prisma.project.findMany({

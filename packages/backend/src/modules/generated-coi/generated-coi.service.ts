@@ -312,7 +312,7 @@ export class GeneratedCOIService {
     }
 
     // PRODUCTION: Auto-create broker user account(s)
-    const brokerAccounts: Array<{ email: string; name: string; password?: string; created?: boolean }> = [];
+    const brokerAccounts: Array<{ email: string; password: string; created: boolean } | { email: string; name: string; password?: string; created?: boolean }> = [];
 
     // If GLOBAL broker type, create one account
     if (updateBrokerInfoDto.brokerEmail && updateBrokerInfoDto.brokerName) {
