@@ -8,6 +8,7 @@ import {
   Request,
   Query,
 } from '@nestjs/common';
+import { Request as ExpressRequest } from 'express';
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -21,8 +22,8 @@ export class ProjectsController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new project' })
-  create(@Body() createProjectDto: CreateProjectDto, @Request() req) {
-    return this.projectsService.create(createProjectDto, req.user.userId);
+  create(@Body() createProjectDto: CreateProjectDto, @Request() req: ExpressRequest) {
+    return this.projectsService.create(createProjectDto, req.user!.id);
   }
 
   @Get()
@@ -30,12 +31,12 @@ export class ProjectsController {
   @ApiQuery({ name: 'search', required: false, type: String, description: 'Search by name, address, or GC name' })
   @ApiQuery({ name: 'status', required: false, type: String, description: 'Filter by project status' })
   findAll(
-    @Request() req,
+    @Request() req: ExpressRequest,
     @Query('search') search?: string,
     @Query('status') status?: string,
   ) {
     // Pass full user object and search parameters for role-based filtering
-    return this.projectsService.findAll(req.user, search, status);
+    return this.projectsService.findAll(req.user!, search, status);
   }
 
   @Get(':id')

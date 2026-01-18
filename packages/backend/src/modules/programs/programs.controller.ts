@@ -10,6 +10,7 @@ import {
   Request,
   Query,
 } from '@nestjs/common';
+import { Request as ExpressRequest } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { ProgramsService } from './programs.service';
 import { CreateProgramDto } from './dto/create-program.dto';
@@ -33,8 +34,8 @@ export class ProgramsController {
   @ApiResponse({ status: 201, description: 'Program created successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin or Super Admin role required' })
-  create(@Body() createProgramDto: CreateProgramDto, @Request() req) {
-    return this.programsService.create(createProgramDto, req.user.userId);
+  create(@Body() createProgramDto: CreateProgramDto, @Request() req: ExpressRequest) {
+    return this.programsService.create(createProgramDto, req.user!.id);
   }
 
   @Get()
@@ -109,8 +110,8 @@ export class ProgramsController {
   assignToProject(
     @Param('id') id: string,
     @Body() assignProgramDto: AssignProgramDto,
-    @Request() req,
+    @Request() req: ExpressRequest,
   ) {
-    return this.programsService.assignToProject(id, assignProgramDto, req.user.userId);
+    return this.programsService.assignToProject(id, assignProgramDto, req.user!.id);
   }
 }

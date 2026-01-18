@@ -8,6 +8,7 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { Request as ExpressRequest } from 'express';
 import { GeneratedCOIService } from './generated-coi.service';
 import { CreateCOIDto } from './dto/create-coi.dto';
 import { UpdateBrokerInfoDto } from './dto/update-broker-info.dto';
@@ -22,16 +23,16 @@ export class GeneratedCOIController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  create(@Body() createCOIDto: CreateCOIDto, @Request() req) {
+  create(@Body() createCOIDto: CreateCOIDto, @Request() req: ExpressRequest) {
     return this.generatedCOIService.create(createCOIDto, req.user?.email);
   }
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  findAll(@Request() req) {
+  findAll(@Request() req: ExpressRequest) {
     const currentUser = {
-      role: req.user?.role,
-      email: req.user?.email,
+      role: req.user!.role,
+      email: req.user!.email,
     };
     return this.generatedCOIService.findAll(currentUser);
   }
@@ -80,14 +81,14 @@ export class GeneratedCOIController {
   reviewCOI(
     @Param('id') id: string,
     @Body() reviewCOIDto: ReviewCOIDto,
-    @Request() req,
+    @Request() req: ExpressRequest,
   ) {
-    return this.generatedCOIService.reviewCOI(id, reviewCOIDto, req.user?.email);
+    return this.generatedCOIService.reviewCOI(id, reviewCOIDto, req.user!.email);
   }
 
   @Post(':id/renew')
   @UseGuards(JwtAuthGuard)
-  renewCOI(@Param('id') id: string, @Request() req) {
+  renewCOI(@Param('id') id: string, @Request() req: ExpressRequest) {
     return this.generatedCOIService.renewCOI(id, req.user?.email);
   }
 

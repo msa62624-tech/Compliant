@@ -71,7 +71,7 @@ export class RemindersService {
             coi.id,
             'GL',
             coi.glExpirationDate,
-            [...new Set([coi.brokerGlEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter(Boolean))],
+            [...new Set([coi.brokerGlEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter((email): email is string => Boolean(email)))],
             coi,
           );
           if (sent) totalReminders++;
@@ -83,7 +83,7 @@ export class RemindersService {
             coi.id,
             'UMBRELLA',
             coi.umbrellaExpirationDate,
-            [...new Set([coi.brokerUmbrellaEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter(Boolean))],
+            [...new Set([coi.brokerUmbrellaEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter((email): email is string => Boolean(email)))],
             coi,
           );
           if (sent) totalReminders++;
@@ -95,7 +95,7 @@ export class RemindersService {
             coi.id,
             'AUTO',
             coi.autoExpirationDate,
-            [...new Set([coi.brokerAutoEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter(Boolean))],
+            [...new Set([coi.brokerAutoEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter((email): email is string => Boolean(email)))],
             coi,
           );
           if (sent) totalReminders++;
@@ -107,7 +107,7 @@ export class RemindersService {
             coi.id,
             'WC',
             coi.wcExpirationDate,
-            [...new Set([coi.brokerWcEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter(Boolean))],
+            [...new Set([coi.brokerWcEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter((email): email is string => Boolean(email)))],
             coi,
           );
           if (sent) totalReminders++;
@@ -195,13 +195,15 @@ export class RemindersService {
     });
 
     if (existingReminder) {
-      this.logger.debug({
-        message: 'Reminder already sent today',
-        context: 'RemindersService',
-        coiId,
-        policyType,
-        reminderType,
-      });
+      if (this.logger.debug) {
+        this.logger.debug({
+          message: 'Reminder already sent today',
+          context: 'RemindersService',
+          coiId,
+          policyType,
+          reminderType,
+        });
+      }
       return false;
     }
 
@@ -367,7 +369,7 @@ This is an automated reminder from the Compliant Insurance Tracking Platform.
    * Get human-readable policy name
    */
   private getPolicyName(policyType: string): string {
-    const names = {
+    const names: Record<string, string> = {
       GL: 'General Liability',
       UMBRELLA: 'Umbrella',
       AUTO: 'Auto Liability',
