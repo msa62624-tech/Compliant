@@ -88,19 +88,15 @@ class EnterpriseReadinessValidator {
   /**
    * Check if a command can be executed successfully
    * SECURITY: Only use with trusted, static commands. Do NOT pass user input.
-   * @param {string|string[]} command - Command string or array of command parts
+   * @param {string} command - Command string (must be static/hardcoded)
    * @param {string} description - Description for logging
    */
   checkCommand(command, description) {
     try {
-      // If command is an array, join it safely for logging only
-      const cmdString = Array.isArray(command) ? command.join(' ') : command;
-      
-      // Execute command - use array form if provided for better security
-      execSync(cmdString, { 
+      // Execute command
+      execSync(command, { 
         cwd: ROOT_DIR, 
-        stdio: 'pipe',
-        shell: '/bin/sh' // Explicitly specify shell
+        stdio: 'pipe'
       });
       success(description);
       this.results.passed++;
