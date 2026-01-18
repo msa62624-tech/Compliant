@@ -76,8 +76,8 @@ jobs:
           COPY packages/frontend/package.json ./packages/frontend/
           COPY packages/shared/package.json ./packages/shared/
           
-          # Install dependencies
-          RUN pnpm install --frozen-lockfile --prod
+          # Install all dependencies (including devDependencies for build)
+          RUN pnpm install --frozen-lockfile
           
           # Copy only necessary application files (excluding .env, secrets, etc.)
           COPY packages/backend/src ./packages/backend/src
@@ -95,6 +95,9 @@ jobs:
           COPY packages/shared/src ./packages/shared/src
           COPY packages/shared/tsconfig*.json ./packages/shared/
           COPY turbo.json tsconfig.json ./
+          
+          # Generate Prisma client before building
+          RUN cd packages/backend && pnpm db:generate
           
           # Build the application
           RUN pnpm build
