@@ -6,10 +6,14 @@ import { UploadPoliciesDto } from './dto/upload-policies.dto';
 import { SignPoliciesDto } from './dto/sign-policies.dto';
 import { ReviewCOIDto } from './dto/review-coi.dto';
 import { COIStatus } from '@prisma/client';
+import { HoldHarmlessService } from '../hold-harmless/hold-harmless.service';
 
 @Injectable()
 export class GeneratedCOIService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private holdHarmlessService: HoldHarmlessService,
+  ) {}
 
   async create(createCOIDto: CreateCOIDto, currentUserEmail?: string) {
     // Check if subcontractor already has an ACTIVE COI from another project
@@ -198,13 +202,25 @@ export class GeneratedCOIService {
       ? COIStatus.ACTIVE
       : COIStatus.DEFICIENCY_PENDING;
 
-    return this.prisma.generatedCOI.update({
+    const updatedCOI = await this.prisma.generatedCOI.update({
       where: { id },
       data: {
         status: newStatus,
         deficiencyNotes: reviewCOIDto.deficiencyNotes,
       },
     });
+
+    // Trigger hold harmless auto-generation when COI is approved (status changes to ACTIVE)
+    if (newStatus === COIStatus.ACTIVE) {
+      try {
+        await this.holdHarmlessService.autoGenerateOnCOIApproval(id);
+      } catch (error) {
+        // Log error but don't fail the COI approval
+        console.error(`Failed to auto-generate hold harmless for COI ${id}:`, error);
+      }
+    }
+
+    return updatedCOI;
   }
 
   async findExpiring(days: number = 30) {

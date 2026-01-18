@@ -3,6 +3,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { PrismaService } from '../../config/prisma.service';
 import { ReminderType } from '@prisma/client';
+import { EmailService } from '../email/email.service';
 
 /**
  * Service for automated policy expiration reminders
@@ -23,6 +24,7 @@ export class RemindersService {
 
   constructor(
     private prisma: PrismaService,
+    private emailService: EmailService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
   ) {}
@@ -69,7 +71,7 @@ export class RemindersService {
             coi.id,
             'GL',
             coi.glExpirationDate,
-            [coi.brokerGlEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter(Boolean),
+            [...new Set([coi.brokerGlEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter(Boolean))],
             coi,
           );
           if (sent) totalReminders++;
@@ -81,7 +83,7 @@ export class RemindersService {
             coi.id,
             'UMBRELLA',
             coi.umbrellaExpirationDate,
-            [coi.brokerUmbrellaEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter(Boolean),
+            [...new Set([coi.brokerUmbrellaEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter(Boolean))],
             coi,
           );
           if (sent) totalReminders++;
@@ -93,7 +95,7 @@ export class RemindersService {
             coi.id,
             'AUTO',
             coi.autoExpirationDate,
-            [coi.brokerAutoEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter(Boolean),
+            [...new Set([coi.brokerAutoEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter(Boolean))],
             coi,
           );
           if (sent) totalReminders++;
@@ -105,7 +107,7 @@ export class RemindersService {
             coi.id,
             'WC',
             coi.wcExpirationDate,
-            [coi.brokerWcEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter(Boolean),
+            [...new Set([coi.brokerWcEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter(Boolean))],
             coi,
           );
           if (sent) totalReminders++;
@@ -243,7 +245,6 @@ export class RemindersService {
 
   /**
    * Send the actual reminder notification (email, SMS, etc.)
-   * This is a placeholder - should integrate with email service
    */
   private async sendReminderNotification(
     coiId: string,
@@ -257,25 +258,23 @@ export class RemindersService {
     const subject = this.buildEmailSubject(reminderType, policyType, daysUntilExpiry);
     const body = this.buildEmailBody(reminderType, policyType, daysUntilExpiry, coiData);
 
-    // TODO: Integrate with email service module
-    // For now, just log the notification
+    // Convert plain text body to HTML
+    const html = `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;"><pre style="white-space: pre-wrap; font-family: Arial, sans-serif;">${body}</pre></div>`;
+
     this.logger.log({
-      message: 'Reminder notification prepared',
+      message: 'Sending reminder notification',
       context: 'RemindersService',
       subject,
-      recipients,
+      recipients: recipients.length,
       coiId,
       policyType,
     });
 
-    // In production, this would call:
-    // await this.emailService.send({
-    //   to: recipients,
-    //   subject,
-    //   body,
-    //   template: 'policy-expiration-reminder',
-    //   data: { coiData, daysUntilExpiry, policyType }
-    // });
+    await this.emailService.sendEmail({
+      to: recipients,
+      subject,
+      html,
+    });
   }
 
   /**
