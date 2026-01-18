@@ -9,14 +9,22 @@ test.describe('Health Checks', () => {
   test('backend health endpoint should be accessible', async ({ request }) => {
     const apiBaseUrl = process.env.API_BASE_URL || 'http://localhost:3001';
     
-    const response = await request.get(`${apiBaseUrl}/health`);
+    // Note: Backend uses /api prefix, so health endpoint is at /api/health
+    const response = await request.get(`${apiBaseUrl}/api/health`);
     
     expect(response.ok()).toBeTruthy();
     expect(response.status()).toBe(200);
     
+    // Verify NestJS Terminus returns the expected format
+    // According to @nestjs/terminus docs, successful health checks return { status: "ok", ... }
     const body = await response.json();
     expect(body).toHaveProperty('status');
     expect(body.status).toBe('ok');
+    
+    // Terminus also includes 'info', 'error', and 'details' objects
+    expect(body).toHaveProperty('info');
+    expect(body).toHaveProperty('error');
+    expect(body).toHaveProperty('details');
   });
 
   test('frontend should load successfully', async ({ page, baseURL }) => {
