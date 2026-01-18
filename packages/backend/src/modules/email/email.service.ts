@@ -17,7 +17,7 @@ export class EmailService {
 
   constructor() {
     this.emailProvider = process.env.EMAIL_PROVIDER || "smtp";
-    this.fromAddress = process.env.SMTP_USER || process.env.EMAIL_FROM || "noreply@example.com";
+    this.fromAddress = process.env.EMAIL_FROM || process.env.SMTP_USER || "noreply@example.com";
 
     // Use test transporter if EMAIL_PROVIDER is set to 'test'
     if (this.emailProvider === "test") {
