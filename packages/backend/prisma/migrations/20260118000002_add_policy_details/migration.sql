@@ -1,25 +1,26 @@
 -- AlterTable
--- Add policy numbers for tracking individual policies
-ALTER TABLE "generated_cois" ADD COLUMN "glPolicyNumber" TEXT;
-ALTER TABLE "generated_cois" ADD COLUMN "umbrellaPolicyNumber" TEXT;
-ALTER TABLE "generated_cois" ADD COLUMN "autoPolicyNumber" TEXT;
-ALTER TABLE "generated_cois" ADD COLUMN "wcPolicyNumber" TEXT;
+-- Add policy tracking, signature timestamps, coverage details, and review fields
+-- Combined into single ALTER TABLE for better performance and reduced lock time
+ALTER TABLE "generated_cois"
+  -- Policy numbers for tracking individual policies
+  ADD COLUMN "glPolicyNumber" TEXT,
+  ADD COLUMN "umbrellaPolicyNumber" TEXT,
+  ADD COLUMN "autoPolicyNumber" TEXT,
+  ADD COLUMN "wcPolicyNumber" TEXT,
+  
+  -- Signature timestamps to track when brokers signed each policy
+  ADD COLUMN "glBrokerSignedAt" TIMESTAMP(3),
+  ADD COLUMN "umbrellaBrokerSignedAt" TIMESTAMP(3),
+  ADD COLUMN "autoBrokerSignedAt" TIMESTAMP(3),
+  ADD COLUMN "wcBrokerSignedAt" TIMESTAMP(3),
+  
+  -- Coverage limits and statutory limits for each policy type
+  ADD COLUMN "glCoverageLimits" TEXT,
+  ADD COLUMN "umbrellaCoverageLimits" TEXT,
+  ADD COLUMN "autoCoverageLimits" TEXT,
+  ADD COLUMN "wcStatutoryLimits" TEXT,
+  
+  -- Review tracking fields for admin review workflow
+  ADD COLUMN "reviewNotes" TEXT,
+  ADD COLUMN "reviewedAt" TIMESTAMP(3);
 
--- AlterTable
--- Add signature timestamps to track when brokers signed each policy
-ALTER TABLE "generated_cois" ADD COLUMN "glBrokerSignedAt" TIMESTAMP(3);
-ALTER TABLE "generated_cois" ADD COLUMN "umbrellaBrokerSignedAt" TIMESTAMP(3);
-ALTER TABLE "generated_cois" ADD COLUMN "autoBrokerSignedAt" TIMESTAMP(3);
-ALTER TABLE "generated_cois" ADD COLUMN "wcBrokerSignedAt" TIMESTAMP(3);
-
--- AlterTable
--- Add coverage limits and statutory limits for each policy type
-ALTER TABLE "generated_cois" ADD COLUMN "glCoverageLimits" TEXT;
-ALTER TABLE "generated_cois" ADD COLUMN "umbrellaCoverageLimits" TEXT;
-ALTER TABLE "generated_cois" ADD COLUMN "autoCoverageLimits" TEXT;
-ALTER TABLE "generated_cois" ADD COLUMN "wcStatutoryLimits" TEXT;
-
--- AlterTable
--- Add review tracking fields for admin review workflow
-ALTER TABLE "generated_cois" ADD COLUMN "reviewNotes" TEXT;
-ALTER TABLE "generated_cois" ADD COLUMN "reviewedAt" TIMESTAMP(3);
