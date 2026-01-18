@@ -85,14 +85,25 @@ class EnterpriseReadinessValidator {
     }
   }
 
+  /**
+   * Check if a command can be executed successfully
+   * SECURITY: Only use with trusted, static commands. Do NOT pass user input.
+   * @param {string} command - Command string (must be static/hardcoded)
+   * @param {string} description - Description for logging
+   */
   checkCommand(command, description) {
     try {
-      execSync(command, { cwd: ROOT_DIR, stdio: 'pipe' });
+      // Execute command
+      execSync(command, { 
+        cwd: ROOT_DIR, 
+        stdio: 'pipe'
+      });
       success(description);
       this.results.passed++;
       return true;
     } catch (err) {
-      error(`${description} - Command failed: ${command}`);
+      // Avoid logging the actual command in error output for security
+      error(`${description} - Check failed`);
       this.results.failed++;
       return false;
     }

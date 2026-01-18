@@ -103,7 +103,6 @@ jobs:
             p/typescript
             p/react
             p/nextjs
-          generateSarif: true
         env:
           SEMGREP_RULES: auto
 
