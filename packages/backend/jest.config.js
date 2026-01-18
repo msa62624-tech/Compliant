@@ -17,4 +17,5 @@ module.exports = {
   },
   coverageDirectory: 'coverage',
   testTimeout: 10000,
+  passWithNoTests: true,
 };

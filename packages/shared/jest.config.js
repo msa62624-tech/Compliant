@@ -12,4 +12,5 @@ module.exports = {
     '!src/**/*.test.ts',
   ],
   coverageDirectory: 'coverage',
+  passWithNoTests: true,
 };

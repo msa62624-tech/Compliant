@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: compliant_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.15.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared package
+        run: cd packages/shared && pnpm build
+
+      - name: Generate Prisma Client
+        run: cd packages/backend && pnpm db:generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/compliant_test
+
+      - name: Run linting
+        run: pnpm lint
+
+      - name: Build all packages
+        run: pnpm build
+
+      - name: Run tests
+        run: pnpm test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/compliant_test
+          JWT_SECRET: test-jwt-secret-key
+          JWT_REFRESH_SECRET: test-jwt-refresh-secret-key
+          NODE_ENV: test
+
+  build-status:
+    runs-on: ubuntu-latest
+    needs: [lint-and-test]
+    if: always()
+    steps:
+      - name: Check build status
+        run: |
+          if [ "${{ needs.lint-and-test.result }}" != "success" ]; then
+            echo "Build failed!"
+            exit 1
+          fi
+          echo "Build succeeded!"
