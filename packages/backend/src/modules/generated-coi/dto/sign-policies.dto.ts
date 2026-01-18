@@ -1,5 +1,5 @@
-import { IsString, IsOptional } from 'class-validator';
-import { IsSafeUrl } from '../../../common/validators/safe-url.validator';
+import { IsString, IsOptional } from "class-validator";
+import { IsSafeUrl } from "../../../common/validators/safe-url.validator";
 
 export class SignPoliciesDto {
   @IsOptional()

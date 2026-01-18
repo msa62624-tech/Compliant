@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 // User Types
 export interface User {
   id: string;
@@ -13,12 +11,12 @@ export interface User {
 }
 
 export enum UserRole {
-  ADMIN = 'ADMIN',
-  MANAGER = 'MANAGER',
-  USER = 'USER',
-  CONTRACTOR = 'CONTRACTOR',
-  SUBCONTRACTOR = 'SUBCONTRACTOR',
-  BROKER = 'BROKER',
+  ADMIN = "ADMIN",
+  MANAGER = "MANAGER",
+  USER = "USER",
+  CONTRACTOR = "CONTRACTOR",
+  SUBCONTRACTOR = "SUBCONTRACTOR",
+  BROKER = "BROKER",
 }
 
 export interface CreateUserDto {
@@ -44,7 +42,7 @@ export interface LoginDto {
 }
 
 export interface AuthResponse {
-  user: Omit<User, 'password'>;
+  user: Omit<User, "password">;
   accessToken?: string; // Optional for backward compatibility
   refreshToken?: string; // Optional for backward compatibility
 }
@@ -85,27 +83,27 @@ export interface Contractor {
 }
 
 export enum ContractorType {
-  GENERAL_CONTRACTOR = 'GENERAL_CONTRACTOR',
-  SUBCONTRACTOR = 'SUBCONTRACTOR',
+  GENERAL_CONTRACTOR = "GENERAL_CONTRACTOR",
+  SUBCONTRACTOR = "SUBCONTRACTOR",
 }
 
 export enum BrokerType {
-  GLOBAL = 'GLOBAL',
-  PER_POLICY = 'PER_POLICY',
+  GLOBAL = "GLOBAL",
+  PER_POLICY = "PER_POLICY",
 }
 
 export enum ContractorStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  PENDING = 'PENDING',
-  SUSPENDED = 'SUSPENDED',
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  PENDING = "PENDING",
+  SUSPENDED = "SUSPENDED",
 }
 
 export enum InsuranceStatus {
-  COMPLIANT = 'COMPLIANT',
-  NON_COMPLIANT = 'NON_COMPLIANT',
-  PENDING = 'PENDING',
-  EXPIRED = 'EXPIRED',
+  COMPLIANT = "COMPLIANT",
+  NON_COMPLIANT = "NON_COMPLIANT",
+  PENDING = "PENDING",
+  EXPIRED = "EXPIRED",
 }
 
 export interface CreateContractorDto {
@@ -142,11 +140,11 @@ export interface Project {
 }
 
 export enum ProjectStatus {
-  PLANNING = 'PLANNING',
-  ACTIVE = 'ACTIVE',
-  ON_HOLD = 'ON_HOLD',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
+  PLANNING = "PLANNING",
+  ACTIVE = "ACTIVE",
+  ON_HOLD = "ON_HOLD",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
 }
 
 export interface CreateProjectDto {
@@ -181,18 +179,18 @@ export interface InsuranceDocument {
 }
 
 export enum InsuranceType {
-  GENERAL_LIABILITY = 'GENERAL_LIABILITY',
-  WORKERS_COMPENSATION = 'WORKERS_COMPENSATION',
-  AUTO_LIABILITY = 'AUTO_LIABILITY',
-  PROFESSIONAL_LIABILITY = 'PROFESSIONAL_LIABILITY',
-  UMBRELLA = 'UMBRELLA',
+  GENERAL_LIABILITY = "GENERAL_LIABILITY",
+  WORKERS_COMPENSATION = "WORKERS_COMPENSATION",
+  AUTO_LIABILITY = "AUTO_LIABILITY",
+  PROFESSIONAL_LIABILITY = "PROFESSIONAL_LIABILITY",
+  UMBRELLA = "UMBRELLA",
 }
 
 export enum DocumentStatus {
-  PENDING = 'PENDING',
-  VERIFIED = 'VERIFIED',
-  REJECTED = 'REJECTED',
-  EXPIRED = 'EXPIRED',
+  PENDING = "PENDING",
+  VERIFIED = "VERIFIED",
+  REJECTED = "REJECTED",
+  EXPIRED = "EXPIRED",
 }
 
 export interface CreateInsuranceDocumentDto {
@@ -255,13 +253,13 @@ export interface GeneratedCOI {
 }
 
 export enum COIStatus {
-  AWAITING_BROKER_INFO = 'AWAITING_BROKER_INFO',
-  AWAITING_BROKER_UPLOAD = 'AWAITING_BROKER_UPLOAD',
-  AWAITING_BROKER_SIGNATURE = 'AWAITING_BROKER_SIGNATURE',
-  AWAITING_ADMIN_REVIEW = 'AWAITING_ADMIN_REVIEW',
-  ACTIVE = 'ACTIVE',
-  DEFICIENCY_PENDING = 'DEFICIENCY_PENDING',
-  EXPIRED = 'EXPIRED',
+  AWAITING_BROKER_INFO = "AWAITING_BROKER_INFO",
+  AWAITING_BROKER_UPLOAD = "AWAITING_BROKER_UPLOAD",
+  AWAITING_BROKER_SIGNATURE = "AWAITING_BROKER_SIGNATURE",
+  AWAITING_ADMIN_REVIEW = "AWAITING_ADMIN_REVIEW",
+  ACTIVE = "ACTIVE",
+  DEFICIENCY_PENDING = "DEFICIENCY_PENDING",
+  EXPIRED = "EXPIRED",
 }
 
 export interface CreateGeneratedCOIDto {
@@ -330,7 +328,7 @@ export interface PaginationParams {
   page?: number;
   limit?: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 // Error Types

@@ -1,27 +1,27 @@
-import { Injectable, Inject, LoggerService } from '@nestjs/common';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { PrismaService } from '../../config/prisma.service';
+import { Injectable, Inject, LoggerService } from "@nestjs/common";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
+import { PrismaService } from "../../config/prisma.service";
 
 export enum AuditAction {
-  CREATE = 'CREATE',
-  UPDATE = 'UPDATE',
-  DELETE = 'DELETE',
-  LOGIN = 'LOGIN',
-  LOGOUT = 'LOGOUT',
-  VIEW = 'VIEW',
-  DOWNLOAD = 'DOWNLOAD',
-  UPLOAD = 'UPLOAD',
-  APPROVE = 'APPROVE',
-  REJECT = 'REJECT',
+  CREATE = "CREATE",
+  UPDATE = "UPDATE",
+  DELETE = "DELETE",
+  LOGIN = "LOGIN",
+  LOGOUT = "LOGOUT",
+  VIEW = "VIEW",
+  DOWNLOAD = "DOWNLOAD",
+  UPLOAD = "UPLOAD",
+  APPROVE = "APPROVE",
+  REJECT = "REJECT",
 }
 
 export enum AuditResource {
-  USER = 'USER',
-  CONTRACTOR = 'CONTRACTOR',
-  PROJECT = 'PROJECT',
-  INSURANCE_DOCUMENT = 'INSURANCE_DOCUMENT',
-  COI = 'COI',
-  SYSTEM = 'SYSTEM',
+  USER = "USER",
+  CONTRACTOR = "CONTRACTOR",
+  PROJECT = "PROJECT",
+  INSURANCE_DOCUMENT = "INSURANCE_DOCUMENT",
+  COI = "COI",
+  SYSTEM = "SYSTEM",
 }
 
 export interface AuditLogData {
@@ -62,11 +62,11 @@ export class AuditService {
     try {
       // Sanitize metadata to remove sensitive information
       const sanitizedMetadata = this.sanitizeMetadata(data.metadata);
-      
+
       // Log to structured logger
       this.logger.log({
         message: `Audit: ${data.action} ${data.resource}`,
-        context: 'Audit',
+        context: "Audit",
         ...data,
         metadata: sanitizedMetadata,
       });
@@ -86,12 +86,13 @@ export class AuditService {
       });
     } catch (error) {
       // Don't fail the request if audit logging fails, but log the error
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       const errorStack = error instanceof Error ? error.stack : undefined;
-      
+
       this.logger.error({
-        message: 'Failed to create audit log',
-        context: 'Audit',
+        message: "Failed to create audit log",
+        context: "Audit",
         error: errorMessage,
         stack: errorStack,
         auditData: data,
@@ -104,17 +105,23 @@ export class AuditService {
    */
   private sanitizeMetadata(metadata: any): any {
     if (!metadata) return {};
-    
+
     // Remove sensitive fields
     const sanitized = { ...metadata };
-    const sensitiveFields = ['password', 'token', 'secret', 'apiKey', 'authorization'];
-    
+    const sensitiveFields = [
+      "password",
+      "token",
+      "secret",
+      "apiKey",
+      "authorization",
+    ];
+
     for (const field of sensitiveFields) {
       if (sanitized[field]) {
-        sanitized[field] = '[REDACTED]';
+        sanitized[field] = "[REDACTED]";
       }
     }
-    
+
     return sanitized;
   }
 
@@ -135,7 +142,7 @@ export class AuditService {
         resourceId,
       },
       orderBy: {
-        timestamp: 'desc',
+        timestamp: "desc",
       },
       skip: options?.skip || 0,
       take: options?.take || 50,
@@ -168,7 +175,7 @@ export class AuditService {
         userId,
       },
       orderBy: {
-        timestamp: 'desc',
+        timestamp: "desc",
       },
       skip: options?.skip || 0,
       take: options?.take || 50,
@@ -191,7 +198,7 @@ export class AuditService {
     if (filters?.action) where.action = filters.action;
     if (filters?.resource) where.resource = filters.resource;
     if (filters?.resourceId) where.resourceId = filters.resourceId;
-    
+
     if (filters?.startDate || filters?.endDate) {
       where.timestamp = {};
       if (filters.startDate) where.timestamp.gte = filters.startDate;
@@ -201,7 +208,7 @@ export class AuditService {
     return this.prisma.auditLog.findMany({
       where,
       orderBy: {
-        timestamp: 'desc',
+        timestamp: "desc",
       },
       skip: filters?.skip || 0,
       take: filters?.take || 50,

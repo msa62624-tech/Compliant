@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../config/prisma.service';
-import { CreateProjectDto } from './dto/create-project.dto';
-import { Prisma, ContractorType } from '@prisma/client';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../../config/prisma.service";
+import { CreateProjectDto } from "./dto/create-project.dto";
+import { Prisma, ContractorType } from "@prisma/client";
 
 @Injectable()
 export class ProjectsService {
@@ -13,8 +13,10 @@ export class ProjectsService {
       description: createProjectDto.description,
       address: createProjectDto.address,
       startDate: new Date(createProjectDto.startDate),
-      endDate: createProjectDto.endDate ? new Date(createProjectDto.endDate) : undefined,
-      status: createProjectDto.status || 'PLANNING',
+      endDate: createProjectDto.endDate
+        ? new Date(createProjectDto.endDate)
+        : undefined,
+      status: createProjectDto.status || "PLANNING",
       gcName: createProjectDto.gcName,
       location: createProjectDto.location,
       borough: createProjectDto.borough,
@@ -58,57 +60,58 @@ export class ProjectsService {
    * - CONTRACTOR/GC: sees only projects where they are the GC
    * - SUBCONTRACTOR: sees only projects where they are assigned
    * - BROKER: sees projects where their contractors are assigned
-   * 
+   *
    * Search parameters:
    * - search: search by project name, address, GC name
    * - status: filter by project status
    */
   async findAll(user?: any, search?: string, status?: string) {
     // Build where clause based on user role
-    let where: any = {};
-    
+    const where: any = {};
+
     if (user) {
       switch (user.role) {
-        case 'SUPER_ADMIN':
+        case "SUPER_ADMIN":
           // Super admin sees everything
           break;
-          
-        case 'ADMIN':
+
+        case "ADMIN":
           // Admin sees projects they created or are assigned to
           if (user.id) {
             where.createdById = user.id;
           }
           break;
-          
-        case 'CONTRACTOR':
+
+        case "CONTRACTOR":
           // GC sees only projects where they are listed as GC (by email)
           if (user.email) {
             where.contactEmail = user.email;
           }
           break;
-          
-        case 'SUBCONTRACTOR':
+
+        case "SUBCONTRACTOR":
           // Subcontractor sees only projects where they are assigned
           if (user.email) {
             const contractor = await this.prisma.contractor.findFirst({
               where: { email: user.email },
             });
-            
+
             if (contractor) {
-              const projectContractors = await this.prisma.projectContractor.findMany({
-                where: { contractorId: contractor.id },
-                select: { projectId: true },
-              });
-              
-              const projectIds = projectContractors.map(pc => pc.projectId);
-              where.id = { in: projectIds.length > 0 ? projectIds : ['none'] };
+              const projectContractors =
+                await this.prisma.projectContractor.findMany({
+                  where: { contractorId: contractor.id },
+                  select: { projectId: true },
+                });
+
+              const projectIds = projectContractors.map((pc) => pc.projectId);
+              where.id = { in: projectIds.length > 0 ? projectIds : ["none"] };
             } else {
-              where.id = 'non-existent-id';
+              where.id = "non-existent-id";
             }
           }
           break;
 
-        case 'BROKER':
+        case "BROKER":
           // Broker sees projects where their contractors are assigned
           if (user.email) {
             // Find contractors served by this broker
@@ -124,25 +127,26 @@ export class ProjectsService {
               },
               select: { id: true },
             });
-            
+
             if (contractors.length > 0) {
-              const contractorIds = contractors.map(c => c.id);
-              const projectContractors = await this.prisma.projectContractor.findMany({
-                where: { contractorId: { in: contractorIds } },
-                select: { projectId: true },
-              });
-              
-              const projectIds = projectContractors.map(pc => pc.projectId);
-              where.id = { in: projectIds.length > 0 ? projectIds : ['none'] };
+              const contractorIds = contractors.map((c) => c.id);
+              const projectContractors =
+                await this.prisma.projectContractor.findMany({
+                  where: { contractorId: { in: contractorIds } },
+                  select: { projectId: true },
+                });
+
+              const projectIds = projectContractors.map((pc) => pc.projectId);
+              where.id = { in: projectIds.length > 0 ? projectIds : ["none"] };
             } else {
-              where.id = 'non-existent-id';
+              where.id = "non-existent-id";
             }
           }
           break;
-          
+
         default:
           // Default: see nothing
-          where.id = 'non-existent-id';
+          where.id = "non-existent-id";
       }
     }
 
@@ -150,18 +154,15 @@ export class ProjectsService {
     if (search) {
       const searchCondition = {
         OR: [
-          { name: { contains: search, mode: 'insensitive' as any } },
-          { address: { contains: search, mode: 'insensitive' as any } },
-          { gcName: { contains: search, mode: 'insensitive' as any } },
-          { description: { contains: search, mode: 'insensitive' as any } },
+          { name: { contains: search, mode: "insensitive" as any } },
+          { address: { contains: search, mode: "insensitive" as any } },
+          { gcName: { contains: search, mode: "insensitive" as any } },
+          { description: { contains: search, mode: "insensitive" as any } },
         ],
       };
-      
+
       if (where.OR) {
-        where.AND = [
-          { OR: where.OR },
-          searchCondition,
-        ];
+        where.AND = [{ OR: where.OR }, searchCondition];
         delete where.OR;
       } else {
         where.OR = searchCondition.OR;
@@ -191,7 +192,7 @@ export class ProjectsService {
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
   }
@@ -253,7 +254,7 @@ export class ProjectsService {
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
 

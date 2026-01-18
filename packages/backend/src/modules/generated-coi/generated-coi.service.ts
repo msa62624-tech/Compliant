@@ -1,14 +1,19 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
-import { PrismaService } from '../../config/prisma.service';
-import { CreateCOIDto } from './dto/create-coi.dto';
-import { UpdateBrokerInfoDto } from './dto/update-broker-info.dto';
-import { UploadPoliciesDto } from './dto/upload-policies.dto';
-import { SignPoliciesDto } from './dto/sign-policies.dto';
-import { ReviewCOIDto } from './dto/review-coi.dto';
-import { COIStatus, UserRole } from '@prisma/client';
-import { HoldHarmlessService } from '../hold-harmless/hold-harmless.service';
-import * as bcrypt from 'bcrypt';
-import { randomBytes } from 'crypto';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from "@nestjs/common";
+import { PrismaService } from "../../config/prisma.service";
+import { CreateCOIDto } from "./dto/create-coi.dto";
+import { UpdateBrokerInfoDto } from "./dto/update-broker-info.dto";
+import { UploadPoliciesDto } from "./dto/upload-policies.dto";
+import { SignPoliciesDto } from "./dto/sign-policies.dto";
+import { ReviewCOIDto } from "./dto/review-coi.dto";
+import { COIStatus, UserRole } from "@prisma/client";
+import { HoldHarmlessService } from "../hold-harmless/hold-harmless.service";
+import * as bcrypt from "bcrypt";
+import { randomBytes } from "crypto";
 
 @Injectable()
 export class GeneratedCOIService {
@@ -25,9 +30,10 @@ export class GeneratedCOIService {
    * Users can change it later if needed via password reset
    */
   private generateSecurePassword(): string {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%';
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
     const bytes = randomBytes(12);
-    let password = '';
+    let password = "";
     for (let i = 0; i < 12; i++) {
       password += chars[bytes[i] % chars.length];
     }
@@ -51,8 +57,10 @@ export class GeneratedCOIService {
       });
 
       if (existingUser) {
-        this.logger.log(`Broker account already exists for ${email} - using existing credentials`);
-        return { email, password: '', created: false };
+        this.logger.log(
+          `Broker account already exists for ${email} - using existing credentials`,
+        );
+        return { email, password: "", created: false };
       }
 
       // Generate PERMANENT password
@@ -60,9 +68,9 @@ export class GeneratedCOIService {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Extract first/last name from full name
-      const nameParts = name.split(' ');
-      const firstName = nameParts[0] || 'Broker';
-      const lastName = nameParts.slice(1).join(' ') || 'User';
+      const nameParts = name.split(" ");
+      const firstName = nameParts[0] || "Broker";
+      const lastName = nameParts.slice(1).join(" ") || "User";
 
       // Create broker user account with PERMANENT password
       await this.prisma.user.create({
@@ -80,23 +88,26 @@ export class GeneratedCOIService {
       this.logger.log(`  Email: ${email}`);
       this.logger.log(`  Password: ${password} (PERMANENT - save this!)`);
       this.logger.log(`  Note: Broker can change password later if forgotten`);
-      
+
       // TODO: Send welcome email with permanent credentials
       // await this.emailService.sendBrokerWelcomeEmail(email, firstName, password);
       // Email should say: "These are your permanent credentials. Keep them safe. You can change your password anytime."
 
       return { email, password, created: true };
     } catch (error) {
-      this.logger.error(`Failed to auto-create broker account for ${email}:`, error);
-      return { email, password: '', created: false };
+      this.logger.error(
+        `Failed to auto-create broker account for ${email}:`,
+        error,
+      );
+      return { email, password: "", created: false };
     }
   }
 
-  async create(createCOIDto: CreateCOIDto, currentUserEmail?: string) {
+  async create(createCOIDto: CreateCOIDto, _currentUserEmail?: string) {
     // PRODUCTION RULE: ACORD 25 follows exactly the first ACORD uploaded for this sub
     // EXCEPT for: Additional Insureds and Project Location
     // Additional Insureds = GC + Owner + Additional Insured Entities from the new project
-    
+
     // Get the new project details for additional insureds and location
     const newProject = await this.prisma.project.findUnique({
       where: { id: createCOIDto.projectId },
@@ -110,7 +121,9 @@ export class GeneratedCOIService {
     });
 
     if (!newProject) {
-      throw new NotFoundException(`Project with ID ${createCOIDto.projectId} not found`);
+      throw new NotFoundException(
+        `Project with ID ${createCOIDto.projectId} not found`,
+      );
     }
 
     // Extract additional insureds from new project
@@ -119,20 +132,28 @@ export class GeneratedCOIService {
     if (newProject.entity) additionalInsureds.push(newProject.entity);
     if (newProject.additionalInsureds) {
       // Parse additional insureds (could be comma-separated string or array)
-      const parsed = typeof newProject.additionalInsureds === 'string'
-        ? newProject.additionalInsureds.split(',').map(s => s.trim()).filter(Boolean)
-        : Array.isArray(newProject.additionalInsureds)
-        ? newProject.additionalInsureds
-        : [];
+      const parsed =
+        typeof newProject.additionalInsureds === "string"
+          ? newProject.additionalInsureds
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : Array.isArray(newProject.additionalInsureds)
+            ? newProject.additionalInsureds
+            : [];
       additionalInsureds.push(...parsed);
     }
 
     // Remove duplicates
     const uniqueAdditionalInsureds = [...new Set(additionalInsureds)];
-    
-    this.logger.log(`Creating ACORD 25 for subcontractor ${createCOIDto.subcontractorId}`);
-    this.logger.log(`Additional Insureds: ${uniqueAdditionalInsureds.join(', ')}`);
-    this.logger.log(`Project Location: ${newProject.address || 'N/A'}`);
+
+    this.logger.log(
+      `Creating ACORD 25 for subcontractor ${createCOIDto.subcontractorId}`,
+    );
+    this.logger.log(
+      `Additional Insureds: ${uniqueAdditionalInsureds.join(", ")}`,
+    );
+    this.logger.log(`Project Location: ${newProject.address || "N/A"}`);
 
     // Check if subcontractor already has an ACTIVE COI from FIRST project
     // This is the MASTER ACORD 25 template that all future COIs will follow
@@ -146,21 +167,23 @@ export class GeneratedCOIService {
         subcontractor: true,
       },
       orderBy: {
-        createdAt: 'asc', // Get the FIRST one
+        createdAt: "asc", // Get the FIRST one
       },
     });
 
     // If subcontractor has first ACORD 25, copy ALL data except additional insureds and location
     if (firstCOI) {
-      this.logger.log(`Found first ACORD 25 (ID: ${firstCOI.id}) - copying all data except additional insureds and location`);
-      
+      this.logger.log(
+        `Found first ACORD 25 (ID: ${firstCOI.id}) - copying all data except additional insureds and location`,
+      );
+
       return this.prisma.generatedCOI.create({
         data: {
           projectId: createCOIDto.projectId,
           subcontractorId: createCOIDto.subcontractorId,
           assignedAdminEmail: createCOIDto.assignedAdminEmail,
           status: COIStatus.AWAITING_ADMIN_REVIEW, // Skip broker steps - using existing data
-          
+
           // COPY FROM FIRST ACORD 25: Broker info
           brokerName: firstCOI.brokerName,
           brokerEmail: firstCOI.brokerEmail,
@@ -178,7 +201,7 @@ export class GeneratedCOIService {
           brokerWcName: firstCOI.brokerWcName,
           brokerWcEmail: firstCOI.brokerWcEmail,
           brokerWcPhone: firstCOI.brokerWcPhone,
-          
+
           // COPY FROM FIRST ACORD 25: Policy URLs and signatures
           firstCOIUrl: firstCOI.firstCOIUrl,
           firstCOIUploaded: firstCOI.firstCOIUploaded,
@@ -190,20 +213,20 @@ export class GeneratedCOIService {
           umbrellaBrokerSignatureUrl: firstCOI.umbrellaBrokerSignatureUrl,
           autoBrokerSignatureUrl: firstCOI.autoBrokerSignatureUrl,
           wcBrokerSignatureUrl: firstCOI.wcBrokerSignatureUrl,
-          
+
           // COPY FROM FIRST ACORD 25: Expiration dates
           glExpirationDate: firstCOI.glExpirationDate,
           umbrellaExpirationDate: firstCOI.umbrellaExpirationDate,
           autoExpirationDate: firstCOI.autoExpirationDate,
           wcExpirationDate: firstCOI.wcExpirationDate,
-          
+
           // COPY FROM FIRST ACORD 25: GC details
           gcName: firstCOI.gcName,
-          
+
           // NEW FOR THIS PROJECT: Project name (location in description)
           projectName: newProject.name,
           subcontractorName: firstCOI.subcontractorName,
-          
+
           // Notes about the copy
           deficiencyNotes: `ACORD 25 auto-generated from first ACORD (ID: ${firstCOI.id}) for new project.`,
         },
@@ -216,15 +239,17 @@ export class GeneratedCOIService {
 
     // No existing COI - create new one (first time for this subcontractor)
     // This will become the MASTER ACORD 25 template for all future projects
-    this.logger.log(`No existing ACORD 25 found - creating FIRST (master) ACORD 25 for subcontractor`);
-    
+    this.logger.log(
+      `No existing ACORD 25 found - creating FIRST (master) ACORD 25 for subcontractor`,
+    );
+
     return this.prisma.generatedCOI.create({
       data: {
         projectId: createCOIDto.projectId,
         subcontractorId: createCOIDto.subcontractorId,
         assignedAdminEmail: createCOIDto.assignedAdminEmail,
         status: COIStatus.AWAITING_BROKER_INFO,
-        
+
         // Set initial project info for first ACORD
         projectName: newProject.name,
         gcName: newProject.gcName,
@@ -240,16 +265,16 @@ export class GeneratedCOIService {
     // Super Admin sees all COIs
     // Assistant Admin only sees COIs assigned to them
     const where =
-      currentUser?.role === 'SUPER_ADMIN'
+      currentUser?.role === "SUPER_ADMIN"
         ? {}
-        : currentUser?.role === 'ADMIN'
-        ? {
-            OR: [
-              { assignedAdminEmail: currentUser.email },
-              { assignedAdminEmail: null },
-            ],
-          }
-        : {};
+        : currentUser?.role === "ADMIN"
+          ? {
+              OR: [
+                { assignedAdminEmail: currentUser.email },
+                { assignedAdminEmail: null },
+              ],
+            }
+          : {};
 
     return this.prisma.generatedCOI.findMany({
       where,
@@ -257,7 +282,7 @@ export class GeneratedCOIService {
         project: true,
         subcontractor: true,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 
@@ -288,7 +313,7 @@ export class GeneratedCOIService {
 
     // PRODUCTION: Auto-create broker user account(s)
     const brokerAccounts: any[] = [];
-    
+
     // If GLOBAL broker type, create one account
     if (updateBrokerInfoDto.brokerEmail && updateBrokerInfoDto.brokerName) {
       const result = await this.autoCreateBrokerAccount(
@@ -297,7 +322,7 @@ export class GeneratedCOIService {
       );
       brokerAccounts.push(result);
     }
-    
+
     // If PER_POLICY broker type, create separate accounts for each
     if (updateBrokerInfoDto.brokerGlEmail && updateBrokerInfoDto.brokerGlName) {
       const result = await this.autoCreateBrokerAccount(
@@ -306,23 +331,29 @@ export class GeneratedCOIService {
       );
       brokerAccounts.push(result);
     }
-    
-    if (updateBrokerInfoDto.brokerAutoEmail && updateBrokerInfoDto.brokerAutoName) {
+
+    if (
+      updateBrokerInfoDto.brokerAutoEmail &&
+      updateBrokerInfoDto.brokerAutoName
+    ) {
       const result = await this.autoCreateBrokerAccount(
         updateBrokerInfoDto.brokerAutoEmail,
         updateBrokerInfoDto.brokerAutoName,
       );
       brokerAccounts.push(result);
     }
-    
-    if (updateBrokerInfoDto.brokerUmbrellaEmail && updateBrokerInfoDto.brokerUmbrellaName) {
+
+    if (
+      updateBrokerInfoDto.brokerUmbrellaEmail &&
+      updateBrokerInfoDto.brokerUmbrellaName
+    ) {
       const result = await this.autoCreateBrokerAccount(
         updateBrokerInfoDto.brokerUmbrellaEmail,
         updateBrokerInfoDto.brokerUmbrellaName,
       );
       brokerAccounts.push(result);
     }
-    
+
     if (updateBrokerInfoDto.brokerWcEmail && updateBrokerInfoDto.brokerWcName) {
       const result = await this.autoCreateBrokerAccount(
         updateBrokerInfoDto.brokerWcEmail,
@@ -386,7 +417,11 @@ export class GeneratedCOIService {
     });
   }
 
-  async reviewCOI(id: string, reviewCOIDto: ReviewCOIDto, reviewerEmail: string) {
+  async reviewCOI(
+    id: string,
+    reviewCOIDto: ReviewCOIDto,
+    _reviewerEmail: string,
+  ) {
     const coi = await this.findOne(id);
 
     if (coi.status !== COIStatus.AWAITING_ADMIN_REVIEW) {
@@ -413,33 +448,37 @@ export class GeneratedCOIService {
         await this.holdHarmlessService.autoGenerateOnCOIApproval(id);
       } catch (error) {
         // Log error with detailed information for monitoring/alerting
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
         const errorStack = error instanceof Error ? error.stack : undefined;
-        
+
         this.logger.error(
           `CRITICAL: Failed to auto-generate hold harmless for COI ${id}. ` +
-          `This creates an inconsistent state where COI is ACTIVE but hold harmless record may be missing. ` +
-          `Error: ${errorMessage}`,
-          errorStack
+            `This creates an inconsistent state where COI is ACTIVE but hold harmless record may be missing. ` +
+            `Error: ${errorMessage}`,
+          errorStack,
         );
-        
+
         // Rollback COI status to prevent inconsistent state
-        this.logger.warn(`Rolling back COI ${id} status to AWAITING_ADMIN_REVIEW due to hold harmless generation failure`);
-        
-        const rollbackMessage = 'Auto-rollback: Hold harmless generation failed - please retry approval.';
+        this.logger.warn(
+          `Rolling back COI ${id} status to AWAITING_ADMIN_REVIEW due to hold harmless generation failure`,
+        );
+
+        const rollbackMessage =
+          "Auto-rollback: Hold harmless generation failed - please retry approval.";
         await this.prisma.generatedCOI.update({
           where: { id },
           data: {
             status: COIStatus.AWAITING_ADMIN_REVIEW,
-            deficiencyNotes: reviewCOIDto.deficiencyNotes 
+            deficiencyNotes: reviewCOIDto.deficiencyNotes
               ? `${reviewCOIDto.deficiencyNotes}\n\n${rollbackMessage}`
               : rollbackMessage,
           },
         });
-        
+
         // Re-throw the error to inform the caller of the failure
         throw new BadRequestException(
-          `COI approval failed: Unable to generate hold harmless agreement. ${errorMessage}`
+          `COI approval failed: Unable to generate hold harmless agreement. ${errorMessage}`,
         );
       }
     }
@@ -485,11 +524,11 @@ export class GeneratedCOIService {
         project: true,
         subcontractor: true,
       },
-      orderBy: { glExpirationDate: 'asc' },
+      orderBy: { glExpirationDate: "asc" },
     });
   }
 
-  async renewCOI(id: string, currentUserEmail?: string) {
+  async renewCOI(id: string, _currentUserEmail?: string) {
     const expiredCOI = await this.findOne(id);
 
     // Can only renew EXPIRED COIs

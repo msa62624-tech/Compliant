@@ -1,14 +1,14 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { ConfigService } from '@nestjs/config';
-import { Request } from 'express';
-import { UsersService } from '../../users/users.service';
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { PassportStrategy } from "@nestjs/passport";
+import { ExtractJwt, Strategy } from "passport-jwt";
+import { ConfigService } from "@nestjs/config";
+import { Request } from "express";
+import { UsersService } from "../../users/users.service";
 
 // Custom JWT extractor that tries both cookies and Authorization header
 const cookieExtractor = (req: Request): string | null => {
   if (req && req.cookies) {
-    return req.cookies['access_token'];
+    return req.cookies["access_token"];
   }
   return null;
 };
@@ -31,7 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: jwtExtractor,
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET'),
+      secretOrKey: configService.get<string>("JWT_SECRET"),
       passReqToCallback: false,
     });
   }

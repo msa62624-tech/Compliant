@@ -1,5 +1,5 @@
-import { WinstonModuleOptions } from 'nest-winston';
-import * as winston from 'winston';
+import { WinstonModuleOptions } from "nest-winston";
+import * as winston from "winston";
 
 /**
  * Get log format configuration based on environment
@@ -8,22 +8,24 @@ import * as winston from 'winston';
  */
 const getLogFormat = () => {
   const formats = [
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
     winston.format.errors({ stack: true }),
     winston.format.splat(),
   ];
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === "production") {
     // JSON format for production (easier for log aggregation)
     formats.push(winston.format.json());
   } else {
     // Pretty print for development
     formats.push(
       winston.format.colorize(),
-      winston.format.printf(({ timestamp, level, message, context, trace, ...meta }) => {
-        const metaStr = Object.keys(meta).length ? JSON.stringify(meta) : '';
-        return `${timestamp} [${context || 'Application'}] ${level}: ${message} ${metaStr}${trace ? `\n${trace}` : ''}`;
-      }),
+      winston.format.printf(
+        ({ timestamp, level, message, context, trace, ...meta }) => {
+          const metaStr = Object.keys(meta).length ? JSON.stringify(meta) : "";
+          return `${timestamp} [${context || "Application"}] ${level}: ${message} ${metaStr}${trace ? `\n${trace}` : ""}`;
+        },
+      ),
     );
   }
 
@@ -36,15 +38,15 @@ export const winstonConfig: WinstonModuleOptions = {
     // Console transport for all logs
     new winston.transports.Console({
       format: getLogFormat(),
-      level: process.env.LOG_LEVEL || 'info',
+      level: process.env.LOG_LEVEL || "info",
     }),
-    
+
     // File transport for errors (only in production)
-    ...(process.env.NODE_ENV === 'production'
+    ...(process.env.NODE_ENV === "production"
       ? [
           new winston.transports.File({
-            filename: 'logs/error.log',
-            level: 'error',
+            filename: "logs/error.log",
+            level: "error",
             format: winston.format.combine(
               winston.format.timestamp(),
               winston.format.json(),
@@ -53,7 +55,7 @@ export const winstonConfig: WinstonModuleOptions = {
             maxFiles: 5,
           }),
           new winston.transports.File({
-            filename: 'logs/combined.log',
+            filename: "logs/combined.log",
             format: winston.format.combine(
               winston.format.timestamp(),
               winston.format.json(),
@@ -67,7 +69,7 @@ export const winstonConfig: WinstonModuleOptions = {
   // Handle uncaught exceptions and rejections
   exceptionHandlers: [
     new winston.transports.File({
-      filename: 'logs/exceptions.log',
+      filename: "logs/exceptions.log",
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.json(),
@@ -76,7 +78,7 @@ export const winstonConfig: WinstonModuleOptions = {
   ],
   rejectionHandlers: [
     new winston.transports.File({
-      filename: 'logs/rejections.log',
+      filename: "logs/rejections.log",
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.json(),

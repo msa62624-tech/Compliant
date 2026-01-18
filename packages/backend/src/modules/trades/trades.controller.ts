@@ -1,15 +1,18 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags, ApiQuery } from '@nestjs/swagger';
-import { TradesService } from './trades.service';
+import { Controller, Get, Query } from "@nestjs/common";
+import { ApiOperation, ApiResponse, ApiTags, ApiQuery } from "@nestjs/swagger";
+import { TradesService } from "./trades.service";
 
-@ApiTags('trades')
-@Controller('trades')
+@ApiTags("trades")
+@Controller("trades")
 export class TradesController {
   constructor(private readonly tradesService: TradesService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all construction trades' })
-  @ApiResponse({ status: 200, description: 'Returns list of all construction trades' })
+  @ApiOperation({ summary: "Get all construction trades" })
+  @ApiResponse({
+    status: 200,
+    description: "Returns list of all construction trades",
+  })
   getAllTrades() {
     return {
       trades: this.tradesService.getAllTrades(),
@@ -17,18 +20,18 @@ export class TradesController {
     };
   }
 
-  @Get('categorized')
-  @ApiOperation({ summary: 'Get construction trades organized by category' })
-  @ApiResponse({ status: 200, description: 'Returns categorized trades' })
+  @Get("categorized")
+  @ApiOperation({ summary: "Get construction trades organized by category" })
+  @ApiResponse({ status: 200, description: "Returns categorized trades" })
   getCategorizedTrades() {
     return this.tradesService.getCategorizedTrades();
   }
 
-  @Get('search')
-  @ApiOperation({ summary: 'Search construction trades' })
-  @ApiQuery({ name: 'q', required: true, description: 'Search query' })
-  @ApiResponse({ status: 200, description: 'Returns matching trades' })
-  searchTrades(@Query('q') query: string) {
+  @Get("search")
+  @ApiOperation({ summary: "Search construction trades" })
+  @ApiQuery({ name: "q", required: true, description: "Search query" })
+  @ApiResponse({ status: 200, description: "Returns matching trades" })
+  searchTrades(@Query("q") query: string) {
     const results = this.tradesService.searchTrades(query);
     return {
       query,
@@ -37,11 +40,15 @@ export class TradesController {
     };
   }
 
-  @Get('insurance-requirements')
-  @ApiOperation({ summary: 'Get insurance requirements for trades' })
-  @ApiQuery({ name: 'trade', required: false, description: 'Specific trade name' })
-  @ApiResponse({ status: 200, description: 'Returns insurance requirements' })
-  getInsuranceRequirements(@Query('trade') trade?: string) {
+  @Get("insurance-requirements")
+  @ApiOperation({ summary: "Get insurance requirements for trades" })
+  @ApiQuery({
+    name: "trade",
+    required: false,
+    description: "Specific trade name",
+  })
+  @ApiResponse({ status: 200, description: "Returns insurance requirements" })
+  getInsuranceRequirements(@Query("trade") trade?: string) {
     if (trade) {
       return {
         trade,
@@ -51,18 +58,22 @@ export class TradesController {
     return this.tradesService.getAllInsuranceRequirements();
   }
 
-  @Get('stats')
-  @ApiOperation({ summary: 'Get construction trades statistics' })
-  @ApiResponse({ status: 200, description: 'Returns statistics about trades' })
+  @Get("stats")
+  @ApiOperation({ summary: "Get construction trades statistics" })
+  @ApiResponse({ status: 200, description: "Returns statistics about trades" })
   getStatistics() {
     return this.tradesService.getStatistics();
   }
 
-  @Get('validate')
-  @ApiOperation({ summary: 'Validate if a trade exists' })
-  @ApiQuery({ name: 'trade', required: true, description: 'Trade name to validate' })
-  @ApiResponse({ status: 200, description: 'Returns validation result' })
-  validateTrade(@Query('trade') trade: string) {
+  @Get("validate")
+  @ApiOperation({ summary: "Validate if a trade exists" })
+  @ApiQuery({
+    name: "trade",
+    required: true,
+    description: "Trade name to validate",
+  })
+  @ApiResponse({ status: 200, description: "Returns validation result" })
+  validateTrade(@Query("trade") trade: string) {
     return {
       trade,
       isValid: this.tradesService.isValidTrade(trade),

@@ -1,9 +1,13 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../../config/prisma.service';
-import { CreateProgramDto } from './dto/create-program.dto';
-import { UpdateProgramDto } from './dto/update-program.dto';
-import { AssignProgramDto } from './dto/assign-program.dto';
-import { Prisma } from '@prisma/client';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from "@nestjs/common";
+import { PrismaService } from "../../config/prisma.service";
+import { CreateProgramDto } from "./dto/create-program.dto";
+import { UpdateProgramDto } from "./dto/update-program.dto";
+import { AssignProgramDto } from "./dto/assign-program.dto";
+import { Prisma } from "@prisma/client";
 
 @Injectable()
 export class ProgramsService {
@@ -20,8 +24,10 @@ export class ProgramsService {
       umbrellaMinimum: createProgramDto.umbrellaMinimum,
       requiresHoldHarmless: createProgramDto.requiresHoldHarmless ?? false,
       holdHarmlessTemplateUrl: createProgramDto.holdHarmlessTemplateUrl,
-      requiresAdditionalInsured: createProgramDto.requiresAdditionalInsured ?? true,
-      requiresWaiverSubrogation: createProgramDto.requiresWaiverSubrogation ?? true,
+      requiresAdditionalInsured:
+        createProgramDto.requiresAdditionalInsured ?? true,
+      requiresWaiverSubrogation:
+        createProgramDto.requiresWaiverSubrogation ?? true,
       tierRequirements: createProgramDto.tierRequirements ?? Prisma.JsonNull,
       tradeRequirements: createProgramDto.tradeRequirements ?? Prisma.JsonNull,
       autoApprovalRules: createProgramDto.autoApprovalRules ?? Prisma.JsonNull,
@@ -35,7 +41,7 @@ export class ProgramsService {
 
   async findAll(isTemplate?: boolean) {
     const where: Prisma.InsuranceProgramWhereInput = {};
-    
+
     if (isTemplate !== undefined) {
       where.isTemplate = isTemplate;
     }
@@ -43,7 +49,7 @@ export class ProgramsService {
     return this.prisma.insuranceProgram.findMany({
       where,
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
   }
@@ -84,18 +90,44 @@ export class ProgramsService {
 
     const updateData: Prisma.InsuranceProgramUpdateInput = {
       ...(updateProgramDto.name && { name: updateProgramDto.name }),
-      ...(updateProgramDto.description !== undefined && { description: updateProgramDto.description }),
-      ...(updateProgramDto.isTemplate !== undefined && { isTemplate: updateProgramDto.isTemplate }),
-      ...(updateProgramDto.glMinimum !== undefined && { glMinimum: updateProgramDto.glMinimum }),
-      ...(updateProgramDto.wcMinimum !== undefined && { wcMinimum: updateProgramDto.wcMinimum }),
-      ...(updateProgramDto.autoMinimum !== undefined && { autoMinimum: updateProgramDto.autoMinimum }),
-      ...(updateProgramDto.umbrellaMinimum !== undefined && { umbrellaMinimum: updateProgramDto.umbrellaMinimum }),
-      ...(updateProgramDto.requiresHoldHarmless !== undefined && { requiresHoldHarmless: updateProgramDto.requiresHoldHarmless }),
-      ...(updateProgramDto.requiresAdditionalInsured !== undefined && { requiresAdditionalInsured: updateProgramDto.requiresAdditionalInsured }),
-      ...(updateProgramDto.requiresWaiverSubrogation !== undefined && { requiresWaiverSubrogation: updateProgramDto.requiresWaiverSubrogation }),
-      ...(updateProgramDto.tierRequirements !== undefined && { tierRequirements: updateProgramDto.tierRequirements ?? Prisma.JsonNull }),
-      ...(updateProgramDto.tradeRequirements !== undefined && { tradeRequirements: updateProgramDto.tradeRequirements ?? Prisma.JsonNull }),
-      ...(updateProgramDto.autoApprovalRules !== undefined && { autoApprovalRules: updateProgramDto.autoApprovalRules ?? Prisma.JsonNull }),
+      ...(updateProgramDto.description !== undefined && {
+        description: updateProgramDto.description,
+      }),
+      ...(updateProgramDto.isTemplate !== undefined && {
+        isTemplate: updateProgramDto.isTemplate,
+      }),
+      ...(updateProgramDto.glMinimum !== undefined && {
+        glMinimum: updateProgramDto.glMinimum,
+      }),
+      ...(updateProgramDto.wcMinimum !== undefined && {
+        wcMinimum: updateProgramDto.wcMinimum,
+      }),
+      ...(updateProgramDto.autoMinimum !== undefined && {
+        autoMinimum: updateProgramDto.autoMinimum,
+      }),
+      ...(updateProgramDto.umbrellaMinimum !== undefined && {
+        umbrellaMinimum: updateProgramDto.umbrellaMinimum,
+      }),
+      ...(updateProgramDto.requiresHoldHarmless !== undefined && {
+        requiresHoldHarmless: updateProgramDto.requiresHoldHarmless,
+      }),
+      ...(updateProgramDto.requiresAdditionalInsured !== undefined && {
+        requiresAdditionalInsured: updateProgramDto.requiresAdditionalInsured,
+      }),
+      ...(updateProgramDto.requiresWaiverSubrogation !== undefined && {
+        requiresWaiverSubrogation: updateProgramDto.requiresWaiverSubrogation,
+      }),
+      ...(updateProgramDto.tierRequirements !== undefined && {
+        tierRequirements: updateProgramDto.tierRequirements ?? Prisma.JsonNull,
+      }),
+      ...(updateProgramDto.tradeRequirements !== undefined && {
+        tradeRequirements:
+          updateProgramDto.tradeRequirements ?? Prisma.JsonNull,
+      }),
+      ...(updateProgramDto.autoApprovalRules !== undefined && {
+        autoApprovalRules:
+          updateProgramDto.autoApprovalRules ?? Prisma.JsonNull,
+      }),
     };
 
     return this.prisma.insuranceProgram.update({
@@ -118,7 +150,7 @@ export class ProgramsService {
 
     if (existingProgram.projects.length > 0) {
       throw new BadRequestException(
-        `Cannot delete program. It is assigned to ${existingProgram.projects.length} project(s). Remove assignments first.`
+        `Cannot delete program. It is assigned to ${existingProgram.projects.length} project(s). Remove assignments first.`,
       );
     }
 
@@ -127,13 +159,19 @@ export class ProgramsService {
     });
   }
 
-  async assignToProject(programId: string, assignProgramDto: AssignProgramDto, userId: string) {
+  async assignToProject(
+    programId: string,
+    assignProgramDto: AssignProgramDto,
+    userId: string,
+  ) {
     const program = await this.prisma.insuranceProgram.findUnique({
       where: { id: programId },
     });
 
     if (!program) {
-      throw new NotFoundException(`Insurance program with ID ${programId} not found`);
+      throw new NotFoundException(
+        `Insurance program with ID ${programId} not found`,
+      );
     }
 
     const project = await this.prisma.project.findUnique({
@@ -141,7 +179,9 @@ export class ProgramsService {
     });
 
     if (!project) {
-      throw new NotFoundException(`Project with ID ${assignProgramDto.projectId} not found`);
+      throw new NotFoundException(
+        `Project with ID ${assignProgramDto.projectId} not found`,
+      );
     }
 
     const existingAssignment = await this.prisma.projectProgram.findUnique({
@@ -154,7 +194,9 @@ export class ProgramsService {
     });
 
     if (existingAssignment) {
-      throw new BadRequestException('This program is already assigned to the project');
+      throw new BadRequestException(
+        "This program is already assigned to the project",
+      );
     }
 
     return this.prisma.projectProgram.create({
@@ -162,7 +204,8 @@ export class ProgramsService {
         projectId: assignProgramDto.projectId,
         programId: programId,
         assignedBy: userId,
-        customRequirements: assignProgramDto.customRequirements ?? Prisma.JsonNull,
+        customRequirements:
+          assignProgramDto.customRequirements ?? Prisma.JsonNull,
       },
       include: {
         project: {
@@ -192,7 +235,7 @@ export class ProgramsService {
         program: true,
       },
       orderBy: {
-        assignedAt: 'desc',
+        assignedAt: "desc",
       },
     });
   }
@@ -218,14 +261,14 @@ export class ProgramsService {
 
     const totalAssignments = programsWithProjects.reduce(
       (sum, program) => sum + program._count.projects,
-      0
+      0,
     );
 
     const mostUsedPrograms = programsWithProjects
-      .filter(p => p._count.projects > 0)
+      .filter((p) => p._count.projects > 0)
       .sort((a, b) => b._count.projects - a._count.projects)
       .slice(0, 5)
-      .map(p => ({
+      .map((p) => ({
         id: p.id,
         name: p.name,
         projectCount: p._count.projects,
@@ -236,7 +279,8 @@ export class ProgramsService {
       templatePrograms,
       customPrograms,
       totalAssignments,
-      averageAssignmentsPerProgram: totalPrograms > 0 ? (totalAssignments / totalPrograms).toFixed(2) : 0,
+      averageAssignmentsPerProgram:
+        totalPrograms > 0 ? (totalAssignments / totalPrograms).toFixed(2) : 0,
       mostUsedPrograms,
     };
   }

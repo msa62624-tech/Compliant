@@ -8,62 +8,67 @@ import {
   Delete,
   UseGuards,
   Query,
-} from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { UserRole } from '@prisma/client';
+} from "@nestjs/common";
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from "@nestjs/swagger";
+import { UsersService } from "./users.service";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { RolesGuard } from "../../common/guards/roles.guard";
+import { Roles } from "../../common/decorators/roles.decorator";
+import { UserRole } from "@prisma/client";
 
-@ApiTags('Users')
-@ApiBearerAuth('JWT-auth')
+@ApiTags("Users")
+@ApiBearerAuth("JWT-auth")
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('users')
+@Controller("users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Create a new user (Admin only)' })
-  @ApiResponse({ status: 201, description: 'User created successfully' })
-  @ApiResponse({ status: 409, description: 'User already exists' })
+  @ApiOperation({ summary: "Create a new user (Admin only)" })
+  @ApiResponse({ status: 201, description: "User created successfully" })
+  @ApiResponse({ status: 409, description: "User already exists" })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
-  findAll(@Query('page') page?: number, @Query('limit') limit?: number) {
+  @ApiOperation({ summary: "Get all users" })
+  @ApiResponse({ status: 200, description: "Users retrieved successfully" })
+  findAll(@Query("page") page?: number, @Query("limit") limit?: number) {
     return this.usersService.findAll(page, limit);
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get user by ID' })
-  @ApiResponse({ status: 200, description: 'User retrieved successfully' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  findOne(@Param('id') id: string) {
+  @Get(":id")
+  @ApiOperation({ summary: "Get user by ID" })
+  @ApiResponse({ status: 200, description: "User retrieved successfully" })
+  @ApiResponse({ status: 404, description: "User not found" })
+  findOne(@Param("id") id: string) {
     return this.usersService.findOne(id);
   }
 
-  @Patch(':id')
+  @Patch(":id")
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Update user (Admin only)' })
-  @ApiResponse({ status: 200, description: 'User updated successfully' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  @ApiOperation({ summary: "Update user (Admin only)" })
+  @ApiResponse({ status: 200, description: "User updated successfully" })
+  @ApiResponse({ status: 404, description: "User not found" })
+  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete(":id")
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Delete user (Admin only)' })
-  @ApiResponse({ status: 200, description: 'User deleted successfully' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  remove(@Param('id') id: string) {
+  @ApiOperation({ summary: "Delete user (Admin only)" })
+  @ApiResponse({ status: 200, description: "User deleted successfully" })
+  @ApiResponse({ status: 404, description: "User not found" })
+  remove(@Param("id") id: string) {
     return this.usersService.remove(id);
   }
 }

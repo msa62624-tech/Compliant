@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 import {
   CONSTRUCTION_TRADES,
   CONSTRUCTION_TRADES_ARRAY,
@@ -7,7 +7,7 @@ import {
   getTradeInsuranceRequirements,
   searchTrades,
   getTradeCategoryName,
-} from '@compliant/shared';
+} from "@compliant/shared";
 
 /**
  * Service for managing construction trades
@@ -83,10 +83,12 @@ export class TradesService {
    */
   getStatistics() {
     const categories = CONSTRUCTION_TRADE_CATEGORIES;
-    const categoryCounts = Object.entries(categories).map(([category, trades]) => ({
-      category,
-      count: (trades as string[]).length,
-    }));
+    const categoryCounts = Object.entries(categories).map(
+      ([category, trades]) => ({
+        category,
+        count: (trades as string[]).length,
+      }),
+    );
 
     return {
       totalTrades: CONSTRUCTION_TRADES_ARRAY.length,

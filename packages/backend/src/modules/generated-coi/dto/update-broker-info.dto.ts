@@ -1,9 +1,9 @@
-import { IsString, IsOptional, IsEmail, IsEnum } from 'class-validator';
-import { SanitizeHtml } from '../../../common/sanitizers/string-sanitizer';
+import { IsString, IsOptional, IsEmail, IsEnum } from "class-validator";
+import { SanitizeHtml } from "../../../common/sanitizers/string-sanitizer";
 
 export enum BrokerType {
-  GLOBAL = 'GLOBAL',
-  PER_POLICY = 'PER_POLICY',
+  GLOBAL = "GLOBAL",
+  PER_POLICY = "PER_POLICY",
 }
 
 export class UpdateBrokerInfoDto {

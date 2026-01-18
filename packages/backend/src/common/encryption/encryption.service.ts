@@ -1,17 +1,22 @@
-import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypto';
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import {
+  createCipheriv,
+  createDecipheriv,
+  randomBytes,
+  scryptSync,
+} from "crypto";
+import { Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 
 /**
  * EncryptionService provides field-level encryption/decryption
  * for sensitive data like SSN, Tax IDs, etc.
- * 
+ *
  * Uses AES-256-GCM for encryption
  */
 @Injectable()
 export class EncryptionService {
   private readonly logger = new Logger(EncryptionService.name);
-  private readonly algorithm = 'aes-256-gcm';
+  private readonly algorithm = "aes-256-gcm";
   private readonly keyLength = 32; // 256 bits
   private encryptionKey: Buffer | null = null;
 
@@ -21,27 +26,31 @@ export class EncryptionService {
 
   private initializeKey() {
     try {
-      const secret = this.configService.get<string>('ENCRYPTION_KEY');
-      const salt = this.configService.get<string>('ENCRYPTION_SALT');
-      
+      const secret = this.configService.get<string>("ENCRYPTION_KEY");
+      const salt = this.configService.get<string>("ENCRYPTION_SALT");
+
       if (!secret) {
-        this.logger.warn('ENCRYPTION_KEY not set - field encryption will not be available');
+        this.logger.warn(
+          "ENCRYPTION_KEY not set - field encryption will not be available",
+        );
         return;
       }
 
       if (!salt) {
         throw new Error(
-          'ENCRYPTION_SALT is required but not set. ' +
-          'This is mandatory to prevent data loss when ENCRYPTION_KEY changes. ' +
-          'Generate a secure salt using: openssl rand -hex 16'
+          "ENCRYPTION_SALT is required but not set. " +
+            "This is mandatory to prevent data loss when ENCRYPTION_KEY changes. " +
+            "Generate a secure salt using: openssl rand -hex 16",
         );
       }
 
       // Derive a 256-bit key from the secret using scrypt
       this.encryptionKey = scryptSync(secret, salt, this.keyLength);
-      this.logger.log('Encryption key initialized successfully');
+      this.logger.log("Encryption key initialized successfully");
     } catch (error) {
-      this.logger.error(`Failed to initialize encryption key: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      this.logger.error(
+        `Failed to initialize encryption key: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
       throw error;
     }
   }
@@ -52,7 +61,7 @@ export class EncryptionService {
    */
   encrypt(plaintext: string): string | null {
     if (!this.encryptionKey) {
-      this.logger.warn('Encryption key not available - returning null');
+      this.logger.warn("Encryption key not available - returning null");
       return null;
     }
 
@@ -63,21 +72,23 @@ export class EncryptionService {
     try {
       // Generate a random IV for each encryption
       const iv = randomBytes(16);
-      
+
       // Create cipher
       const cipher = createCipheriv(this.algorithm, this.encryptionKey, iv);
-      
+
       // Encrypt the data
-      let encrypted = cipher.update(plaintext, 'utf8', 'hex');
-      encrypted += cipher.final('hex');
-      
+      let encrypted = cipher.update(plaintext, "utf8", "hex");
+      encrypted += cipher.final("hex");
+
       // Get the auth tag (for GCM mode authentication)
       const authTag = cipher.getAuthTag();
-      
+
       // Return iv:authTag:encrypted (all in hex)
-      return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
+      return `${iv.toString("hex")}:${authTag.toString("hex")}:${encrypted}`;
     } catch (error) {
-      this.logger.error(`Encryption error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      this.logger.error(
+        `Encryption error: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
       return null;
     }
   }
@@ -88,7 +99,7 @@ export class EncryptionService {
    */
   decrypt(ciphertext: string): string | null {
     if (!this.encryptionKey) {
-      this.logger.warn('Encryption key not available - returning null');
+      this.logger.warn("Encryption key not available - returning null");
       return null;
     }
 
@@ -98,30 +109,32 @@ export class EncryptionService {
 
     try {
       // Split the ciphertext into its components
-      const parts = ciphertext.split(':');
+      const parts = ciphertext.split(":");
       if (parts.length !== 3) {
-        this.logger.error('Invalid ciphertext format');
+        this.logger.error("Invalid ciphertext format");
         return null;
       }
 
       const [ivHex, authTagHex, encryptedHex] = parts;
-      
+
       // Convert from hex
-      const iv = Buffer.from(ivHex, 'hex');
-      const authTag = Buffer.from(authTagHex, 'hex');
-      const encrypted = Buffer.from(encryptedHex, 'hex');
-      
+      const iv = Buffer.from(ivHex, "hex");
+      const authTag = Buffer.from(authTagHex, "hex");
+      const encrypted = Buffer.from(encryptedHex, "hex");
+
       // Create decipher
       const decipher = createDecipheriv(this.algorithm, this.encryptionKey, iv);
       decipher.setAuthTag(authTag);
-      
+
       // Decrypt the data
       let decrypted = decipher.update(encrypted);
       decrypted = Buffer.concat([decrypted, decipher.final()]);
-      
-      return decrypted.toString('utf8');
+
+      return decrypted.toString("utf8");
     } catch (error) {
-      this.logger.error(`Decryption error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      this.logger.error(
+        `Decryption error: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
       return null;
     }
   }
@@ -131,7 +144,7 @@ export class EncryptionService {
    */
   isEncrypted(value: string): boolean {
     if (!value) return false;
-    const parts = value.split(':');
+    const parts = value.split(":");
     return parts.length === 3;
   }
 
@@ -142,16 +155,16 @@ export class EncryptionService {
    */
   encryptFields<T extends Record<string, any>>(obj: T, fields: string[]): T {
     const result = { ...obj };
-    
+
     for (const field of fields) {
-      if (result[field] && typeof result[field] === 'string') {
+      if (result[field] && typeof result[field] === "string") {
         const encrypted = this.encrypt(result[field]);
         if (encrypted) {
           (result as any)[field] = encrypted;
         }
       }
     }
-    
+
     return result;
   }
 
@@ -162,16 +175,20 @@ export class EncryptionService {
    */
   decryptFields<T extends Record<string, any>>(obj: T, fields: string[]): T {
     const result = { ...obj };
-    
+
     for (const field of fields) {
-      if (result[field] && typeof result[field] === 'string' && this.isEncrypted(result[field])) {
+      if (
+        result[field] &&
+        typeof result[field] === "string" &&
+        this.isEncrypted(result[field])
+      ) {
         const decrypted = this.decrypt(result[field]);
         if (decrypted) {
           (result as any)[field] = decrypted;
         }
       }
     }
-    
+
     return result;
   }
 }

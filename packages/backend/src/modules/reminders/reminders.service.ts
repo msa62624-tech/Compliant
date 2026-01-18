@@ -1,9 +1,9 @@
-import { Injectable, Inject, LoggerService } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { PrismaService } from '../../config/prisma.service';
-import { ReminderType } from '@prisma/client';
-import { EmailService } from '../email/email.service';
+import { Injectable, Inject, LoggerService } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
+import { PrismaService } from "../../config/prisma.service";
+import { ReminderType } from "@prisma/client";
+import { EmailService } from "../email/email.service";
 
 /**
  * Service for automated policy expiration reminders
@@ -20,7 +20,8 @@ export class RemindersService {
   };
 
   // Email configuration
-  private readonly ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@compliant.com';
+  private readonly ADMIN_EMAIL =
+    process.env.ADMIN_EMAIL || "admin@compliant.com";
 
   constructor(
     private prisma: PrismaService,
@@ -36,8 +37,8 @@ export class RemindersService {
   @Cron(CronExpression.EVERY_DAY_AT_6AM)
   async checkExpiringPolicies() {
     this.logger.log({
-      message: 'Starting automated expiration reminder check',
-      context: 'RemindersService',
+      message: "Starting automated expiration reminder check",
+      context: "RemindersService",
     });
 
     try {
@@ -45,7 +46,7 @@ export class RemindersService {
       const activeCOIs = await this.prisma.generatedCOI.findMany({
         where: {
           status: {
-            in: ['ACTIVE', 'AWAITING_ADMIN_REVIEW'],
+            in: ["ACTIVE", "AWAITING_ADMIN_REVIEW"],
           },
           OR: [
             { glExpirationDate: { not: null } },
@@ -69,9 +70,18 @@ export class RemindersService {
         if (coi.glExpirationDate) {
           const sent = await this.checkAndSendReminder(
             coi.id,
-            'GL',
+            "GL",
             coi.glExpirationDate,
-            [...new Set([coi.brokerGlEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter((email): email is string => Boolean(email)))],
+            [
+              ...new Set(
+                [
+                  coi.brokerGlEmail,
+                  coi.brokerEmail,
+                  coi.assignedAdminEmail,
+                  this.ADMIN_EMAIL,
+                ].filter((email): email is string => Boolean(email)),
+              ),
+            ],
             coi,
           );
           if (sent) totalReminders++;
@@ -81,9 +91,18 @@ export class RemindersService {
         if (coi.umbrellaExpirationDate) {
           const sent = await this.checkAndSendReminder(
             coi.id,
-            'UMBRELLA',
+            "UMBRELLA",
             coi.umbrellaExpirationDate,
-            [...new Set([coi.brokerUmbrellaEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter((email): email is string => Boolean(email)))],
+            [
+              ...new Set(
+                [
+                  coi.brokerUmbrellaEmail,
+                  coi.brokerEmail,
+                  coi.assignedAdminEmail,
+                  this.ADMIN_EMAIL,
+                ].filter((email): email is string => Boolean(email)),
+              ),
+            ],
             coi,
           );
           if (sent) totalReminders++;
@@ -93,9 +112,18 @@ export class RemindersService {
         if (coi.autoExpirationDate) {
           const sent = await this.checkAndSendReminder(
             coi.id,
-            'AUTO',
+            "AUTO",
             coi.autoExpirationDate,
-            [...new Set([coi.brokerAutoEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter((email): email is string => Boolean(email)))],
+            [
+              ...new Set(
+                [
+                  coi.brokerAutoEmail,
+                  coi.brokerEmail,
+                  coi.assignedAdminEmail,
+                  this.ADMIN_EMAIL,
+                ].filter((email): email is string => Boolean(email)),
+              ),
+            ],
             coi,
           );
           if (sent) totalReminders++;
@@ -105,9 +133,18 @@ export class RemindersService {
         if (coi.wcExpirationDate) {
           const sent = await this.checkAndSendReminder(
             coi.id,
-            'WC',
+            "WC",
             coi.wcExpirationDate,
-            [...new Set([coi.brokerWcEmail, coi.brokerEmail, coi.assignedAdminEmail, this.ADMIN_EMAIL].filter((email): email is string => Boolean(email)))],
+            [
+              ...new Set(
+                [
+                  coi.brokerWcEmail,
+                  coi.brokerEmail,
+                  coi.assignedAdminEmail,
+                  this.ADMIN_EMAIL,
+                ].filter((email): email is string => Boolean(email)),
+              ),
+            ],
             coi,
           );
           if (sent) totalReminders++;
@@ -115,16 +152,17 @@ export class RemindersService {
       }
 
       this.logger.log({
-        message: 'Completed automated expiration reminder check',
-        context: 'RemindersService',
+        message: "Completed automated expiration reminder check",
+        context: "RemindersService",
         totalCOIsChecked: activeCOIs.length,
         remindersSent: totalReminders,
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       this.logger.error({
-        message: 'Failed to check expiring policies',
-        context: 'RemindersService',
+        message: "Failed to check expiring policies",
+        context: "RemindersService",
         error: errorMessage,
       });
     }
@@ -146,7 +184,9 @@ export class RemindersService {
     const expDate = new Date(expirationDate);
     expDate.setHours(0, 0, 0, 0);
 
-    const daysUntilExpiry = Math.ceil((expDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const daysUntilExpiry = Math.ceil(
+      (expDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+    );
 
     // Determine which reminder type to send
     let reminderType: ReminderType | null = null;
@@ -170,7 +210,7 @@ export class RemindersService {
     } else if (daysUntilExpiry < 0) {
       // Policy is already expired - check if we should send every-2-days reminder
       const daysSinceExpiry = Math.abs(daysUntilExpiry);
-      
+
       // Send reminder every 2 days after expiration
       if (daysSinceExpiry % 2 === 0) {
         reminderType = ReminderType.EVERY_2_DAYS;
@@ -197,8 +237,8 @@ export class RemindersService {
     if (existingReminder) {
       if (this.logger.debug) {
         this.logger.debug({
-          message: 'Reminder already sent today',
-          context: 'RemindersService',
+          message: "Reminder already sent today",
+          context: "RemindersService",
           coiId,
           policyType,
           reminderType,
@@ -227,14 +267,23 @@ export class RemindersService {
         daysBeforeExpiry,
         reminderType,
         sentTo: recipients,
-        emailSubject: this.buildEmailSubject(reminderType, policyType, daysUntilExpiry),
-        emailBody: this.buildEmailBody(reminderType, policyType, daysUntilExpiry, coiData),
+        emailSubject: this.buildEmailSubject(
+          reminderType,
+          policyType,
+          daysUntilExpiry,
+        ),
+        emailBody: this.buildEmailBody(
+          reminderType,
+          policyType,
+          daysUntilExpiry,
+          coiData,
+        ),
       },
     });
 
     this.logger.log({
-      message: 'Sent expiration reminder',
-      context: 'RemindersService',
+      message: "Sent expiration reminder",
+      context: "RemindersService",
       coiId,
       policyType,
       reminderType,
@@ -257,15 +306,24 @@ export class RemindersService {
     recipients: string[],
     coiData: any,
   ): Promise<void> {
-    const subject = this.buildEmailSubject(reminderType, policyType, daysUntilExpiry);
-    const body = this.buildEmailBody(reminderType, policyType, daysUntilExpiry, coiData);
+    const subject = this.buildEmailSubject(
+      reminderType,
+      policyType,
+      daysUntilExpiry,
+    );
+    const body = this.buildEmailBody(
+      reminderType,
+      policyType,
+      daysUntilExpiry,
+      coiData,
+    );
 
     // Convert plain text body to HTML
     const html = `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;"><pre style="white-space: pre-wrap; font-family: Arial, sans-serif;">${body}</pre></div>`;
 
     this.logger.log({
-      message: 'Sending reminder notification',
-      context: 'RemindersService',
+      message: "Sending reminder notification",
+      context: "RemindersService",
       subject,
       recipients: recipients.length,
       coiId,
@@ -279,14 +337,20 @@ export class RemindersService {
     });
 
     if (!emailSent) {
-      throw new Error(`Failed to send reminder notification email for COI ${coiId}, policy ${policyType} to recipients: ${recipients.join(', ')}`);
+      throw new Error(
+        `Failed to send reminder notification email for COI ${coiId}, policy ${policyType} to recipients: ${recipients.join(", ")}`,
+      );
     }
   }
 
   /**
    * Build email subject based on reminder type
    */
-  private buildEmailSubject(reminderType: ReminderType, policyType: string, daysUntilExpiry: number): string {
+  private buildEmailSubject(
+    reminderType: ReminderType,
+    policyType: string,
+    daysUntilExpiry: number,
+  ): string {
     const policyName = this.getPolicyName(policyType);
 
     switch (reminderType) {
@@ -310,37 +374,45 @@ export class RemindersService {
   /**
    * Build email body based on reminder type
    */
-  private buildEmailBody(reminderType: ReminderType, policyType: string, daysUntilExpiry: number, coiData: any): string {
+  private buildEmailBody(
+    reminderType: ReminderType,
+    policyType: string,
+    daysUntilExpiry: number,
+    coiData: any,
+  ): string {
     const policyName = this.getPolicyName(policyType);
-    const projectName = coiData.project?.name || 'Unknown Project';
-    const subcontractorName = coiData.subcontractor?.name || 'Unknown Subcontractor';
+    const projectName = coiData.project?.name || "Unknown Project";
+    const subcontractorName =
+      coiData.subcontractor?.name || "Unknown Subcontractor";
 
-    let urgencyLevel = '';
-    let actionRequired = '';
+    let urgencyLevel = "";
+    let actionRequired = "";
 
     switch (reminderType) {
       case ReminderType.DAYS_30:
-        urgencyLevel = 'NOTICE';
-        actionRequired = 'Please begin the renewal process for this policy.';
+        urgencyLevel = "NOTICE";
+        actionRequired = "Please begin the renewal process for this policy.";
         break;
       case ReminderType.DAYS_14:
-        urgencyLevel = 'IMPORTANT';
-        actionRequired = 'Immediate action required to renew this policy.';
+        urgencyLevel = "IMPORTANT";
+        actionRequired = "Immediate action required to renew this policy.";
         break;
       case ReminderType.DAYS_7:
-        urgencyLevel = 'URGENT';
-        actionRequired = 'This policy must be renewed within the next week.';
+        urgencyLevel = "URGENT";
+        actionRequired = "This policy must be renewed within the next week.";
         break;
       case ReminderType.DAYS_2:
-        urgencyLevel = 'CRITICAL';
-        actionRequired = 'This policy will expire in 2 days. Renew immediately!';
+        urgencyLevel = "CRITICAL";
+        actionRequired =
+          "This policy will expire in 2 days. Renew immediately!";
         break;
       case ReminderType.EXPIRED:
-        urgencyLevel = 'EXPIRED';
-        actionRequired = 'This policy has expired. Work may not proceed without valid coverage.';
+        urgencyLevel = "EXPIRED";
+        actionRequired =
+          "This policy has expired. Work may not proceed without valid coverage.";
         break;
       case ReminderType.EVERY_2_DAYS:
-        urgencyLevel = 'OVERDUE';
+        urgencyLevel = "OVERDUE";
         actionRequired = `This policy has been expired for ${Math.abs(daysUntilExpiry)} days. Immediate renewal required.`;
         break;
     }
@@ -370,10 +442,10 @@ This is an automated reminder from the Compliant Insurance Tracking Platform.
    */
   private getPolicyName(policyType: string): string {
     const names: Record<string, string> = {
-      GL: 'General Liability',
-      UMBRELLA: 'Umbrella',
-      AUTO: 'Auto Liability',
-      WC: 'Workers Compensation',
+      GL: "General Liability",
+      UMBRELLA: "Umbrella",
+      AUTO: "Auto Liability",
+      WC: "Workers Compensation",
     };
     return names[policyType] || policyType;
   }
@@ -384,7 +456,7 @@ This is an automated reminder from the Compliant Insurance Tracking Platform.
   async getReminderHistory(coiId: string) {
     return this.prisma.expirationReminder.findMany({
       where: { coiId },
-      orderBy: { sentAt: 'desc' },
+      orderBy: { sentAt: "desc" },
     });
   }
 
@@ -404,7 +476,7 @@ This is an automated reminder from the Compliant Insurance Tracking Platform.
           },
         },
       },
-      orderBy: { sentAt: 'desc' },
+      orderBy: { sentAt: "desc" },
     });
   }
 
@@ -435,7 +507,7 @@ This is an automated reminder from the Compliant Insurance Tracking Platform.
     });
 
     const remindersByType = await this.prisma.expirationReminder.groupBy({
-      by: ['reminderType'],
+      by: ["reminderType"],
       _count: true,
     });
 

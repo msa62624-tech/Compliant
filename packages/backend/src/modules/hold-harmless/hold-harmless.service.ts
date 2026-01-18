@@ -1,12 +1,16 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../../config/prisma.service';
-import { HoldHarmlessStatus } from '@prisma/client';
-import { randomBytes } from 'crypto';
-import { EmailService } from '../email/email.service';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from "@nestjs/common";
+import { PrismaService } from "../../config/prisma.service";
+import { HoldHarmlessStatus } from "@prisma/client";
+import { randomBytes } from "crypto";
+import { EmailService } from "../email/email.service";
 
 /**
  * Service for managing hold harmless agreements with signature workflow
- * 
+ *
  * Workflow:
  * 1. When all COI policies are approved, hold harmless is auto-generated
  * 2. System fills in address and additional insureds from project/COI data
@@ -34,10 +38,10 @@ export class HoldHarmlessService {
           include: {
             programs: {
               include: {
-                program: true
-              }
-            }
-          }
+                program: true,
+              },
+            },
+          },
         },
         subcontractor: true,
       },
@@ -53,20 +57,24 @@ export class HoldHarmlessService {
     });
 
     if (existing) {
-      console.log(`Hold harmless already exists for COI ${coiId}, skipping generation`);
+      console.log(
+        `Hold harmless already exists for COI ${coiId}, skipping generation`,
+      );
       return existing;
     }
 
     // Get program with hold harmless template
     const program = coi.project.programs?.[0]?.program;
-    
+
     if (!program?.requiresHoldHarmless) {
       console.log(`Program does not require hold harmless for COI ${coiId}`);
       return null;
     }
 
     if (!program.holdHarmlessTemplateUrl) {
-      throw new BadRequestException('Program requires hold harmless but no template is configured');
+      throw new BadRequestException(
+        "Program requires hold harmless but no template is configured",
+      );
     }
 
     // Generate unique signature token for subcontractor
@@ -79,16 +87,16 @@ export class HoldHarmlessService {
         programId: program.id,
         templateUrl: program.holdHarmlessTemplateUrl,
         status: HoldHarmlessStatus.PENDING_SUB_SIGNATURE,
-        
+
         // Auto-fill from project/COI data
-        projectAddress: coi.project.address || '',
-        gcName: coi.project.gcName || coi.gcName || '',
-        gcEmail: coi.project.contactEmail || '',
-        ownersEntity: coi.project.entity || '',
+        projectAddress: coi.project.address || "",
+        gcName: coi.project.gcName || coi.gcName || "",
+        gcEmail: coi.project.contactEmail || "",
+        ownersEntity: coi.project.entity || "",
         additionalInsureds: this.extractAdditionalInsureds(coi.project),
         subcontractorName: coi.subcontractor.name,
         subcontractorEmail: coi.subcontractor.email,
-        
+
         subSignatureToken,
         generatedAt: new Date(),
       },
@@ -113,19 +121,20 @@ export class HoldHarmlessService {
    */
   private extractAdditionalInsureds(project: any): string[] {
     const insureds: string[] = [];
-    
+
     if (project.gcName) insureds.push(project.gcName);
     if (project.entity) insureds.push(project.entity);
     if (project.additionalInsureds) {
       // Parse if it's a string, otherwise assume it's already an array
-      const parsed = typeof project.additionalInsureds === 'string' 
-        ? project.additionalInsureds.split(',').map((s: string) => s.trim())
-        : Array.isArray(project.additionalInsureds)
-        ? project.additionalInsureds
-        : [];
+      const parsed =
+        typeof project.additionalInsureds === "string"
+          ? project.additionalInsureds.split(",").map((s: string) => s.trim())
+          : Array.isArray(project.additionalInsureds)
+            ? project.additionalInsureds
+            : [];
       insureds.push(...parsed);
     }
-    
+
     return [...new Set(insureds)]; // Remove duplicates
   }
 
@@ -133,15 +142,15 @@ export class HoldHarmlessService {
    * Generate a unique signature token
    */
   private generateSignatureToken(): string {
-    return randomBytes(32).toString('hex');
+    return randomBytes(32).toString("hex");
   }
 
   /**
    * Send signature notification to subcontractor (authenticated access)
    */
   private async sendSignatureLinkToSubcontractor(holdHarmless: any) {
-    const signatureUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/subcontractor/hold-harmless/${holdHarmless.id}`;
-    
+    const signatureUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/subcontractor/hold-harmless/${holdHarmless.id}`;
+
     const html = `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #7c3aed;">Hold Harmless Agreement - Signature Required</h2>
       <p>Hello,</p>
@@ -158,12 +167,14 @@ export class HoldHarmlessService {
 
     const emailSent = await this.emailService.sendEmail({
       to: holdHarmless.subcontractorEmail,
-      subject: 'Hold Harmless Agreement - Signature Required',
+      subject: "Hold Harmless Agreement - Signature Required",
       html,
     });
 
     if (!emailSent) {
-      throw new Error(`Failed to send signature notification email to subcontractor: ${holdHarmless.subcontractorEmail}`);
+      throw new Error(
+        `Failed to send signature notification email to subcontractor: ${holdHarmless.subcontractorEmail}`,
+      );
     }
 
     await this.prisma.holdHarmless.update({
@@ -200,7 +211,10 @@ export class HoldHarmlessService {
   /**
    * Process subcontractor signature (authenticated)
    */
-  async processSubcontractorSignature(id: string, signatureData: { signatureUrl: string; signedBy: string }) {
+  async processSubcontractorSignature(
+    id: string,
+    signatureData: { signatureUrl: string; signedBy: string },
+  ) {
     const holdHarmless = await this.prisma.holdHarmless.findUnique({
       where: { id },
     });
@@ -210,7 +224,9 @@ export class HoldHarmlessService {
     }
 
     if (holdHarmless.status !== HoldHarmlessStatus.PENDING_SUB_SIGNATURE) {
-      throw new BadRequestException('Hold harmless is not in the correct state for subcontractor signature');
+      throw new BadRequestException(
+        "Hold harmless is not in the correct state for subcontractor signature",
+      );
     }
 
     // Update with sub signature and move to GC signature pending
@@ -242,8 +258,8 @@ export class HoldHarmlessService {
    * Notify GC to sign (without token link)
    */
   private async notifyGCToSign(holdHarmless: any) {
-    const signatureUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/gc/hold-harmless/${holdHarmless.id}`;
-    
+    const signatureUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/gc/hold-harmless/${holdHarmless.id}`;
+
     const html = `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #10b981;">Hold Harmless Agreement - GC Signature Required</h2>
       <p>Hello,</p>
@@ -260,12 +276,14 @@ export class HoldHarmlessService {
 
     const emailSent = await this.emailService.sendEmail({
       to: holdHarmless.gcEmail,
-      subject: 'Hold Harmless Agreement - GC Signature Required',
+      subject: "Hold Harmless Agreement - GC Signature Required",
       html,
     });
 
     if (!emailSent) {
-      throw new Error(`Failed to send notification email to GC: ${holdHarmless.gcEmail}`);
+      throw new Error(
+        `Failed to send notification email to GC: ${holdHarmless.gcEmail}`,
+      );
     }
 
     await this.prisma.holdHarmless.update({
@@ -279,7 +297,14 @@ export class HoldHarmlessService {
   /**
    * Process GC signature (authenticated)
    */
-  async processGCSignature(id: string, signatureData: { signatureUrl: string; signedBy: string; finalDocUrl: string }) {
+  async processGCSignature(
+    id: string,
+    signatureData: {
+      signatureUrl: string;
+      signedBy: string;
+      finalDocUrl: string;
+    },
+  ) {
     const holdHarmless = await this.prisma.holdHarmless.findUnique({
       where: { id },
       include: {
@@ -297,7 +322,9 @@ export class HoldHarmlessService {
     }
 
     if (holdHarmless.status !== HoldHarmlessStatus.PENDING_GC_SIGNATURE) {
-      throw new BadRequestException('Hold harmless is not in the correct state for GC signature');
+      throw new BadRequestException(
+        "Hold harmless is not in the correct state for GC signature",
+      );
     }
 
     // Update with GC signature and mark as completed
@@ -338,9 +365,13 @@ export class HoldHarmlessService {
     ].filter(Boolean);
 
     // Send completion notification email to all parties
-    const subSignedDate = holdHarmless.subSignedAt ? new Date(holdHarmless.subSignedAt).toLocaleString() : 'N/A';
-    const gcSignedDate = holdHarmless.gcSignedAt ? new Date(holdHarmless.gcSignedAt).toLocaleString() : 'N/A';
-    
+    const subSignedDate = holdHarmless.subSignedAt
+      ? new Date(holdHarmless.subSignedAt).toLocaleString()
+      : "N/A";
+    const gcSignedDate = holdHarmless.gcSignedAt
+      ? new Date(holdHarmless.gcSignedAt).toLocaleString()
+      : "N/A";
+
     const html = `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #10b981;">✓ Hold Harmless Agreement Completed</h2>
       <p>Good news! The hold harmless agreement has been fully executed with signatures from all parties.</p>
@@ -356,12 +387,14 @@ export class HoldHarmlessService {
 
     const emailSent = await this.emailService.sendEmail({
       to: recipients,
-      subject: '✓ Hold Harmless Agreement Completed',
+      subject: "✓ Hold Harmless Agreement Completed",
       html,
     });
 
     if (!emailSent) {
-      throw new Error(`Failed to send completion notification email to recipients: ${recipients.join(', ')}`);
+      throw new Error(
+        `Failed to send completion notification email to recipients: ${recipients.join(", ")}`,
+      );
     }
 
     // Only update notification records if email was successfully sent
@@ -380,10 +413,7 @@ export class HoldHarmlessService {
   async getByToken(token: string) {
     const holdHarmless = await this.prisma.holdHarmless.findFirst({
       where: {
-        OR: [
-          { subSignatureToken: token },
-          { gcSignatureToken: token },
-        ],
+        OR: [{ subSignatureToken: token }, { gcSignatureToken: token }],
       },
       include: {
         coi: {
@@ -396,11 +426,12 @@ export class HoldHarmlessService {
     });
 
     if (!holdHarmless) {
-      throw new NotFoundException('Invalid signature token');
+      throw new NotFoundException("Invalid signature token");
     }
 
     // Determine which party should sign
-    const signingParty = token === holdHarmless.subSignatureToken ? 'SUBCONTRACTOR' : 'GC';
+    const signingParty =
+      token === holdHarmless.subSignatureToken ? "SUBCONTRACTOR" : "GC";
 
     return {
       ...holdHarmless,
@@ -412,15 +443,15 @@ export class HoldHarmlessService {
   /**
    * Check if a party can sign based on current status
    */
-  private canSign(holdHarmless: any, party: 'SUBCONTRACTOR' | 'GC'): boolean {
-    if (party === 'SUBCONTRACTOR') {
+  private canSign(holdHarmless: any, party: "SUBCONTRACTOR" | "GC"): boolean {
+    if (party === "SUBCONTRACTOR") {
       return holdHarmless.status === HoldHarmlessStatus.PENDING_SUB_SIGNATURE;
     }
-    
-    if (party === 'GC') {
+
+    if (party === "GC") {
       return holdHarmless.status === HoldHarmlessStatus.PENDING_GC_SIGNATURE;
     }
-    
+
     return false;
   }
 
@@ -441,7 +472,9 @@ export class HoldHarmlessService {
     });
 
     if (!holdHarmless) {
-      throw new NotFoundException(`Hold harmless agreement for COI ${coiId} not found`);
+      throw new NotFoundException(
+        `Hold harmless agreement for COI ${coiId} not found`,
+      );
     }
 
     return holdHarmless;
@@ -462,7 +495,10 @@ export class HoldHarmlessService {
 
     if (filters?.pendingSignature) {
       where.status = {
-        in: [HoldHarmlessStatus.PENDING_SUB_SIGNATURE, HoldHarmlessStatus.PENDING_GC_SIGNATURE],
+        in: [
+          HoldHarmlessStatus.PENDING_SUB_SIGNATURE,
+          HoldHarmlessStatus.PENDING_GC_SIGNATURE,
+        ],
       };
     }
 
@@ -476,30 +512,30 @@ export class HoldHarmlessService {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 
   /**
    * Resend signature link
    */
-  async resendSignatureLink(holdHarmlessId: string, party: 'SUB' | 'GC') {
+  async resendSignatureLink(holdHarmlessId: string, party: "SUB" | "GC") {
     const holdHarmless = await this.prisma.holdHarmless.findUnique({
       where: { id: holdHarmlessId },
     });
 
     if (!holdHarmless) {
-      throw new NotFoundException('Hold harmless not found');
+      throw new NotFoundException("Hold harmless not found");
     }
 
-    if (party === 'SUB') {
+    if (party === "SUB") {
       if (holdHarmless.status !== HoldHarmlessStatus.PENDING_SUB_SIGNATURE) {
-        throw new BadRequestException('Subcontractor signature is not pending');
+        throw new BadRequestException("Subcontractor signature is not pending");
       }
       await this.sendSignatureLinkToSubcontractor(holdHarmless);
     } else {
       if (holdHarmless.status !== HoldHarmlessStatus.PENDING_GC_SIGNATURE) {
-        throw new BadRequestException('GC signature is not pending');
+        throw new BadRequestException("GC signature is not pending");
       }
       await this.notifyGCToSign(holdHarmless);
     }

@@ -1,5 +1,5 @@
 // API Configuration
-export const API_VERSION = 'v1';
+export const API_VERSION = "v1";
 export const API_PREFIX = `/api/${API_VERSION}`;
 
 // Pagination
@@ -8,8 +8,8 @@ export const DEFAULT_LIMIT = 10;
 export const MAX_LIMIT = 100;
 
 // JWT Configuration
-export const JWT_EXPIRATION = '15m';
-export const JWT_REFRESH_EXPIRATION = '7d';
+export const JWT_EXPIRATION = "15m";
+export const JWT_REFRESH_EXPIRATION = "7d";
 
 // Insurance Coverage Minimums (in dollars)
 export const INSURANCE_MINIMUMS = {
@@ -21,34 +21,35 @@ export const INSURANCE_MINIMUMS = {
 };
 
 // Date Formats
-export const DATE_FORMAT = 'yyyy-MM-dd';
-export const DATETIME_FORMAT = 'yyyy-MM-dd HH:mm:ss';
+export const DATE_FORMAT = "yyyy-MM-dd";
+export const DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 // File Upload
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 export const ALLOWED_FILE_TYPES = [
-  'application/pdf',
-  'image/jpeg',
-  'image/png',
-  'image/jpg',
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/jpg",
 ];
 
 // HTTP Status Messages
 export const HTTP_MESSAGES = {
-  UNAUTHORIZED: 'Unauthorized access',
-  FORBIDDEN: 'Forbidden resource',
-  NOT_FOUND: 'Resource not found',
-  BAD_REQUEST: 'Bad request',
-  INTERNAL_ERROR: 'Internal server error',
-  VALIDATION_ERROR: 'Validation error',
+  UNAUTHORIZED: "Unauthorized access",
+  FORBIDDEN: "Forbidden resource",
+  NOT_FOUND: "Resource not found",
+  BAD_REQUEST: "Bad request",
+  INTERNAL_ERROR: "Internal server error",
+  VALIDATION_ERROR: "Validation error",
 };
 
 // Regex Patterns
 export const PATTERNS = {
   EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   PHONE: /^\+?[\d\s-()]+$/,
-  PASSWORD: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+  PASSWORD:
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
 };
 
 // Export construction trades
-export * from './construction-trades';
+export * from "./construction-trades";

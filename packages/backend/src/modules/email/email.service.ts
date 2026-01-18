@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import * as nodemailer from 'nodemailer';
+import { Injectable, Logger } from "@nestjs/common";
+import * as nodemailer from "nodemailer";
 
 export interface EmailOptions {
   to: string | string[];
@@ -16,13 +16,15 @@ export class EmailService {
   constructor() {
     // Validate required environment variables
     if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-      throw new Error('SMTP_USER and SMTP_PASS environment variables are required');
+      throw new Error(
+        "SMTP_USER and SMTP_PASS environment variables are required",
+      );
     }
 
     // Initialize SMTP transporter with Microsoft 365 settings
     this.transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.office365.com',
-      port: parseInt(process.env.SMTP_PORT || '587', 10),
+      host: process.env.SMTP_HOST || "smtp.office365.com",
+      port: parseInt(process.env.SMTP_PORT || "587", 10),
       secure: false, // Use STARTTLS
       auth: {
         user: process.env.SMTP_USER,
@@ -30,8 +32,8 @@ export class EmailService {
       },
       tls: {
         // Use secure TLS settings - reject unauthorized certificates in production
-        rejectUnauthorized: process.env.NODE_ENV === 'production',
-        minVersion: 'TLSv1.2',
+        rejectUnauthorized: process.env.NODE_ENV === "production",
+        minVersion: "TLSv1.2",
       },
     });
   }
@@ -40,7 +42,7 @@ export class EmailService {
     try {
       const mailOptions = {
         from: process.env.SMTP_USER,
-        to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
+        to: Array.isArray(options.to) ? options.to.join(", ") : options.to,
         subject: options.subject,
         html: options.html,
         text: options.text || this.stripHtml(options.html),
@@ -63,7 +65,7 @@ export class EmailService {
     name: string,
     resetToken: string,
   ): Promise<boolean> {
-    const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+    const resetLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/reset-password?token=${resetToken}`;
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #7c3aed;">Welcome to Compliant Platform</h2>
@@ -96,7 +98,7 @@ export class EmailService {
 
     return this.sendEmail({
       to: email,
-      subject: 'Welcome to Compliant Platform - Set Your Password',
+      subject: "Welcome to Compliant Platform - Set Your Password",
       html,
     });
   }
@@ -108,7 +110,7 @@ export class EmailService {
     resetToken: string,
     subcontractorName: string,
   ): Promise<boolean> {
-    const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+    const resetLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/reset-password?token=${resetToken}`;
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #10b981;">Welcome to Compliant Platform - Broker Portal</h2>
@@ -140,7 +142,7 @@ export class EmailService {
 
     return this.sendEmail({
       to: email,
-      subject: 'Broker Account Created - Set Your Password',
+      subject: "Broker Account Created - Set Your Password",
       html,
     });
   }
@@ -170,7 +172,9 @@ export class EmailService {
       </div>
     `;
 
-    const emails = [recipients.gc, recipients.sub, recipients.broker].filter(Boolean);
+    const emails = [recipients.gc, recipients.sub, recipients.broker].filter(
+      Boolean,
+    );
     return this.sendEmail({
       to: emails,
       subject: `✓ Insurance Compliance Approved - ${details.subcontractorName}`,
@@ -211,7 +215,9 @@ export class EmailService {
       </div>
     `;
 
-    const emails = [recipients.gc, recipients.sub, recipients.broker].filter(Boolean);
+    const emails = [recipients.gc, recipients.sub, recipients.broker].filter(
+      Boolean,
+    );
     return this.sendEmail({
       to: emails,
       subject: `⚠️ URGENT: Insurance Non-Compliance - ${details.subcontractorName}`,
@@ -226,7 +232,7 @@ export class EmailService {
       subcontractorName: string;
       projectName: string;
       brokerName: string;
-      uploadType: 'first-time' | 'renewal';
+      uploadType: "first-time" | "renewal";
     },
   ): Promise<boolean> {
     const html = `
@@ -238,10 +244,10 @@ export class EmailService {
           <p><strong>Subcontractor:</strong> ${details.subcontractorName}</p>
           <p><strong>Project:</strong> ${details.projectName}</p>
           <p><strong>Uploaded by:</strong> ${details.brokerName} (Broker)</p>
-          <p><strong>Type:</strong> ${details.uploadType === 'first-time' ? 'First-Time COI' : 'Renewal COI'}</p>
+          <p><strong>Type:</strong> ${details.uploadType === "first-time" ? "First-Time COI" : "Renewal COI"}</p>
         </div>
         <p>Please log in to the admin portal to review and approve these documents.</p>
-        <p><a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin/coi-reviews" 
+        <p><a href="${process.env.FRONTEND_URL || "http://localhost:3000"}/admin/coi-reviews" 
               style="display: inline-block; padding: 12px 24px; background-color: #3b82f6; color: white; text-decoration: none; border-radius: 6px; margin-top: 10px;">
            Review Documents
         </a></p>
@@ -258,6 +264,6 @@ export class EmailService {
 
   // Helper to strip HTML tags for plain text version
   private stripHtml(html: string): string {
-    return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
+    return html.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ");
   }
 }

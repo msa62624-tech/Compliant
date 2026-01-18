@@ -1,12 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../config/prisma.service';
-import { CacheService } from '../cache/cache.service';
-import { CreateContractorDto } from './dto/create-contractor.dto';
-import { UpdateContractorDto } from './dto/update-contractor.dto';
-import { InsuranceStatus } from '@compliant/shared';
-import { Prisma, UserRole } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
-import { randomBytes } from 'crypto';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../../config/prisma.service";
+import { CacheService } from "../cache/cache.service";
+import { CreateContractorDto } from "./dto/create-contractor.dto";
+import { UpdateContractorDto } from "./dto/update-contractor.dto";
+import { InsuranceStatus } from "@compliant/shared";
+import { Prisma, UserRole } from "@prisma/client";
+import * as bcrypt from "bcrypt";
+import { randomBytes } from "crypto";
 
 // Define the return type for findOne including all relations
 type ContractorWithRelations = Prisma.ContractorGetPayload<{
@@ -37,7 +37,7 @@ type ContractorWithRelations = Prisma.ContractorGetPayload<{
 @Injectable()
 export class ContractorsService {
   private readonly CACHE_TTL = 300; // 5 minutes
-  private readonly CACHE_PREFIX = 'contractor:';
+  private readonly CACHE_PREFIX = "contractor:";
 
   constructor(
     private prisma: PrismaService,
@@ -51,9 +51,10 @@ export class ContractorsService {
    */
   private generateSecurePassword(): string {
     // Generate a secure random password: 12 characters with uppercase, lowercase, numbers, special chars
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%';
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
     const bytes = randomBytes(12);
-    let password = '';
+    let password = "";
     for (let i = 0; i < 12; i++) {
       password += chars[bytes[i] % chars.length];
     }
@@ -78,8 +79,10 @@ export class ContractorsService {
       });
 
       if (existingUser) {
-        console.log(`User account already exists for ${email} - using existing credentials`);
-        return { email, password: '', created: false };
+        console.log(
+          `User account already exists for ${email} - using existing credentials`,
+        );
+        return { email, password: "", created: false };
       }
 
       // Generate PERMANENT password
@@ -87,14 +90,15 @@ export class ContractorsService {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Determine role based on contractor type
-      const role: UserRole = contractorType === 'SUBCONTRACTOR' 
-        ? UserRole.SUBCONTRACTOR 
-        : UserRole.CONTRACTOR;
+      const role: UserRole =
+        contractorType === "SUBCONTRACTOR"
+          ? UserRole.SUBCONTRACTOR
+          : UserRole.CONTRACTOR;
 
       // Extract first/last name from full name
-      const nameParts = name.split(' ');
-      const firstName = nameParts[0] || 'User';
-      const lastName = nameParts.slice(1).join(' ') || 'Account';
+      const nameParts = name.split(" ");
+      const firstName = nameParts[0] || "User";
+      const lastName = nameParts.slice(1).join(" ") || "Account";
 
       // Create user account with PERMANENT password
       await this.prisma.user.create({
@@ -112,7 +116,7 @@ export class ContractorsService {
       console.log(`  Email: ${email}`);
       console.log(`  Password: ${password} (PERMANENT - save this!)`);
       console.log(`  Note: User can change password later if forgotten`);
-      
+
       // TODO: Send welcome email with permanent credentials
       // await this.emailService.sendWelcomeEmail(email, firstName, password);
       // Email should say: "These are your permanent credentials. Keep them safe. You can change your password anytime."
@@ -121,7 +125,7 @@ export class ContractorsService {
     } catch (error) {
       console.error(`Failed to auto-create user account for ${email}:`, error);
       // Don't throw - contractor creation should succeed even if user creation fails
-      return { email, password: '', created: false };
+      return { email, password: "", created: false };
     }
   }
 
@@ -168,11 +172,11 @@ export class ContractorsService {
    * - CONTRACTOR/GC: sees only themselves + can search their subs
    * - SUBCONTRACTOR: sees ONLY themselves (PRIVACY: NOT other subs)
    * - BROKER: sees ONLY subs that entered their broker info (PRIVACY: NOT all subs)
-   * 
+   *
    * PRIVACY RULES:
    * ✓ Subs CANNOT see other subs on the same project
    * ✓ Brokers can ONLY see subs that listed them as broker
-   * 
+   *
    * Search parameters:
    * - search: search by name, email, company
    * - trade: filter by trade type
@@ -180,9 +184,9 @@ export class ContractorsService {
    * - status: filter by contractor status
    */
   async findAll(
-    page = 1, 
-    limit = 10, 
-    status?: string, 
+    page = 1,
+    limit = 10,
+    status?: string,
     user?: any,
     search?: string,
     trade?: string,
@@ -190,21 +194,21 @@ export class ContractorsService {
   ) {
     // Build where clause based on user role
     const where: any = status ? { status: status as any } : {};
-    
+
     if (user) {
       switch (user.role) {
-        case 'SUPER_ADMIN':
+        case "SUPER_ADMIN":
           // Super admin sees everything - no filter
           break;
-          
-        case 'ADMIN':
+
+        case "ADMIN":
           // Admin sees only contractors assigned to them
           if (user.email) {
             where.assignedAdminEmail = user.email;
           }
           break;
-          
-        case 'CONTRACTOR':
+
+        case "CONTRACTOR":
           // GC/Contractor sees only their own record OR subcontractors they created
           if (user.id) {
             where.OR = [
@@ -213,14 +217,14 @@ export class ContractorsService {
             ];
           }
           break;
-          
-        case 'SUBCONTRACTOR':
+
+        case "SUBCONTRACTOR":
           // PRIVACY: Subcontractor sees ONLY their own record
           // CANNOT see other subs on the same project
           where.email = user.email;
           break;
-          
-        case 'BROKER':
+
+        case "BROKER":
           // PRIVACY: Broker sees ONLY contractors that entered their broker info
           // where broker email matches ANY broker field (global or per-policy)
           where.OR = [
@@ -231,10 +235,10 @@ export class ContractorsService {
             { brokerWcEmail: user.email },
           ];
           break;
-          
+
         default:
           // Default: see nothing
-          where.id = 'non-existent-id';
+          where.id = "non-existent-id";
       }
     }
 
@@ -242,18 +246,15 @@ export class ContractorsService {
     if (search) {
       const searchCondition = {
         OR: [
-          { name: { contains: search, mode: 'insensitive' as any } },
-          { email: { contains: search, mode: 'insensitive' as any } },
-          { company: { contains: search, mode: 'insensitive' as any } },
+          { name: { contains: search, mode: "insensitive" as any } },
+          { email: { contains: search, mode: "insensitive" as any } },
+          { company: { contains: search, mode: "insensitive" as any } },
         ],
       };
-      
+
       if (where.OR) {
         // If there's already an OR condition (like for CONTRACTOR), combine them
-        where.AND = [
-          { OR: where.OR },
-          searchCondition,
-        ];
+        where.AND = [{ OR: where.OR }, searchCondition];
         delete where.OR;
       } else {
         where.OR = searchCondition.OR;
@@ -273,8 +274,8 @@ export class ContractorsService {
     }
 
     // Cache key includes all filter parameters
-    const cacheKey = `${this.CACHE_PREFIX}list:${page}:${limit}:${status || 'all'}:${user?.role}:${user?.email}:${search || ''}:${trade || ''}:${insuranceStatus || ''}`;
-    
+    const cacheKey = `${this.CACHE_PREFIX}list:${page}:${limit}:${status || "all"}:${user?.role}:${user?.email}:${search || ""}:${trade || ""}:${insuranceStatus || ""}`;
+
     // Try to get from cache first
     const cached = await this.cacheService.get(cacheKey);
     if (cached) {
@@ -307,7 +308,7 @@ export class ContractorsService {
           },
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
       }),
       this.prisma.contractor.count({ where }),
@@ -329,7 +330,7 @@ export class ContractorsService {
 
   async findOne(id: string): Promise<ContractorWithRelations> {
     const cacheKey = `${this.CACHE_PREFIX}${id}`;
-    
+
     // Try to get from cache first
     const cached = await this.cacheService.get(cacheKey);
     if (cached) {
@@ -408,19 +409,23 @@ export class ContractorsService {
     await this.cacheService.del(`${this.CACHE_PREFIX}${id}`);
     await this.cacheService.delPattern(`${this.CACHE_PREFIX}list:*`);
 
-    return { message: 'Contractor deleted successfully' };
+    return { message: "Contractor deleted successfully" };
   }
 
   async getInsuranceStatus(id: string) {
     const contractor = await this.findOne(id);
-    
+
     // Now we can safely access insuranceDocuments without type assertion
     const insuranceDocs = contractor.insuranceDocuments || [];
     const now = new Date();
 
-    const hasExpired = insuranceDocs.some((doc) => new Date(doc.expirationDate) < now);
-    const hasNonCompliant = insuranceDocs.some((doc) => doc.status === 'REJECTED');
-    const hasPending = insuranceDocs.some((doc) => doc.status === 'PENDING');
+    const hasExpired = insuranceDocs.some(
+      (doc) => new Date(doc.expirationDate) < now,
+    );
+    const hasNonCompliant = insuranceDocs.some(
+      (doc) => doc.status === "REJECTED",
+    );
+    const hasPending = insuranceDocs.some((doc) => doc.status === "PENDING");
 
     let insuranceStatus = InsuranceStatus.COMPLIANT;
     if (hasExpired) {
@@ -452,11 +457,11 @@ export class ContractorsService {
     const contractors = await this.prisma.contractor.findMany({
       where: {
         OR: [
-          { name: { contains: query, mode: 'insensitive' } },
-          { company: { contains: query, mode: 'insensitive' } },
-          { email: { contains: query, mode: 'insensitive' } },
+          { name: { contains: query, mode: "insensitive" } },
+          { company: { contains: query, mode: "insensitive" } },
+          { email: { contains: query, mode: "insensitive" } },
         ],
-        contractorType: 'SUBCONTRACTOR', // Only search subcontractors
+        contractorType: "SUBCONTRACTOR", // Only search subcontractors
       },
       select: {
         id: true,
@@ -470,7 +475,7 @@ export class ContractorsService {
       },
       take: limit,
       orderBy: {
-        name: 'asc',
+        name: "asc",
       },
     });
 
@@ -481,23 +486,27 @@ export class ContractorsService {
    * Search brokers from all contractors
    * Extracts broker information from contractors who have broker details
    */
-  async searchBrokers(query: string, policyType: string = 'GLOBAL', limit = 10) {
+  async searchBrokers(
+    query: string,
+    policyType: string = "GLOBAL",
+    limit = 10,
+  ) {
     const contractors = await this.prisma.contractor.findMany({
       where: {
         OR: [
           // Global broker search
-          { brokerName: { contains: query, mode: 'insensitive' } },
-          { brokerEmail: { contains: query, mode: 'insensitive' } },
-          { brokerCompany: { contains: query, mode: 'insensitive' } },
+          { brokerName: { contains: query, mode: "insensitive" } },
+          { brokerEmail: { contains: query, mode: "insensitive" } },
+          { brokerCompany: { contains: query, mode: "insensitive" } },
           // Per-policy broker search
-          { brokerGlName: { contains: query, mode: 'insensitive' } },
-          { brokerGlEmail: { contains: query, mode: 'insensitive' } },
-          { brokerAutoName: { contains: query, mode: 'insensitive' } },
-          { brokerAutoEmail: { contains: query, mode: 'insensitive' } },
-          { brokerUmbrellaName: { contains: query, mode: 'insensitive' } },
-          { brokerUmbrellaEmail: { contains: query, mode: 'insensitive' } },
-          { brokerWcName: { contains: query, mode: 'insensitive' } },
-          { brokerWcEmail: { contains: query, mode: 'insensitive' } },
+          { brokerGlName: { contains: query, mode: "insensitive" } },
+          { brokerGlEmail: { contains: query, mode: "insensitive" } },
+          { brokerAutoName: { contains: query, mode: "insensitive" } },
+          { brokerAutoEmail: { contains: query, mode: "insensitive" } },
+          { brokerUmbrellaName: { contains: query, mode: "insensitive" } },
+          { brokerUmbrellaEmail: { contains: query, mode: "insensitive" } },
+          { brokerWcName: { contains: query, mode: "insensitive" } },
+          { brokerWcEmail: { contains: query, mode: "insensitive" } },
         ],
       },
       select: {
@@ -528,7 +537,7 @@ export class ContractorsService {
 
     contractors.forEach((contractor) => {
       // Add global broker if exists
-      if (contractor.brokerEmail && (policyType === 'GLOBAL' || !policyType)) {
+      if (contractor.brokerEmail && (policyType === "GLOBAL" || !policyType)) {
         const key = contractor.brokerEmail.toLowerCase();
         if (!brokersMap.has(key)) {
           brokersMap.set(key, {
@@ -537,13 +546,13 @@ export class ContractorsService {
             email: contractor.brokerEmail,
             phone: contractor.brokerPhone,
             company: contractor.brokerCompany,
-            brokerType: contractor.brokerType || 'GLOBAL',
+            brokerType: contractor.brokerType || "GLOBAL",
           });
         }
       }
 
       // Add per-policy brokers if requested
-      if (policyType === 'GL' || policyType === 'PER_POLICY') {
+      if (policyType === "GL" || policyType === "PER_POLICY") {
         if (contractor.brokerGlEmail) {
           const key = contractor.brokerGlEmail.toLowerCase();
           if (!brokersMap.has(key)) {
@@ -553,13 +562,13 @@ export class ContractorsService {
               email: contractor.brokerGlEmail,
               phone: contractor.brokerGlPhone,
               company: contractor.brokerCompany,
-              brokerType: 'PER_POLICY',
+              brokerType: "PER_POLICY",
             });
           }
         }
       }
 
-      if (policyType === 'AUTO' || policyType === 'PER_POLICY') {
+      if (policyType === "AUTO" || policyType === "PER_POLICY") {
         if (contractor.brokerAutoEmail) {
           const key = contractor.brokerAutoEmail.toLowerCase();
           if (!brokersMap.has(key)) {
@@ -569,13 +578,13 @@ export class ContractorsService {
               email: contractor.brokerAutoEmail,
               phone: contractor.brokerAutoPhone,
               company: contractor.brokerCompany,
-              brokerType: 'PER_POLICY',
+              brokerType: "PER_POLICY",
             });
           }
         }
       }
 
-      if (policyType === 'UMBRELLA' || policyType === 'PER_POLICY') {
+      if (policyType === "UMBRELLA" || policyType === "PER_POLICY") {
         if (contractor.brokerUmbrellaEmail) {
           const key = contractor.brokerUmbrellaEmail.toLowerCase();
           if (!brokersMap.has(key)) {
@@ -585,13 +594,13 @@ export class ContractorsService {
               email: contractor.brokerUmbrellaEmail,
               phone: contractor.brokerUmbrellaPhone,
               company: contractor.brokerCompany,
-              brokerType: 'PER_POLICY',
+              brokerType: "PER_POLICY",
             });
           }
         }
       }
 
-      if (policyType === 'WC' || policyType === 'PER_POLICY') {
+      if (policyType === "WC" || policyType === "PER_POLICY") {
         if (contractor.brokerWcEmail) {
           const key = contractor.brokerWcEmail.toLowerCase();
           if (!brokersMap.has(key)) {
@@ -601,7 +610,7 @@ export class ContractorsService {
               email: contractor.brokerWcEmail,
               phone: contractor.brokerWcPhone,
               company: contractor.brokerCompany,
-              brokerType: 'PER_POLICY',
+              brokerType: "PER_POLICY",
             });
           }
         }
@@ -610,7 +619,7 @@ export class ContractorsService {
 
     // Convert map to array and limit results
     const brokers = Array.from(brokersMap.values())
-      .filter(broker => broker.name && broker.email) // Only valid brokers
+      .filter((broker) => broker.name && broker.email) // Only valid brokers
       .slice(0, limit);
 
     return { brokers };

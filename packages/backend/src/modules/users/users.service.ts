@@ -1,8 +1,12 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { PrismaService } from '../../config/prisma.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from "@nestjs/common";
+import * as bcrypt from "bcrypt";
+import { PrismaService } from "../../config/prisma.service";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
 
 @Injectable()
 export class UsersService {
@@ -14,7 +18,7 @@ export class UsersService {
     });
 
     if (existingUser) {
-      throw new ConflictException('User with this email already exists');
+      throw new ConflictException("User with this email already exists");
     }
 
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
@@ -26,7 +30,8 @@ export class UsersService {
       },
     });
 
-    const { password, ...result } = user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: __, ...result } = user;
     return result;
   }
 
@@ -116,6 +121,6 @@ export class UsersService {
       where: { id },
     });
 
-    return { message: 'User deleted successfully' };
+    return { message: "User deleted successfully" };
   }
 }

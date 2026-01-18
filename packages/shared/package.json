@@ -9,7 +9,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "lint": "echo 'No linting configured for shared package'",
+    "lint": "eslint \"src/**/*.ts\" --fix",
     "clean": "rm -rf dist"
   },
   "dependencies": {
