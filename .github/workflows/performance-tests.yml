@@ -87,7 +87,7 @@ jobs:
           cd packages/backend
           NODE_ENV=production pnpm start:prod &
           echo $! > backend.pid
-          timeout 60 bash -c 'until curl -f http://localhost:3001/health; do sleep 2; done'
+          timeout 60 bash -c 'until curl -f http://localhost:3001/api/health; do sleep 2; done'
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/compliant_perf_test
           REDIS_URL: redis://localhost:6379
@@ -128,7 +128,7 @@ jobs:
           
           export default function () {
             // Test health endpoint
-            let healthRes = http.get(`${BASE_URL}/health`);
+            let healthRes = http.get(`${BASE_URL}/api/health`);
             let healthCheck = check(healthRes, {
               'health check status is 200': (r) => r.status === 200,
               'health check response time < 200ms': (r) => r.timings.duration < 200,
@@ -169,7 +169,7 @@ jobs:
           {
             "ci": {
               "collect": {
-                "url": ["http://localhost:3001/health"],
+                "url": ["http://localhost:3001/api/health"],
                 "numberOfRuns": 3
               },
               "assert": {
