@@ -25,7 +25,7 @@ export enum AuditResource {
 }
 
 export interface AuditLogData {
-  userId: string;
+  userId?: string;
   action: AuditAction;
   resource: AuditResource;
   resourceId?: string;
@@ -74,13 +74,13 @@ export class AuditService {
       // Store in database
       await this.prisma.auditLog.create({
         data: {
-          userId: data.userId,
+          userId: data.userId ?? null,
           action: data.action,
           resource: data.resource,
-          resourceId: data.resourceId,
-          changes: data.changes || {},
-          metadata: sanitizedMetadata || {},
-          ipAddress: data.ipAddress,
+          resourceId: data.resourceId ?? null,
+          changes: data.changes ?? {},
+          metadata: sanitizedMetadata ?? {},
+          ipAddress: data.ipAddress ?? null,
           userAgent: data.userAgent ? data.userAgent.substring(0, 200) : null,
         },
       });

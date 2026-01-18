@@ -69,13 +69,13 @@ export class AuditService {
   async log(entry: Omit<AuditLogEntry, "timestamp">): Promise<void> {
     try {
       const auditLog = {
-        userId: entry.userId || null,
+        userId: entry.userId ?? null,
         action: entry.action,
         resourceType: entry.resourceType,
-        resourceId: entry.resourceId || null,
+        resourceId: entry.resourceId ?? null,
         details: entry.details ? JSON.stringify(entry.details) : null,
-        ipAddress: entry.ipAddress || null,
-        userAgent: entry.userAgent || null,
+        ipAddress: entry.ipAddress ?? null,
+        userAgent: entry.userAgent ?? null,
         timestamp: new Date(),
       };
 
@@ -86,7 +86,7 @@ export class AuditService {
           action: auditLog.action,
           resource: auditLog.resourceType,
           resourceId: auditLog.resourceId,
-          changes: auditLog.details || undefined,
+          changes: auditLog.details ?? undefined,
           ipAddress: auditLog.ipAddress,
           userAgent: auditLog.userAgent,
           timestamp: auditLog.timestamp,
@@ -201,7 +201,7 @@ export class AuditService {
           lte: filter.endDate,
         },
       },
-      take: filter.limit || 100,
+      take: filter.limit ?? 100,
       orderBy: { timestamp: "desc" },
     });
 
