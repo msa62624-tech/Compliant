@@ -38,12 +38,12 @@ export class HealthController {
       // Memory RSS check (should not exceed 500MB)
       () => this.memory.checkRSS("memory_rss", 500 * 1024 * 1024),
 
-      // Disk health check (should not exceed 90% usage, i.e., at least 10% free space)
-      // Note: Using 90% threshold (0.9) as CI runners often have 60-80% usage
+      // Disk health check (should not exceed 50% usage, i.e., at least 50% free space)
+      // Note: Using 50% threshold (0.5) to provide early warning before disk space becomes critical
       () =>
         this.disk.checkStorage("disk", {
           path: "/",
-          thresholdPercent: 0.9,
+          thresholdPercent: 0.5,
         }),
     ]);
   }
