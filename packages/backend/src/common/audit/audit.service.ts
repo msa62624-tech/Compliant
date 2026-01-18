@@ -207,7 +207,7 @@ export class AuditService {
 
     // Map database records to AuditLogEntry format
     return logs.map((log) => ({
-      userId: log.userId,
+      userId: log.userId || undefined,
       action: log.action as AuditAction,
       resourceType: log.resource as AuditResourceType,
       resourceId: log.resourceId || undefined,
