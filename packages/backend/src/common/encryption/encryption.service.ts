@@ -74,7 +74,9 @@ export class EncryptionService {
       const iv = randomBytes(16);
 
       // Create cipher
-      const cipher = createCipheriv(this.algorithm, this.encryptionKey, iv);
+      const cipher = createCipheriv(this.algorithm, this.encryptionKey, iv, {
+        authTagLength: 16, // 128 bits - standard GCM auth tag length
+      });
 
       // Encrypt the data
       let encrypted = cipher.update(plaintext, "utf8", "hex");
