@@ -75,7 +75,7 @@ jobs:
       - name: Run migrations and seed
         run: |
           cd packages/backend
-          pnpm prisma migrate deploy
+          pnpm prisma db push
           pnpm db:seed || echo "Seed script not available"
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/compliant_perf_test
