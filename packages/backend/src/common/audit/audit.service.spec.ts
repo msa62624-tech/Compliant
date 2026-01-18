@@ -13,7 +13,10 @@ describe('AuditService', () => {
         {
           provide: PrismaService,
           useValue: {
-            // Mock PrismaService
+            auditLog: {
+              create: jest.fn(),
+              findMany: jest.fn(),
+            },
           },
         },
       ],
@@ -28,8 +31,9 @@ describe('AuditService', () => {
   });
 
   describe('log', () => {
-    it('should log an audit entry', async () => {
+    it('should log an audit entry to database', async () => {
       const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+      const createSpy = jest.spyOn(prismaService.auditLog, 'create').mockResolvedValue({} as any);
 
       await service.log({
         userId: 'user-123',
@@ -39,15 +43,21 @@ describe('AuditService', () => {
         details: { name: 'Test Contractor' },
       });
 
+      expect(createSpy).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          userId: 'user-123',
+          action: AuditAction.CREATE,
+          resource: AuditResourceType.CONTRACTOR,
+          resourceId: 'contractor-456',
+        }),
+      });
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
 
     it('should handle errors gracefully', async () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {
-        throw new Error('Test error');
-      });
+      const createSpy = jest.spyOn(prismaService.auditLog, 'create').mockRejectedValue(new Error('Test error'));
 
       await service.log({
         userId: 'user-123',
@@ -56,7 +66,6 @@ describe('AuditService', () => {
       });
 
       expect(consoleErrorSpy).toHaveBeenCalled();
-      consoleSpy.mockRestore();
       consoleErrorSpy.mockRestore();
     });
   });
@@ -153,8 +162,23 @@ describe('AuditService', () => {
   });
 
   describe('queryLogs', () => {
-    it('should query audit logs with filters', async () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+    it('should query audit logs with filters from database', async () => {
+      const mockLogs = [
+        {
+          id: '1',
+          userId: 'user-123',
+          action: AuditAction.CREATE,
+          resource: AuditResourceType.CONTRACTOR,
+          resourceId: 'contractor-456',
+          changes: { name: 'Test Contractor' },
+          metadata: null,
+          ipAddress: '127.0.0.1',
+          userAgent: 'Test Agent',
+          timestamp: new Date('2026-01-15'),
+        },
+      ];
+      
+      const findManySpy = jest.spyOn(prismaService.auditLog, 'findMany').mockResolvedValue(mockLogs as any);
 
       const result = await service.queryLogs({
         userId: 'user-123',
@@ -163,14 +187,28 @@ describe('AuditService', () => {
         endDate: new Date('2026-12-31'),
       });
 
-      expect(result).toEqual([]);
-      expect(consoleSpy).toHaveBeenCalled();
-      consoleSpy.mockRestore();
+      expect(findManySpy).toHaveBeenCalledWith({
+        where: {
+          userId: 'user-123',
+          action: AuditAction.CREATE,
+          resource: undefined,
+          timestamp: {
+            gte: new Date('2026-01-01'),
+            lte: new Date('2026-12-31'),
+          },
+        },
+        take: 100,
+        orderBy: { timestamp: 'desc' },
+      });
+      expect(result).toHaveLength(1);
+      expect(result[0].userId).toBe('user-123');
     });
   });
 
   describe('exportLogs', () => {
     it('should export logs in JSON format', async () => {
+      jest.spyOn(prismaService.auditLog, 'findMany').mockResolvedValue([]);
+
       const result = await service.exportLogs({
         startDate: new Date('2026-01-01'),
         endDate: new Date('2026-12-31'),
@@ -181,6 +219,8 @@ describe('AuditService', () => {
     });
 
     it('should export logs in CSV format', async () => {
+      jest.spyOn(prismaService.auditLog, 'findMany').mockResolvedValue([]);
+
       const result = await service.exportLogs({
         startDate: new Date('2026-01-01'),
         endDate: new Date('2026-12-31'),

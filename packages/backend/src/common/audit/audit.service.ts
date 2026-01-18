@@ -79,12 +79,25 @@ export class AuditService {
         timestamp: new Date(),
       };
 
-      // Store in database if audit log table exists
-      // Otherwise, log to console for development
-      console.log('[AUDIT]', JSON.stringify(auditLog, null, 2));
+      // Only log to database if userId is provided (required field in schema)
+      if (entry.userId) {
+        // Store in database
+        await this.prisma.auditLog.create({
+          data: {
+            userId: entry.userId,
+            action: auditLog.action,
+            resource: auditLog.resourceType,
+            resourceId: auditLog.resourceId,
+            changes: auditLog.details || undefined,
+            ipAddress: auditLog.ipAddress,
+            userAgent: auditLog.userAgent,
+            timestamp: auditLog.timestamp,
+          },
+        });
+      }
 
-      // In production, you would:
-      // await this.prisma.auditLog.create({ data: auditLog });
+      // Also log to console for development/debugging
+      console.log('[AUDIT]', JSON.stringify(auditLog, null, 2));
     } catch (error) {
       // Don't throw errors from audit logging to avoid disrupting main operations
       console.error('[AUDIT ERROR]', error);
@@ -181,23 +194,31 @@ export class AuditService {
     endDate?: Date;
     limit?: number;
   }): Promise<AuditLogEntry[]> {
-    // In production, implement database query:
-    // return await this.prisma.auditLog.findMany({
-    //   where: {
-    //     userId: filter.userId,
-    //     action: filter.action,
-    //     resourceType: filter.resourceType,
-    //     timestamp: {
-    //       gte: filter.startDate,
-    //       lte: filter.endDate,
-    //     },
-    //   },
-    //   take: filter.limit || 100,
-    //   orderBy: { timestamp: 'desc' },
-    // });
+    const logs = await this.prisma.auditLog.findMany({
+      where: {
+        userId: filter.userId,
+        action: filter.action,
+        resource: filter.resourceType,
+        timestamp: {
+          gte: filter.startDate,
+          lte: filter.endDate,
+        },
+      },
+      take: filter.limit || 100,
+      orderBy: { timestamp: 'desc' },
+    });
 
-    console.log('[AUDIT QUERY]', filter);
-    return [];
+    // Map database records to AuditLogEntry format
+    return logs.map((log) => ({
+      userId: log.userId,
+      action: log.action as AuditAction,
+      resourceType: log.resource as AuditResourceType,
+      resourceId: log.resourceId || undefined,
+      details: log.changes as Record<string, any>,
+      ipAddress: log.ipAddress || undefined,
+      userAgent: log.userAgent || undefined,
+      timestamp: log.timestamp,
+    }));
   }
 
   /**
