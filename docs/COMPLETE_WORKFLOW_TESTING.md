@@ -384,12 +384,11 @@ Update broker contact information.
   "brokerGlName": "John Smith",
   "brokerGlEmail": "john@insurance.com",
   "brokerGlPhone": "(555) 100-0001",
-  "brokerGlCompany": "Insurance Pro LLC",
+  "brokerCompany": "Insurance Pro LLC",
   
   "brokerAutoName": "Jane Doe",
   "brokerAutoEmail": "jane@insurance.com",
   "brokerAutoPhone": "(555) 100-0002",
-  "brokerAutoCompany": "Insurance Pro LLC",
   
   "brokerUmbrellaName": "Bob Johnson",
   "brokerUmbrellaEmail": "bob@insurance.com",
