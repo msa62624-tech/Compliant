@@ -10,32 +10,15 @@ interface Subcontractor {
   company: string;
   email: string;
   projects: Array<{ id: string; name: string; gcName: string }>;
-  hasFirstCOI: boolean;
+  needsCOI: boolean;
+  coiStatus: 'pending' | 'uploaded' | 'approved' | 'deficient';
 }
 
-interface PolicyUpload {
-  file: File | null;
-  expirationDate: string;
-  uploaded: boolean;
-}
-
-export default function BrokerUploadPage() {
+export default function BrokerUploadListPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [subcontractors, setSubcontractors] = useState<Subcontractor[]>([]);
-  const [selectedSubId, setSelectedSubId] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  
-  const [policies, setPolicies] = useState({
-    generalLiability: { file: null, expirationDate: '', uploaded: false } as PolicyUpload,
-    autoLiability: { file: null, expirationDate: '', uploaded: false } as PolicyUpload,
-    umbrella: { file: null, expirationDate: '', uploaded: false } as PolicyUpload,
-    workersComp: { file: null, expirationDate: '', uploaded: false } as PolicyUpload,
-  });
-
-  const [coiDocument, setCoiDocument] = useState<File | null>(null);
-  const [holdHarmless, setHoldHarmless] = useState<File | null>(null);
 
   useEffect(() => {
     fetchSubcontractors();
@@ -48,8 +31,31 @@ export default function BrokerUploadPage() {
       // const response = await apiClient.get('/api/broker/subcontractors');
       // setSubcontractors(response.data);
       
-      // Mock data
-      setSubcontractors([]);
+      // Mock data - subcontractors that need COI uploads
+      setSubcontractors([
+        {
+          id: '1',
+          name: 'John Smith',
+          company: 'Smith Electric Co.',
+          email: 'john@smithelectric.com',
+          projects: [
+            { id: '1', name: 'Downtown Office Tower', gcName: 'ABC Construction' }
+          ],
+          needsCOI: true,
+          coiStatus: 'pending'
+        },
+        {
+          id: '2',
+          name: 'Maria Garcia',
+          company: 'Garcia Plumbing Services',
+          email: 'maria@garciaplumbing.com',
+          projects: [
+            { id: '2', name: 'Riverside Apartments', gcName: 'XYZ Builders' }
+          ],
+          needsCOI: true,
+          coiStatus: 'deficient'
+        }
+      ]);
     } catch (error) {
       console.error('Failed to fetch subcontractors:', error);
     } finally {
@@ -57,82 +63,25 @@ export default function BrokerUploadPage() {
     }
   };
 
-  const handleFileChange = (
-    policyType: keyof typeof policies,
-    file: File | null
-  ) => {
-    setPolicies({
-      ...policies,
-      [policyType]: { ...policies[policyType], file, uploaded: false },
-    });
+  const getStatusBadge = (status: string) => {
+    const styles = {
+      pending: 'bg-yellow-100 text-yellow-800',
+      uploaded: 'bg-blue-100 text-blue-800',
+      approved: 'bg-green-100 text-green-800',
+      deficient: 'bg-red-100 text-red-800'
+    };
+    const labels = {
+      pending: 'Pending Upload',
+      uploaded: 'Under Review',
+      approved: 'Approved',
+      deficient: 'Needs Correction'
+    };
+    return (
+      <span className={`px-3 py-1 rounded-full text-xs font-medium ${styles[status as keyof typeof styles]}`}>
+        {labels[status as keyof typeof labels]}
+      </span>
+    );
   };
-
-  const handleExpirationChange = (
-    policyType: keyof typeof policies,
-    date: string
-  ) => {
-    setPolicies({
-      ...policies,
-      [policyType]: { ...policies[policyType], expirationDate: date },
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!selectedSubId) {
-      alert('Please select a subcontractor');
-      return;
-    }
-
-    if (!coiDocument) {
-      alert('Please upload the COI document');
-      return;
-    }
-
-    // Check if all required policies are uploaded
-    const requiredPolicies = Object.entries(policies);
-    const missingPolicies = requiredPolicies.filter(([_, policy]) => !policy.file || !policy.expirationDate);
-    
-    if (missingPolicies.length > 0) {
-      alert('Please upload all required policy documents with expiration dates');
-      return;
-    }
-
-    setUploading(true);
-
-    try {
-      const formData = new FormData();
-      formData.append('subcontractorId', selectedSubId);
-      formData.append('coiDocument', coiDocument);
-      if (holdHarmless) {
-        formData.append('holdHarmless', holdHarmless);
-      }
-
-      // Append policy files and expiration dates
-      Object.entries(policies).forEach(([type, policy]) => {
-        if (policy.file) {
-          formData.append(`${type}File`, policy.file);
-          formData.append(`${type}Expiration`, policy.expirationDate);
-        }
-      });
-
-      // TODO: Implement API call to upload documents
-      // const response = await apiClient.post('/api/broker/upload-first-coi', formData, {
-      //   headers: { 'Content-Type': 'multipart/form-data' },
-      // });
-
-      alert('Documents uploaded successfully! Email notifications sent to GC, Subcontractor, and Admin.');
-      router.push('/dashboard');
-    } catch (error) {
-      console.error('Failed to upload documents:', error);
-      alert('Failed to upload documents. Please try again.');
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const selectedSub = subcontractors.find((s) => s.id === selectedSubId);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -140,7 +89,7 @@ export default function BrokerUploadPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">Upload First-Time COI</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Upload COI Documents</h1>
             </div>
             <div className="flex items-center gap-4">
               <button
@@ -154,260 +103,107 @@ export default function BrokerUploadPage() {
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">First-Time COI Upload</h2>
-              <p className="text-gray-600">
-                Upload all required insurance policies and COI document for a new subcontractor. This is for subcontractors who don't have existing insurance on file.
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">Subcontractors Requiring COI Upload</h2>
+              <p className="mt-1 text-sm text-gray-600">
+                Click on a subcontractor to upload their ACORD 25 (Certificate of Insurance) and policy documents.
               </p>
             </div>
 
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-blue-700">
-                    📧 After uploading, email notifications will be sent to the GC, Subcontractor, and Admin for review and approval.
+            {loading ? (
+              <div className="p-12 text-center">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+                <p className="mt-4 text-gray-600">Loading subcontractors...</p>
+              </div>
+            ) : subcontractors.length === 0 ? (
+              <div className="p-12 text-center">
+                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p className="mt-4 text-gray-600">No subcontractors requiring COI uploads at this time.</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-200">
+                {subcontractors.map((sub) => (
+                  <div
+                    key={sub.id}
+                    className="p-6 hover:bg-gray-50 transition cursor-pointer"
+                    onClick={() => router.push(`/broker/upload/${sub.id}`)}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="text-lg font-semibold text-gray-900">{sub.name}</h3>
+                          {getStatusBadge(sub.coiStatus)}
+                        </div>
+                        <p className="text-sm text-gray-600 mb-1">
+                          <span className="font-medium">Company:</span> {sub.company}
+                        </p>
+                        <p className="text-sm text-gray-600 mb-2">
+                          <span className="font-medium">Email:</span> {sub.email}
+                        </p>
+                        
+                        {sub.projects.length > 0 && (
+                          <div className="mt-2">
+                            <p className="text-xs font-medium text-gray-500 mb-1">Projects:</p>
+                            <div className="flex flex-wrap gap-2">
+                              {sub.projects.map((project) => (
+                                <span key={project.id} className="inline-flex items-center px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">
+                                  {project.name} (GC: {project.gcName})
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="ml-4">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/broker/upload/${sub.id}`);
+                          }}
+                          className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition text-sm font-medium"
+                        >
+                          {sub.coiStatus === 'deficient' ? 'Correct & Resubmit' : 'Upload COI'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Info Box */}
+          <div className="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-blue-800">About COI Uploads</h3>
+                <div className="mt-2 text-sm text-blue-700">
+                  <p>
+                    • Click on any subcontractor to access their specific upload page
+                  </p>
+                  <p className="mt-1">
+                    • Each link is unique to the subcontractor - no need to select from a dropdown
+                  </p>
+                  <p className="mt-1">
+                    • Upload ACORD 25 form and all required policy documents (GL, Auto, Umbrella, WC)
+                  </p>
+                  <p className="mt-1">
+                    • Email notifications will be sent automatically after upload
                   </p>
                 </div>
               </div>
             </div>
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Subcontractor Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Subcontractor <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={selectedSubId}
-                  onChange={(e) => setSelectedSubId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  required
-                >
-                  <option value="">Choose a subcontractor...</option>
-                  {subcontractors
-                    .filter((sub) => !sub.hasFirstCOI)
-                    .map((sub) => (
-                      <option key={sub.id} value={sub.id}>
-                        {sub.name} - {sub.company}
-                      </option>
-                    ))}
-                </select>
-                {subcontractors.filter((sub) => !sub.hasFirstCOI).length === 0 && (
-                  <p className="text-sm text-gray-500 mt-2">
-                    No subcontractors pending first-time COI upload.
-                  </p>
-                )}
-              </div>
-
-              {/* Show selected subcontractor details */}
-              {selectedSub && (
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-gray-900 mb-2">Subcontractor Details</h3>
-                  <p className="text-sm text-gray-600">Email: {selectedSub.email}</p>
-                  <p className="text-sm text-gray-600 mt-1">Projects:</p>
-                  <ul className="ml-4 mt-1">
-                    {selectedSub.projects.map((project) => (
-                      <li key={project.id} className="text-sm text-gray-600">
-                        • {project.name} (GC: {project.gcName})
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {selectedSubId && (
-                <>
-                  {/* COI Document */}
-                  <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                      Certificate of Insurance (COI) <span className="text-red-500">*</span>
-                    </h3>
-                    <input
-                      type="file"
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      onChange={(e) => setCoiDocument(e.target.files?.[0] || null)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      required
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Upload the master COI document (PDF, JPG, or PNG)
-                    </p>
-                  </div>
-
-                  {/* Hold Harmless Agreement */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                      Hold Harmless Agreement (Optional)
-                    </h3>
-                    <input
-                      type="file"
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      onChange={(e) => setHoldHarmless(e.target.files?.[0] || null)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Optional: Upload hold harmless agreement if required
-                    </p>
-                  </div>
-
-                  {/* Individual Policies */}
-                  <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Individual Policy Documents</h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Upload individual policy documents for each coverage type.
-                    </p>
-
-                    {/* General Liability */}
-                    <div className="mb-6">
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        General Liability (GL) <span className="text-red-500">*</span>
-                      </label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-xs text-gray-600 mb-1">Policy Document</label>
-                          <input
-                            type="file"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFileChange('generalLiability', e.target.files?.[0] || null)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs text-gray-600 mb-1">Expiration Date</label>
-                          <input
-                            type="date"
-                            value={policies.generalLiability.expirationDate}
-                            onChange={(e) => handleExpirationChange('generalLiability', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Auto Liability */}
-                    <div className="mb-6">
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Auto Liability <span className="text-red-500">*</span>
-                      </label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-xs text-gray-600 mb-1">Policy Document</label>
-                          <input
-                            type="file"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFileChange('autoLiability', e.target.files?.[0] || null)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs text-gray-600 mb-1">Expiration Date</label>
-                          <input
-                            type="date"
-                            value={policies.autoLiability.expirationDate}
-                            onChange={(e) => handleExpirationChange('autoLiability', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Umbrella Policy */}
-                    <div className="mb-6">
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Umbrella Policy <span className="text-red-500">*</span>
-                      </label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-xs text-gray-600 mb-1">Policy Document</label>
-                          <input
-                            type="file"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFileChange('umbrella', e.target.files?.[0] || null)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs text-gray-600 mb-1">Expiration Date</label>
-                          <input
-                            type="date"
-                            value={policies.umbrella.expirationDate}
-                            onChange={(e) => handleExpirationChange('umbrella', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Workers Compensation */}
-                    <div className="mb-6">
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Workers Compensation (WC) <span className="text-red-500">*</span>
-                      </label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-xs text-gray-600 mb-1">Policy Document</label>
-                          <input
-                            type="file"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFileChange('workersComp', e.target.files?.[0] || null)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs text-gray-600 mb-1">Expiration Date</label>
-                          <input
-                            type="date"
-                            value={policies.workersComp.expirationDate}
-                            onChange={(e) => handleExpirationChange('workersComp', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end gap-4 pt-4 border-t">
-                    <button
-                      type="button"
-                      onClick={() => router.push('/dashboard')}
-                      className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={uploading}
-                      className="px-6 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition disabled:opacity-50 flex items-center gap-2"
-                    >
-                      {uploading ? (
-                        <>
-                          <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          Uploading...
-                        </>
-                      ) : (
-                        'Upload All Documents'
-                      )}
-                    </button>
-                  </div>
-                </>
-              )}
-            </form>
           </div>
         </div>
       </main>
