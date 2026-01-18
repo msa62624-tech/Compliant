@@ -79,22 +79,19 @@ export class AuditService {
         timestamp: new Date(),
       };
 
-      // Only log to database if userId is provided (required field in schema)
-      if (entry.userId) {
-        // Store in database
-        await this.prisma.auditLog.create({
-          data: {
-            userId: entry.userId,
-            action: auditLog.action,
-            resource: auditLog.resourceType,
-            resourceId: auditLog.resourceId,
-            changes: auditLog.details || undefined,
-            ipAddress: auditLog.ipAddress,
-            userAgent: auditLog.userAgent,
-            timestamp: auditLog.timestamp,
-          },
-        });
-      }
+      // Store in database (supports both authenticated and anonymous events)
+      await this.prisma.auditLog.create({
+        data: {
+          userId: auditLog.userId,
+          action: auditLog.action,
+          resource: auditLog.resourceType,
+          resourceId: auditLog.resourceId,
+          changes: auditLog.details || undefined,
+          ipAddress: auditLog.ipAddress,
+          userAgent: auditLog.userAgent,
+          timestamp: auditLog.timestamp,
+        },
+      });
 
       // Also log to console for development/debugging
       console.log('[AUDIT]', JSON.stringify(auditLog, null, 2));

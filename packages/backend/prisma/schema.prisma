@@ -343,8 +343,8 @@ enum DocumentStatus {
 // Audit Log Model for security and compliance tracking
 model AuditLog {
   id         String   @id @default(uuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   action     String // CREATE, UPDATE, DELETE, LOGIN, LOGOUT, VIEW, etc.
   resource   String // USER, CONTRACTOR, PROJECT, INSURANCE_DOCUMENT, etc.
   resourceId String? // ID of the affected resource
