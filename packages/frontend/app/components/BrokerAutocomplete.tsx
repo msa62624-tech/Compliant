@@ -54,7 +54,7 @@ export default function BrokerAutocomplete({
       setLoading(true);
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/contractors/search-brokers?q=${encodeURIComponent(value)}&policyType=${policyType}&limit=10`,
+          `${process.env.NEXT_PUBLIC_API_URL}/contractors/search-brokers/all?q=${encodeURIComponent(value)}&policyType=${policyType}&limit=10`,
           {
             headers: {
               'X-API-Version': '1',
