@@ -197,28 +197,15 @@ export class GeneratedCOIService {
           autoExpirationDate: firstCOI.autoExpirationDate,
           wcExpirationDate: firstCOI.wcExpirationDate,
           
-          // COPY FROM FIRST ACORD 25: Coverage amounts and limits
-          glMinimum: firstCOI.glMinimum,
-          glPerOccurrence: firstCOI.glPerOccurrence,
-          glAggregate: firstCOI.glAggregate,
-          autoMinimum: firstCOI.autoMinimum,
-          wcMinimum: firstCOI.wcMinimum,
-          umbrellaMinimum: firstCOI.umbrellaMinimum,
-          
-          // COPY FROM FIRST ACORD 25: Other policy details
+          // COPY FROM FIRST ACORD 25: GC details
           gcName: firstCOI.gcName,
-          gcEmail: firstCOI.gcEmail,
-          gcPhone: firstCOI.gcPhone,
           
-          // NEW FOR THIS PROJECT: Additional Insureds (GC + Owner + Entities)
-          additionalInsureds: uniqueAdditionalInsureds,
-          
-          // NEW FOR THIS PROJECT: Project Location
-          projectAddress: newProject.address,
+          // NEW FOR THIS PROJECT: Project name (location in description)
           projectName: newProject.name,
+          subcontractorName: firstCOI.subcontractorName,
           
           // Notes about the copy
-          deficiencyNotes: `ACORD 25 auto-generated from first ACORD (ID: ${firstCOI.id}) with updated additional insureds and project location.`,
+          deficiencyNotes: `ACORD 25 auto-generated from first ACORD (ID: ${firstCOI.id}) for new project.`,
         },
         include: {
           project: true,
@@ -238,13 +225,9 @@ export class GeneratedCOIService {
         assignedAdminEmail: createCOIDto.assignedAdminEmail,
         status: COIStatus.AWAITING_BROKER_INFO,
         
-        // Set initial additional insureds and project location for first ACORD
-        additionalInsureds: uniqueAdditionalInsureds,
-        projectAddress: newProject.address,
+        // Set initial project info for first ACORD
         projectName: newProject.name,
         gcName: newProject.gcName,
-        gcEmail: newProject.contactEmail,
-        gcPhone: newProject.contactPhone,
       },
       include: {
         project: true,
