@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '../../../../lib/auth/AuthContext';
+import { ErrorMessage, LoadingSpinner } from '../../../../components/ErrorMessage';
 
 interface Subcontractor {
   id: string;
@@ -142,27 +143,18 @@ export default function BrokerUploadSubPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
-          <p className="mt-4 text-gray-600">Loading subcontractor information...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading subcontractor information..." />;
   }
 
   if (!subcontractor) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600">Subcontractor not found</p>
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
-          >
-            Back to Dashboard
-          </button>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="max-w-md w-full">
+          <ErrorMessage
+            message="Subcontractor not found. The subcontractor may have been deleted or the ID is incorrect."
+            statusCode={404}
+            onRetry={fetchSubcontractor}
+          />
         </div>
       </div>
     );

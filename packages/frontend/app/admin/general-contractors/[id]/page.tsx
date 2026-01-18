@@ -4,6 +4,8 @@ import { useAuth } from '../../../../lib/auth/AuthContext';
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import apiClient from '../../../../lib/api/client';
+import { ErrorMessage, LoadingSpinner } from '../../../../components/ErrorMessage';
+import { AxiosError } from 'axios';
 
 interface Contractor {
   id: string;
@@ -37,6 +39,7 @@ export default function ContractorDetailPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorStatusCode, setErrorStatusCode] = useState<number | undefined>();
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -54,10 +57,24 @@ export default function ContractorDetailPage() {
   const fetchContractorDetails = async () => {
     try {
       setIsLoading(true);
+      setError(null);
+      setErrorStatusCode(undefined);
       const response = await apiClient.get(`/contractors/${contractorId}`);
       setContractor(response.data);
     } catch (err) {
-      setError('Error connecting to server');
+      const axiosError = err as AxiosError;
+      const status = axiosError.response?.status;
+      setErrorStatusCode(status);
+      
+      if (status === 404) {
+        setError('Contractor not found. It may have been deleted or the ID is incorrect.');
+      } else if (status === 403) {
+        setError('You do not have permission to view this contractor.');
+      } else if (status && status >= 500) {
+        setError('Server error occurred. Please try again later.');
+      } else {
+        setError('Error connecting to server. Please check your connection.');
+      }
       console.error('Error fetching contractor:', err);
     } finally {
       setIsLoading(false);
@@ -73,15 +90,12 @@ export default function ContractorDetailPage() {
     }
   };
 
-  if (loading || !isAuthenticated || isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
+  if (loading || !isAuthenticated) {
+    return <LoadingSpinner message="Authenticating..." />;
+  }
+
+  if (isLoading) {
+    return <LoadingSpinner message="Loading contractor details..." />;
   }
 
   if (error || !contractor) {
@@ -102,9 +116,13 @@ export default function ContractorDetailPage() {
           </div>
         </nav>
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          <div className="bg-red-50 border-l-4 border-red-400 p-4">
-            <p className="text-sm text-red-700">{error || 'Contractor not found'}</p>
-          </div>
+          <ErrorMessage
+            message={error || 'Contractor not found'}
+            statusCode={errorStatusCode}
+            onRetry={fetchContractorDetails}
+            showBackButton={false}
+            showDashboardLink={false}
+          />
         </main>
       </div>
     );

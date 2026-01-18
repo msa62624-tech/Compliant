@@ -4,6 +4,8 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import apiClient from '../../../lib/api/client';
+import { ErrorMessage, LoadingSpinner } from '../../../components/ErrorMessage';
+import { AxiosError } from 'axios';
 
 interface Contractor {
   id: string;
@@ -22,6 +24,7 @@ export default function GeneralContractorsPage() {
   const [contractors, setContractors] = useState<Contractor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorStatusCode, setErrorStatusCode] = useState<number | undefined>();
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -38,10 +41,22 @@ export default function GeneralContractorsPage() {
   const fetchContractors = async () => {
     try {
       setIsLoading(true);
+      setError(null);
+      setErrorStatusCode(undefined);
       const response = await apiClient.get('/contractors');
       setContractors(response.data);
     } catch (err) {
-      setError('Error connecting to server');
+      const axiosError = err as AxiosError;
+      const status = axiosError.response?.status;
+      setErrorStatusCode(status);
+      
+      if (status === 403) {
+        setError('You do not have permission to view contractors.');
+      } else if (status && status >= 500) {
+        setError('Server error occurred. Please try again later.');
+      } else {
+        setError('Error connecting to server. Please check your connection.');
+      }
       console.error('Error fetching contractors:', err);
     } finally {
       setIsLoading(false);
@@ -49,14 +64,7 @@ export default function GeneralContractorsPage() {
   };
 
   if (loading || !isAuthenticated) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Authenticating..." />;
   }
 
   const getStatusColor = (status: string) => {
@@ -126,19 +134,17 @@ export default function GeneralContractorsPage() {
           </div>
 
           {error && (
-            <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-              <div className="flex">
-                <div className="ml-3">
-                  <p className="text-sm text-red-700">{error}</p>
-                </div>
-              </div>
-            </div>
+            <ErrorMessage
+              message={error}
+              statusCode={errorStatusCode}
+              onRetry={fetchContractors}
+              showBackButton={false}
+              showDashboardLink={false}
+            />
           )}
 
           {isLoading ? (
-            <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            </div>
+            <LoadingSpinner message="Loading contractors..." />
           ) : contractors.length === 0 ? (
             <div className="bg-white rounded-lg shadow p-8 text-center">
               <p className="text-gray-500">No contractors found. Add your first contractor to get started.</p>
