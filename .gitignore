@@ -13,9 +13,12 @@ coverage
 
 # Test artifacts
 test-results/
-screenshots*/
 playwright-report/
 *.spec.ts.snap
+
+# Allow documentation screenshots but ignore test screenshots
+/tests/screenshots/
+/packages/*/screenshots/
 
 # Logs
 logs

@@ -38,7 +38,8 @@ export class HealthController {
       // Memory RSS check (should not exceed 500MB)
       () => this.memory.checkRSS("memory_rss", 500 * 1024 * 1024),
 
-      // Disk health check (should have at least 50% free space)
+      // Disk health check (should not exceed 50% usage, i.e., at least 50% free space)
+      // Note: Using 50% threshold (0.5) to provide early warning before disk space becomes critical
       () =>
         this.disk.checkStorage("disk", {
           path: "/",

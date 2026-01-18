@@ -152,6 +152,13 @@ pnpm lint       # Lint code
 - **Implementation Guidelines**: See [docs/IMPLEMENTATION_GUIDELINES.md](./docs/IMPLEMENTATION_GUIDELINES.md)
 - **Additional Documentation**: See [docs/](./docs/) directory for feature requirements and workflow details
 
+### Visual Documentation 📸
+- **Screenshot Documentation**: [SCREENSHOT_DOCUMENTATION.md](./docs/SCREENSHOT_DOCUMENTATION.md) - Complete visual guide to all 27 application pages
+- **Email Template Renders**: [EMAIL_TEMPLATE_RENDERS.md](./docs/EMAIL_TEMPLATE_RENDERS.md) - Visual documentation of all 6 email templates
+- **Visual Assets Summary**: [VISUAL_DOCUMENTATION_COMPLETE.md](./docs/VISUAL_DOCUMENTATION_COMPLETE.md) - Delivery summary and asset index
+- **Screenshots Directory**: `docs/screenshots/` - All application page screenshots
+- **Email Templates Directory**: `docs/email-templates/` - Email template HTML and visual renders
+
 ### Production Deployment 🚀
 - **Quick Start (30 min)**: [QUICK_START_PRODUCTION.md](./QUICK_START_PRODUCTION.md) - Fast production deployment
 - **Complete Guide**: [PRODUCTION_READINESS_GUIDE.md](./PRODUCTION_READINESS_GUIDE.md) - Comprehensive deployment documentation
@@ -161,6 +168,8 @@ pnpm lint       # Lint code
 ### Tools & Scripts
 - **Validate Config**: `node scripts/validate-production-env.js` - Verify environment variables
 - **Deployment Checklist**: `./scripts/production-deployment-checklist.sh` - Interactive deployment guide
+- **Capture Screenshots**: `pnpm capture:screenshots` - Automated screenshot capture for all pages
+- **Render Email Templates**: `pnpm render:emails` - Generate visual renders of email templates
 
 ### Business Logic Status
 - **Implementation Status**: [BUSINESS_LOGIC_STATUS.md](./BUSINESS_LOGIC_STATUS.md) - Current feature implementation status

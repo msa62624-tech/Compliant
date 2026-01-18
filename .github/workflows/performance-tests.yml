@@ -89,7 +89,7 @@ jobs:
           echo $! > backend.pid
           # Wait for backend using liveness probe
           echo "Waiting for backend to start..."
-          timeout 60 bash -c 'until curl -f http://localhost:3001/api/health/liveness 2>/dev/null; do sleep 2; done' || {
+          timeout 60 bash -c 'until curl -f -H "X-API-Version: 1" http://localhost:3001/api/health/liveness 2>/dev/null; do sleep 2; done' || {
             echo "Backend failed to start. Logs:"
             cat backend.log
             exit 1
@@ -202,11 +202,11 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             
             # Check thresholds using awk
-            if awk -v p95="$HTTP_REQ_DURATION_P95" 'BEGIN {exit (p95 > 500)}'; then
+            if awk -v p95="$HTTP_REQ_DURATION_P95" 'BEGIN {exit !(p95 > 500)}'; then
               echo "⚠️ **Warning**: 95th percentile response time exceeds 500ms" >> $GITHUB_STEP_SUMMARY
             fi
             
-            if awk -v rate="$HTTP_REQ_FAILED_RATE" 'BEGIN {exit (rate > 0.05)}'; then
+            if awk -v rate="$HTTP_REQ_FAILED_RATE" 'BEGIN {exit !(rate > 0.05)}'; then
               echo "❌ **Error**: Error rate exceeds 5%" >> $GITHUB_STEP_SUMMARY
             fi
           else

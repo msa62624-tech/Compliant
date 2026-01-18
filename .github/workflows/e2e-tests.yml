@@ -90,7 +90,7 @@ jobs:
           echo $! > backend.pid
           # Wait for backend to be ready (try liveness endpoint first, then readiness)
           echo "Waiting for backend to start..."
-          timeout 60 bash -c 'until curl -f http://localhost:3001/api/health/liveness 2>/dev/null; do 
+          timeout 60 bash -c 'until curl -f -H "X-API-Version: 1" http://localhost:3001/api/health/liveness 2>/dev/null; do 
             echo "Backend not ready yet, waiting..."; 
             sleep 2; 
           done' || {
@@ -278,7 +278,7 @@ jobs:
           
           # Wait for services (using correct API endpoints)
           echo "Waiting for backend to start..."
-          timeout 90 bash -c 'until curl -f http://localhost:3001/api/health/liveness 2>/dev/null; do sleep 2; done' || {
+          timeout 90 bash -c 'until curl -f -H "X-API-Version: 1" http://localhost:3001/api/health/liveness 2>/dev/null; do sleep 2; done' || {
             echo "Backend failed to start. Logs:"
             cat backend.log || echo "No logs available"
             kill $BACKEND_PID $FRONTEND_PID || true

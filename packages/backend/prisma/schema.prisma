@@ -243,21 +243,33 @@ model GeneratedCOI {
 
   // Policy documents
   glPolicyUrl       String?
+  glPolicyNumber    String?
   umbrellaPolicyUrl String?
+  umbrellaPolicyNumber String?
   autoPolicyUrl     String?
+  autoPolicyNumber  String?
   wcPolicyUrl       String?
+  wcPolicyNumber    String?
 
   // Broker signatures
   glBrokerSignatureUrl       String?
+  glBrokerSignedAt           DateTime?
   umbrellaBrokerSignatureUrl String?
+  umbrellaBrokerSignedAt     DateTime?
   autoBrokerSignatureUrl     String?
+  autoBrokerSignedAt         DateTime?
   wcBrokerSignatureUrl       String?
+  wcBrokerSignedAt           DateTime?
 
   // Policy details
   glExpirationDate       DateTime?
+  glCoverageLimits       String?
   umbrellaExpirationDate DateTime?
+  umbrellaCoverageLimits String?
   autoExpirationDate     DateTime?
+  autoCoverageLimits     String?
   wcExpirationDate       DateTime?
+  wcStatutoryLimits      String?
 
   // First COI tracking
   firstCOIUploaded Boolean @default(false)
@@ -273,6 +285,8 @@ model GeneratedCOI {
   assignedAdmin      User?   @relation("AssignedAdmin", fields: [assignedAdminEmail], references: [email], onDelete: SetNull)
   deficiencyNotes    String?
   rejectionReason    String?
+  reviewNotes        String?
+  reviewedAt         DateTime?
 
   // Timestamps
   uploadedForReviewDate   DateTime?

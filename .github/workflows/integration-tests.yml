@@ -103,11 +103,11 @@ jobs:
           
           # Wait for backend to start using liveness probe (simpler check)
           echo "Waiting for backend to start..."
-          timeout 60 bash -c 'until curl -f http://localhost:3001/api/health/liveness 2>/dev/null; do sleep 2; done'
+          timeout 60 bash -c 'until curl -f -H "X-API-Version: 1" http://localhost:3001/api/health/liveness 2>/dev/null; do sleep 2; done'
           
           # Test full health endpoint
           echo "Testing full health endpoint..."
-          curl -f http://localhost:3001/api/health || exit 1
+          curl -f -H "X-API-Version: 1" http://localhost:3001/api/health || exit 1
           
           # Cleanup
           kill $BACKEND_PID || true
