@@ -134,7 +134,6 @@ Our CI/CD pipeline automatically runs:
 
 - **Security Team**: security@yourdomain.com (update with your organization's security email)
 - **General Support**: support@yourdomain.com (update with your organization's support email)
-- **Documentation**: See [PRODUCTION_READINESS_GUIDE.md](./PRODUCTION_READINESS_GUIDE.md)
 
 ## Security Acknowledgments
 
@@ -146,8 +145,6 @@ We thank the following security researchers for responsibly disclosing vulnerabi
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [CWE Top 25](https://cwe.mitre.org/top25/)
 - [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
-- [Production Readiness Guide](./PRODUCTION_READINESS_GUIDE.md#security-hardening-verification)
-- [Security Improvements Documentation](./docs/SECURITY_IMPROVEMENTS.md)
 
 ---
 
