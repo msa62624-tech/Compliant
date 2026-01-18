@@ -376,10 +376,10 @@ categories.forEach(category => {
           results.errors.push(`${varConfig.name}: ${validationError}`);
         }
       } else {
-        // Mask sensitive values in output
-        const displayValue = value.length > 20 
-          ? `${value.substring(0, 8)}...${value.substring(value.length - 4)}`
-          : '*'.repeat(value.length);
+        // Mask sensitive values in output - use fixed pattern for security
+        const displayValue = value.length > 12 
+          ? `${value.substring(0, 4)}...${value.substring(value.length - 4)}`
+          : '****...****';
         console.log(`  ${colors.green}✓${colors.reset} ${varConfig.name}: ${colors.green}Valid${colors.reset} (${displayValue})`);
         results.passed.push(varConfig.name);
       }
@@ -424,7 +424,7 @@ if (results.errors.some(e => e.includes('JWT_SECRET') || e.includes('ENCRYPTION'
   console.log(`  Generate JWT secrets:`);
   console.log(`  ${colors.blue}echo "JWT_SECRET=$(openssl rand -base64 32)"${colors.reset}`);
   console.log(`  ${colors.blue}echo "JWT_REFRESH_SECRET=$(openssl rand -base64 32)"${colors.reset}`);
-  console.log(``);
+  console.log('');
   console.log(`  Generate encryption keys:`);
   console.log(`  ${colors.blue}echo "ENCRYPTION_KEY=$(openssl rand -base64 32)"${colors.reset}`);
   console.log(`  ${colors.blue}echo "ENCRYPTION_SALT=$(openssl rand -hex 16)"${colors.reset}`);
