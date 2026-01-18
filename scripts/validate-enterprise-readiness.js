@@ -158,9 +158,6 @@ class EnterpriseReadinessValidator {
       'SECURITY.md',
       'PRODUCTION_READINESS_GUIDE.md',
       'DEPLOYMENT_GUIDE.md',
-      'MONITORING_OBSERVABILITY_COMPLETE.md',
-      'BUILD_TESTING_COMPLETE.md',
-      'CICD_AUTOMATION_COMPLETE.md',
       'BUSINESS_LOGIC_STATUS.md',
       'QUICK_START_PRODUCTION.md',
       'ENTERPRISE_READINESS_ASSESSMENT.md',
@@ -260,7 +257,6 @@ class EnterpriseReadinessValidator {
   validateMonitoring() {
     header('8. Monitoring & Observability Validation (Target: 92%)');
     
-    this.checkFile('MONITORING_OBSERVABILITY_COMPLETE.md', 'Monitoring documentation');
     this.checkDirectory('packages/backend/src/modules/health', 'Health check module');
     this.checkDirectory('packages/backend/src/common/audit', 'Audit logging');
     
