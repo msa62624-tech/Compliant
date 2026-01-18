@@ -75,7 +75,7 @@ jobs:
       - name: Run migrations and seed
         run: |
           cd packages/backend
-          pnpm prisma migrate deploy
+          pnpm prisma db push
           pnpm db:seed || echo "Seed script not available"
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/compliant_perf_test
@@ -95,6 +95,8 @@ jobs:
           JWT_REFRESH_SECRET: test-jwt-refresh-secret-key-performance-tests
           ENCRYPTION_KEY: dGVzdC1lbmNyeXB0aW9uLWtleS1mb3ItcGVyZm9ybWFuY2UtdGVzdHMxMg==
           ENCRYPTION_SALT: 0123456789abcdef0123456789abcdef
+          SMTP_USER: test-perf@example.com
+          SMTP_PASS: test-password-for-performance-tests
           NODE_ENV: production
           PORT: 3001
 
