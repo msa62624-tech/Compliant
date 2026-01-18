@@ -207,14 +207,14 @@ export class AuditService {
     });
 
     // Map database records to AuditLogEntry format
-    return logs.map((log: AuditLog) => ({
-      userId: log.userId || undefined,
+    return logs.map((log) => ({
+      userId: log.userId ?? undefined,
       action: log.action as AuditAction,
       resourceType: log.resource as AuditResourceType,
-      resourceId: log.resourceId || undefined,
+      resourceId: log.resourceId ?? undefined,
       details: log.changes as Record<string, any>,
-      ipAddress: log.ipAddress || undefined,
-      userAgent: log.userAgent || undefined,
+      ipAddress: log.ipAddress ?? undefined,
+      userAgent: log.userAgent ?? undefined,
       timestamp: log.timestamp,
     }));
   }
