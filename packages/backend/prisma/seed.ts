@@ -115,9 +115,7 @@ async function main() {
   console.log("   Admin: admin@compliant.com / Admin123!@#");
   console.log("   Manager: manager@compliant.com / Manager123!@#");
   console.log("   Contractor: contractor@compliant.com / Contractor123!@#");
-  console.log(
-    "   Subcontractor: subcontractor@compliant.com / Subcontractor123!@#",
-  );
+  console.log("   Subcontractor: subcontractor@compliant.com / Subcontractor123!@#");
   console.log("   Broker: broker@compliant.com / Broker123!@#");
 }
 
