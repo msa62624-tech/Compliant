@@ -59,6 +59,8 @@ jobs:
 
       - name: Generate Prisma Client
         run: cd packages/backend && pnpm db:generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/compliant_test
 
       - name: Run linting
         run: pnpm lint
@@ -103,6 +105,8 @@ jobs:
 
       - name: Generate Prisma Client
         run: cd packages/backend && pnpm db:generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/compliant_test
 
       - name: Build production bundles
         run: pnpm build
