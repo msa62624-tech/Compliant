@@ -82,22 +82,58 @@ pnpm lint       # Lint code
 
 ## 🏗️ Features
 
-- **Authentication**: Secure JWT-based authentication
-- **Contractor Management**: Full CRUD operations for contractors
-- **Insurance Tracking**: Monitor insurance documents and status
+### Core Workflows
+- **Authentication**: Secure JWT-based authentication with refresh tokens
+- **Contractor Management**: Full CRUD operations for contractors and subcontractors
+- **Insurance Tracking**: Monitor insurance documents and policy status
 - **Project Management**: Track projects and contractor assignments
-- **User Management**: Admin, Manager, and User roles
+- **COI Generation**: Automated Certificate of Insurance workflow
+- **User Management**: Multi-role access control (SUPER_ADMIN, ADMIN, MANAGER, USER, CONTRACTOR, SUBCONTRACTOR, BROKER)
 - **Real-time Updates**: Automatic data refresh
 - **Responsive UI**: Mobile-friendly interface
 
+### Automated Business Logic ✨
+- **Renewal Reminder System**: Automated email reminders at 30d, 14d, 7d, 2d intervals (cron-based)
+  - Per-policy broker routing
+  - Escalation after expiration (every 2 days)
+  - Tracking and acknowledgment workflow
+  - Location: `packages/backend/src/modules/reminders/`
+
+- **Hold Harmless Workflow**: Complete signature workflow with auto-generation
+  - Auto-generate on COI approval
+  - Subcontractor → GC signature flow
+  - Email notifications at each step
+  - Document storage and tracking
+  - Location: `packages/backend/src/modules/hold-harmless/`
+
+### Security & Compliance
+- **Field-Level Encryption**: Sensitive data encryption at rest
+- **Audit Logging**: Comprehensive activity tracking
+- **Rate Limiting**: DDoS protection
+- **Input Validation**: SQL injection and XSS prevention
+- **SSL/TLS Support**: Secure communications
+
 ## 📚 Documentation
 
+### Development
 - **API Documentation**: Visit http://localhost:3001/api/docs when backend is running
 - **Database Schema**: See `packages/backend/prisma/schema.prisma`
 - **Getting Started Guide**: See [GETTING_STARTED.md](./GETTING_STARTED.md)
-- **Deployment Guide**: See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
 - **Implementation Guidelines**: See [docs/IMPLEMENTATION_GUIDELINES.md](./docs/IMPLEMENTATION_GUIDELINES.md)
-- **Additional Documentation**: See [docs/](./docs/) directory for feature requirements, workflow details, and PR implementation notes
+- **Additional Documentation**: See [docs/](./docs/) directory for feature requirements and workflow details
+
+### Production Deployment 🚀
+- **Quick Start (30 min)**: [QUICK_START_PRODUCTION.md](./QUICK_START_PRODUCTION.md) - Fast production deployment
+- **Complete Guide**: [PRODUCTION_READINESS_GUIDE.md](./PRODUCTION_READINESS_GUIDE.md) - Comprehensive deployment documentation
+- **Deployment Guide**: [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) - Enterprise deployment strategies
+- **Configuration Template**: `packages/backend/.env.production.template` - Production environment template
+
+### Tools & Scripts
+- **Validate Config**: `node scripts/validate-production-env.js` - Verify environment variables
+- **Deployment Checklist**: `./scripts/production-deployment-checklist.sh` - Interactive deployment guide
+
+### Business Logic Status
+- **Implementation Status**: [BUSINESS_LOGIC_STATUS.md](./BUSINESS_LOGIC_STATUS.md) - Current feature implementation status
 
 ## 🔧 Configuration
 
