@@ -101,10 +101,10 @@ jobs:
           BACKEND_PID=$!
           
           # Wait for backend to start
-          timeout 60 bash -c 'until curl -f http://localhost:3001/health; do sleep 2; done'
+          timeout 60 bash -c 'until curl -f http://localhost:3001/api/health; do sleep 2; done'
           
           # Test health endpoint
-          curl -f http://localhost:3001/health || exit 1
+          curl -f http://localhost:3001/api/health || exit 1
           
           # Cleanup
           kill $BACKEND_PID
