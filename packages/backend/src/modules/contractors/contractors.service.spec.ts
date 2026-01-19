@@ -3,11 +3,8 @@ import { NotFoundException } from "@nestjs/common";
 import { ContractorsService } from "./contractors.service";
 import { PrismaService } from "../../config/prisma.service";
 import { CacheService } from "../cache/cache.service";
-import {
-  ContractorStatus,
-  ContractorType,
-  InsuranceStatus,
-} from "@prisma/client";
+import { ContractorStatus, ContractorType } from "@prisma/client";
+import { InsuranceStatus } from "@compliant/shared";
 
 describe("ContractorsService", () => {
   let service: ContractorsService;
@@ -331,10 +328,6 @@ describe("ContractorsService", () => {
         totalPages: number;
       };
 
-      expect(result).toHaveProperty("data");
-      expect(result).toHaveProperty("total");
-      expect(Array.isArray(result.data)).toBe(true);
-      expect(result.total).toBe(1);
       expect(result).toEqual(expectedResult);
     });
   });
