@@ -40,6 +40,39 @@ async function main() {
 
   console.log("✓ Created admin user:", admin.email);
 
+  // Create additional admin users (assistant admins)
+  const admin2Password = await bcrypt.hash("Admin2123!@#", 10);
+  const admin2 = await prisma.user.upsert({
+    where: { email: "admin2@compliant.com" },
+    update: {},
+    create: {
+      email: "admin2@compliant.com",
+      password: admin2Password,
+      firstName: "Admin",
+      lastName: "Two",
+      role: "ADMIN",
+      isActive: true,
+    },
+  });
+
+  console.log("✓ Created admin user 2:", admin2.email);
+
+  const admin3Password = await bcrypt.hash("Admin3123!@#", 10);
+  const admin3 = await prisma.user.upsert({
+    where: { email: "admin3@compliant.com" },
+    update: {},
+    create: {
+      email: "admin3@compliant.com",
+      password: admin3Password,
+      firstName: "Admin",
+      lastName: "Three",
+      role: "ADMIN",
+      isActive: true,
+    },
+  });
+
+  console.log("✓ Created admin user 3:", admin3.email);
+
   // Create sample manager user
   const managerPassword = await bcrypt.hash("Manager123!@#", 10);
   const manager = await prisma.user.upsert({
@@ -113,6 +146,8 @@ async function main() {
   console.log("📧 Login credentials:");
   console.log("   Super Admin: superadmin@compliant.com / SuperAdmin123!@#");
   console.log("   Admin: admin@compliant.com / Admin123!@#");
+  console.log("   Admin 2: admin2@compliant.com / Admin2123!@#");
+  console.log("   Admin 3: admin3@compliant.com / Admin3123!@#");
   console.log("   Manager: manager@compliant.com / Manager123!@#");
   console.log("   Contractor: contractor@compliant.com / Contractor123!@#");
   console.log("   Subcontractor: subcontractor@compliant.com / Subcontractor123!@#");
