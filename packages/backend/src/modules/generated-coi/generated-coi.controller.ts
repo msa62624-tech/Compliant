@@ -16,6 +16,9 @@ import { UploadPoliciesDto } from "./dto/upload-policies.dto";
 import { SignPoliciesDto } from "./dto/sign-policies.dto";
 import { ReviewCOIDto } from "./dto/review-coi.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { RolesGuard } from "../../common/guards/roles.guard";
+import { Roles } from "../../common/decorators/roles.decorator";
+import { UserRole } from "@prisma/client";
 
 @Controller("generated-coi")
 export class GeneratedCOIController {
@@ -77,7 +80,8 @@ export class GeneratedCOIController {
   }
 
   @Patch(":id/review")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER)
   reviewCOI(
     @Param("id") id: string,
     @Body() reviewCOIDto: ReviewCOIDto,
