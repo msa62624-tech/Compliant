@@ -193,7 +193,9 @@ describe("ProjectsService", () => {
     it("should return empty array when contractor has no projects", async () => {
       (prisma.project.findMany as jest.Mock).mockResolvedValue([]);
 
-      const result = await service.findByContractor("contractor-with-no-projects");
+      const result = await service.findByContractor(
+        "contractor-with-no-projects",
+      );
 
       expect(result).toEqual([]);
       expect(Array.isArray(result)).toBe(true);
@@ -215,7 +217,7 @@ describe("ProjectsService", () => {
 
       (prisma.project.findMany as jest.Mock).mockResolvedValue(mockProjects);
 
-      const result = await service.findByContractor("contractor-123");
+      await service.findByContractor("contractor-123");
 
       expect(prisma.project.findMany).toHaveBeenCalledWith(
         expect.objectContaining({

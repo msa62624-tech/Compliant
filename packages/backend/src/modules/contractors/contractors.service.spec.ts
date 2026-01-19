@@ -323,7 +323,7 @@ describe("ContractorsService", () => {
       cacheService.get.mockResolvedValue(null);
       cacheService.set.mockResolvedValue(undefined);
 
-      const result = await service.findAll() as {
+      const result = (await service.findAll()) as {
         data: unknown[];
         total: number;
         page: number;
@@ -816,7 +816,12 @@ describe("ContractorsService", () => {
         expect.objectContaining({
           where: expect.objectContaining({
             OR: expect.arrayContaining([
-              { email: { contains: "contractor@example.com", mode: "insensitive" } },
+              {
+                email: {
+                  contains: "contractor@example.com",
+                  mode: "insensitive",
+                },
+              },
             ]),
           }),
         }),
@@ -919,7 +924,12 @@ describe("ContractorsService", () => {
         expect.objectContaining({
           where: {
             OR: expect.arrayContaining([
-              { brokerEmail: { contains: "broker@example.com", mode: "insensitive" } },
+              {
+                brokerEmail: {
+                  contains: "broker@example.com",
+                  mode: "insensitive",
+                },
+              },
             ]),
           },
         }),

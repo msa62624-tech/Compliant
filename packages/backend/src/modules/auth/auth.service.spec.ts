@@ -450,7 +450,8 @@ describe("AuthService", () => {
 
       // Verify transaction was called with an array of operations
       expect(prisma.$transaction).toHaveBeenCalledTimes(1);
-      const transactionArg = (prisma.$transaction as jest.Mock).mock.calls[0][0];
+      const transactionArg = (prisma.$transaction as jest.Mock).mock
+        .calls[0][0];
       expect(Array.isArray(transactionArg)).toBe(true);
       expect(transactionArg).toHaveLength(2);
     });
