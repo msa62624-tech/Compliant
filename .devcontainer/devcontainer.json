@@ -1,9 +1,12 @@
 {
   "name": "Compliant Platform",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
   "forwardPorts": [3000, 3001, 5432],
-  "postCreateCommand": "pnpm install"
+  "postCreateCommand": "pnpm install",
+  "remoteUser": "node"
 }
