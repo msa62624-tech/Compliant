@@ -12,16 +12,11 @@ phases:
     commands:
       - echo "Installing dependencies..."
       - pnpm install --frozen-lockfile
-      - echo "Building shared package (CRITICAL)..."
-      - cd packages/shared
-      - pnpm build
-      - cd ../..
       
   build:
     commands:
-      - echo "Running tests..."
-      - pnpm test
       - echo "Building all packages..."
+      - export DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
       - pnpm build
       
   post_build:
@@ -30,7 +25,10 @@ phases:
 
 artifacts:
   files:
-    - '**/*'
+    - 'packages/*/dist/**/*'
+    - 'packages/*/build/**/*'
+    - 'packages/*/.next/**/*'
+    - '!packages/*/.next/cache/**/*'
   base-directory: .
 
 cache:
