@@ -116,7 +116,13 @@ describe("ContractorsService", () => {
       cacheService.get.mockResolvedValue(null);
       cacheService.set.mockResolvedValue(undefined);
 
-      const result = await service.findAll();
+      const result = await service.findAll() as {
+        data: any[];
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+      };
 
       expect(result.data).toBeDefined();
       expect(Array.isArray(result.data)).toBe(true);
