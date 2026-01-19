@@ -3,8 +3,11 @@ import { NotFoundException } from "@nestjs/common";
 import { ContractorsService } from "./contractors.service";
 import { PrismaService } from "../../config/prisma.service";
 import { CacheService } from "../cache/cache.service";
-import { ContractorStatus, ContractorType } from "@prisma/client";
-import { InsuranceStatus } from "@compliant/shared";
+import {
+  ContractorStatus,
+  ContractorType,
+  InsuranceStatus,
+} from "@prisma/client";
 
 describe("ContractorsService", () => {
   let service: ContractorsService;
@@ -109,6 +112,13 @@ describe("ContractorsService", () => {
   describe("findAll", () => {
     it("should return paginated contractors", async () => {
       const mockContractors = [mockContractor];
+      const expectedResult = {
+        data: mockContractors,
+        total: 1,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      };
       (prisma.contractor.findMany as jest.Mock).mockResolvedValue(
         mockContractors,
       );
@@ -116,11 +126,19 @@ describe("ContractorsService", () => {
       cacheService.get.mockResolvedValue(null);
       cacheService.set.mockResolvedValue(undefined);
 
-      const result = await service.findAll();
+      const result = await service.findAll() as {
+        data: unknown[];
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+      };
 
-      expect(result.data).toBeDefined();
+      expect(result).toHaveProperty("data");
+      expect(result).toHaveProperty("total");
       expect(Array.isArray(result.data)).toBe(true);
       expect(result.total).toBe(1);
+      expect(result).toEqual(expectedResult);
     });
   });
 

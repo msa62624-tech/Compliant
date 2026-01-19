@@ -21,7 +21,12 @@ describe("AuthService", () => {
   let usersService: jest.Mocked<UsersService>;
   let jwtService: jest.Mocked<JwtService>;
   let prisma: jest.Mocked<PrismaService>;
-  let mockLogger: unknown;
+  let mockLogger: {
+    log: jest.Mock;
+    warn: jest.Mock;
+    error: jest.Mock;
+    debug: jest.Mock;
+  };
 
   const mockUser = {
     id: "user-123",
