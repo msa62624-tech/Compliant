@@ -841,7 +841,7 @@ For advanced deployments, use Kubernetes:
    kubectl apply -f k8s/
    ```
 
-Example manifests available in the repository can be created upon request.
+Example Kubernetes manifests can be created upon request.
 
 ---
 
