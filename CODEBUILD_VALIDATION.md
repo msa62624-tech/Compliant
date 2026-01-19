@@ -18,7 +18,7 @@ This document helps you verify that your CodeBuild project is correctly configur
   aws codebuild batch-get-projects --names YOUR_PROJECT_NAME \
     --query 'projects[0].source.location' --output text
   ```
-  Expected: `https://github.com/hml-brokerage/Compliant-` (Note: Repository name ends with hyphen)
+  Expected: `https://github.com/hml-brokerage/compliant-` (Note: Repository name ends with hyphen)
 
 - [ ] **Auth Type**: OAUTH configured
   ```bash

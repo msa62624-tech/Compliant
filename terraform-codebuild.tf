@@ -21,7 +21,7 @@ variable "project_name" {
 variable "github_repository_url" {
   description = "GitHub repository URL"
   type        = string
-  default     = "https://github.com/hml-brokerage/Compliant-"
+  default     = "https://github.com/hml-brokerage/compliant-"
 }
 
 variable "source_version" {

@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 # Configuration
 DEFAULT_PROJECT_NAME="compliant-build"
 DEFAULT_SOURCE_VERSION="refs/heads/main"
-REPO_URL="https://github.com/hml-brokerage/Compliant-"
+REPO_URL="https://github.com/hml-brokerage/compliant-"
 
 echo -e "${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║  CodeBuild Source Reference Fix Script                    ║${NC}"

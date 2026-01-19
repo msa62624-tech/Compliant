@@ -9,7 +9,7 @@ Parameters:
 
   GitHubRepositoryUrl:
     Type: String
-    Default: https://github.com/hml-brokerage/Compliant-
+    Default: https://github.com/hml-brokerage/compliant-
     Description: GitHub repository URL
 
   SourceVersion:
