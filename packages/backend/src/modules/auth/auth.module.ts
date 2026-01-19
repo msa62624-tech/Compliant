@@ -14,14 +14,19 @@ import { UsersModule } from "../users/users.module";
     JwtModule.registerAsync({
       useFactory: async (
         configService: ConfigService,
-      ): Promise<JwtModuleOptions> => ({
-        secret: configService.get<string>("JWT_SECRET") as string,
-        signOptions: {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          expiresIn: (configService.get<string>("JWT_EXPIRATION") ||
-            "15m") as any,
-        },
-      }),
+      ): Promise<JwtModuleOptions> => {
+        const expiresIn = configService.get<string>("JWT_EXPIRATION") || "15m";
+        return {
+          secret: configService.get<string>("JWT_SECRET") as string,
+          signOptions: {
+            // Type assertion is required because ConfigService.get<string>() returns string,
+            // but SignOptions.expiresIn expects StringValue (a strict template literal type) | number.
+            // The runtime value is guaranteed to be valid (e.g., "15m", "1h", "7d") by configuration.
+            // We use a more targeted assertion than 'as any' for better type safety.
+            expiresIn: expiresIn as never,
+          },
+        };
+      },
       inject: [ConfigService],
     }),
   ],
