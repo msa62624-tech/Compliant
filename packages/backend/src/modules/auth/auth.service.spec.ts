@@ -79,12 +79,14 @@ describe("AuthService", () => {
             refreshToken: {
               create: jest.fn(),
               findUnique: jest.fn(),
+              findMany: jest.fn(),
               delete: jest.fn(),
               deleteMany: jest.fn(),
             },
             user: {
               update: jest.fn(),
             },
+            $transaction: jest.fn(),
           },
         },
         {
@@ -268,6 +270,372 @@ describe("AuthService", () => {
           userId: "user-123",
         }),
       );
+    });
+  });
+
+  describe("refresh", () => {
+    const mockSelector = "a".repeat(32); // 32 hex chars
+    const mockVerifier = "b".repeat(64); // 64 hex chars
+    const mockRefreshToken = `${mockSelector}:${mockVerifier}`;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it("should successfully refresh tokens with valid refresh token", async () => {
+      const mockTokenRecord = {
+        id: "token-id-123",
+        userId: mockUser.id,
+        selector: mockSelector,
+        verifier: "$2b$10$hashedVerifier",
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        createdAt: new Date(),
+        user: mockUser,
+      };
+
+      (prisma.refreshToken.findUnique as jest.Mock).mockResolvedValue(
+        mockTokenRecord,
+      );
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      (bcrypt.hash as jest.Mock).mockResolvedValue("$2b$10$newHashedVerifier");
+      jwtService.sign.mockReturnValue("new-access-token");
+      (prisma.$transaction as jest.Mock).mockResolvedValue([
+        { id: "new-token-id" },
+        { id: "token-id-123" },
+      ]);
+
+      const result = await service.refresh(mockRefreshToken);
+
+      expect(result.accessToken).toBe("new-access-token");
+      expect(result.refreshToken).toBeDefined();
+      expect(typeof result.refreshToken).toBe("string");
+      expect(result.refreshToken).toContain(":");
+      expect(prisma.refreshToken.findUnique).toHaveBeenCalledWith({
+        where: { selector: mockSelector },
+        include: { user: true },
+      });
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+        mockVerifier,
+        mockTokenRecord.verifier,
+      );
+      expect(prisma.$transaction).toHaveBeenCalled();
+    });
+
+    it("should throw UnauthorizedException for invalid refresh token format (no colon)", async () => {
+      const invalidToken = "invalidtokenwithnocolon";
+
+      await expect(service.refresh(invalidToken)).rejects.toThrow(
+        UnauthorizedException,
+      );
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "Token refresh failed",
+        }),
+      );
+    });
+
+    it("should throw UnauthorizedException for invalid refresh token format (multiple colons)", async () => {
+      const invalidToken = "part1:part2:part3";
+
+      await expect(service.refresh(invalidToken)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it("should throw UnauthorizedException for invalid selector format (wrong length)", async () => {
+      const invalidToken = "short:b".repeat(64);
+
+      await expect(service.refresh(invalidToken)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it("should throw UnauthorizedException for invalid verifier format (wrong length)", async () => {
+      const invalidToken = `${"a".repeat(32)}:short`;
+
+      await expect(service.refresh(invalidToken)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it("should throw UnauthorizedException for non-hex selector", async () => {
+      const invalidToken = `${"z".repeat(32)}:${"b".repeat(64)}`;
+
+      await expect(service.refresh(invalidToken)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it("should throw UnauthorizedException for non-hex verifier", async () => {
+      const invalidToken = `${"a".repeat(32)}:${"z".repeat(64)}`;
+
+      await expect(service.refresh(invalidToken)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it("should throw UnauthorizedException when token record not found", async () => {
+      (prisma.refreshToken.findUnique as jest.Mock).mockResolvedValue(null);
+
+      await expect(service.refresh(mockRefreshToken)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it("should throw UnauthorizedException when token is expired", async () => {
+      const expiredTokenRecord = {
+        id: "token-id-123",
+        userId: mockUser.id,
+        selector: mockSelector,
+        verifier: "$2b$10$hashedVerifier",
+        expiresAt: new Date(Date.now() - 1000), // Expired 1 second ago
+        createdAt: new Date(),
+        user: mockUser,
+      };
+
+      (prisma.refreshToken.findUnique as jest.Mock).mockResolvedValue(
+        expiredTokenRecord,
+      );
+
+      await expect(service.refresh(mockRefreshToken)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it("should throw UnauthorizedException when verifier does not match", async () => {
+      const mockTokenRecord = {
+        id: "token-id-123",
+        userId: mockUser.id,
+        selector: mockSelector,
+        verifier: "$2b$10$hashedVerifier",
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(),
+        user: mockUser,
+      };
+
+      (prisma.refreshToken.findUnique as jest.Mock).mockResolvedValue(
+        mockTokenRecord,
+      );
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+      await expect(service.refresh(mockRefreshToken)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it("should use transaction to atomically create new token and delete old token", async () => {
+      const mockTokenRecord = {
+        id: "token-id-123",
+        userId: mockUser.id,
+        selector: mockSelector,
+        verifier: "$2b$10$hashedVerifier",
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(),
+        user: mockUser,
+      };
+
+      (prisma.refreshToken.findUnique as jest.Mock).mockResolvedValue(
+        mockTokenRecord,
+      );
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      (bcrypt.hash as jest.Mock).mockResolvedValue("$2b$10$newHashedVerifier");
+      jwtService.sign.mockReturnValue("new-access-token");
+
+      (prisma.$transaction as jest.Mock).mockResolvedValue([
+        { id: "new-token-id" },
+        { id: "token-id-123" },
+      ]);
+
+      await service.refresh(mockRefreshToken);
+
+      // Verify transaction was called with an array of operations
+      expect(prisma.$transaction).toHaveBeenCalledTimes(1);
+      const transactionArg = (prisma.$transaction as jest.Mock).mock
+        .calls[0][0];
+      expect(Array.isArray(transactionArg)).toBe(true);
+      expect(transactionArg).toHaveLength(2);
+    });
+
+    it("should log successful token refresh", async () => {
+      const mockTokenRecord = {
+        id: "token-id-123",
+        userId: mockUser.id,
+        selector: mockSelector,
+        verifier: "$2b$10$hashedVerifier",
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(),
+        user: mockUser,
+      };
+
+      (prisma.refreshToken.findUnique as jest.Mock).mockResolvedValue(
+        mockTokenRecord,
+      );
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      (bcrypt.hash as jest.Mock).mockResolvedValue("$2b$10$newHashedVerifier");
+      jwtService.sign.mockReturnValue("new-access-token");
+      (prisma.$transaction as jest.Mock).mockResolvedValue([
+        { id: "new-token-id" },
+        { id: "token-id-123" },
+      ]);
+
+      await service.refresh(mockRefreshToken);
+
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "Token refreshed successfully",
+          userId: mockUser.id,
+        }),
+      );
+    });
+
+    it("should generate new selector and verifier for rotation", async () => {
+      const mockTokenRecord = {
+        id: "token-id-123",
+        userId: mockUser.id,
+        selector: mockSelector,
+        verifier: "$2b$10$hashedVerifier",
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(),
+        user: mockUser,
+      };
+
+      (prisma.refreshToken.findUnique as jest.Mock).mockResolvedValue(
+        mockTokenRecord,
+      );
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      (bcrypt.hash as jest.Mock).mockResolvedValue("$2b$10$newHashedVerifier");
+      jwtService.sign.mockReturnValue("new-access-token");
+      (prisma.$transaction as jest.Mock).mockResolvedValue([
+        { id: "new-token-id" },
+        { id: "token-id-123" },
+      ]);
+
+      const result = await service.refresh(mockRefreshToken);
+
+      // New refresh token should be different from old one
+      expect(result.refreshToken).not.toBe(mockRefreshToken);
+      // New refresh token should have valid format
+      const [newSelector, newVerifier] = result.refreshToken.split(":");
+      expect(newSelector).toHaveLength(32);
+      expect(newVerifier).toHaveLength(64);
+      expect(newSelector).toMatch(/^[a-f0-9]{32}$/i);
+      expect(newVerifier).toMatch(/^[a-f0-9]{64}$/i);
+    });
+  });
+
+  describe("cleanupExpiredTokens", () => {
+    it("should delete expired tokens in batch", async () => {
+      const expiredTokens = [
+        { id: "token-1" },
+        { id: "token-2" },
+        { id: "token-3" },
+      ];
+
+      (prisma.refreshToken.findMany as jest.Mock).mockResolvedValue(
+        expiredTokens,
+      );
+      (prisma.refreshToken.deleteMany as jest.Mock).mockResolvedValue({
+        count: 3,
+      });
+
+      const result = await service.cleanupExpiredTokens(1000);
+
+      expect(result).toBe(3);
+      expect(prisma.refreshToken.findMany).toHaveBeenCalledWith({
+        where: { expiresAt: { lt: expect.any(Date) } },
+        select: { id: true },
+        take: 1000,
+      });
+      expect(prisma.refreshToken.deleteMany).toHaveBeenCalledWith({
+        where: { id: { in: ["token-1", "token-2", "token-3"] } },
+      });
+    });
+
+    it("should use default batch size of 1000", async () => {
+      const expiredTokens = [{ id: "token-1" }];
+
+      (prisma.refreshToken.findMany as jest.Mock).mockResolvedValue(
+        expiredTokens,
+      );
+      (prisma.refreshToken.deleteMany as jest.Mock).mockResolvedValue({
+        count: 1,
+      });
+
+      await service.cleanupExpiredTokens();
+
+      expect(prisma.refreshToken.findMany).toHaveBeenCalledWith({
+        where: { expiresAt: { lt: expect.any(Date) } },
+        select: { id: true },
+        take: 1000,
+      });
+    });
+
+    it("should return 0 when no expired tokens found", async () => {
+      (prisma.refreshToken.findMany as jest.Mock).mockResolvedValue([]);
+
+      const result = await service.cleanupExpiredTokens();
+
+      expect(result).toBe(0);
+      expect(prisma.refreshToken.deleteMany).not.toHaveBeenCalled();
+    });
+
+    it("should respect custom batch size parameter", async () => {
+      const expiredTokens = Array.from({ length: 50 }, (_, i) => ({
+        id: `token-${i}`,
+      }));
+
+      (prisma.refreshToken.findMany as jest.Mock).mockResolvedValue(
+        expiredTokens,
+      );
+      (prisma.refreshToken.deleteMany as jest.Mock).mockResolvedValue({
+        count: 50,
+      });
+
+      const result = await service.cleanupExpiredTokens(50);
+
+      expect(result).toBe(50);
+      expect(prisma.refreshToken.findMany).toHaveBeenCalledWith({
+        where: { expiresAt: { lt: expect.any(Date) } },
+        select: { id: true },
+        take: 50,
+      });
+    });
+
+    it("should log successful cleanup", async () => {
+      const expiredTokens = [{ id: "token-1" }, { id: "token-2" }];
+
+      (prisma.refreshToken.findMany as jest.Mock).mockResolvedValue(
+        expiredTokens,
+      );
+      (prisma.refreshToken.deleteMany as jest.Mock).mockResolvedValue({
+        count: 2,
+      });
+
+      await service.cleanupExpiredTokens();
+
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "Cleaned up expired refresh tokens",
+          count: 2,
+        }),
+      );
+    });
+
+    it("should only query for tokens with expiresAt in the past", async () => {
+      const beforeCall = new Date();
+      (prisma.refreshToken.findMany as jest.Mock).mockResolvedValue([]);
+
+      await service.cleanupExpiredTokens();
+
+      const callArgs = (prisma.refreshToken.findMany as jest.Mock).mock
+        .calls[0][0];
+      const queriedDate = callArgs.where.expiresAt.lt;
+
+      // The queried date should be close to now (within 1 second)
+      expect(queriedDate.getTime()).toBeGreaterThanOrEqual(
+        beforeCall.getTime(),
+      );
+      expect(queriedDate.getTime()).toBeLessThanOrEqual(Date.now());
     });
   });
 });
