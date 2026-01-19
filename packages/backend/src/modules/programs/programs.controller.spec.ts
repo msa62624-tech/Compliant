@@ -333,13 +333,6 @@ describe("ProgramsController - RBAC Tests", () => {
   });
 
   describe("RBAC - Assign Program to Project", () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const assignDto = { projectId: "project-123" };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-    const mockRequest = {
-      user: { id: "user-123", role: UserRole.ADMIN },
-    } as any;
-
     it("should allow ADMIN to assign program to project", () => {
       const context = createMockExecutionContext({
         id: "admin-123",

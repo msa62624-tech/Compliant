@@ -143,7 +143,10 @@ describe("AuditController - RBAC Tests", () => {
       expect(canActivate).toBe(false);
     });
 
-    it("should allow SUPER_ADMIN to get audit logs (if they have ADMIN privileges)", () => {
+    it("should note that SUPER_ADMIN is not explicitly allowed to get audit logs", () => {
+      // NOTE: The controller decorator uses @Roles("ADMIN", "MANAGER")
+      // SUPER_ADMIN is intentionally not included, which may be a design choice
+      // or an oversight. This test documents the current behavior.
       const context = createMockExecutionContext({
         id: "superadmin-123",
         role: UserRole.SUPER_ADMIN,
@@ -157,6 +160,9 @@ describe("AuditController - RBAC Tests", () => {
       const canActivate = rolesGuard.canActivate(context);
       // This will be false because SUPER_ADMIN is not in the allowed roles
       expect(canActivate).toBe(false);
+
+      // RECOMMENDATION: Consider adding UserRole.SUPER_ADMIN to the decorator
+      // @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER)
     });
   });
 

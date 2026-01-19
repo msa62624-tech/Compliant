@@ -62,18 +62,6 @@ describe("GeneratedCOIController - RBAC Tests", () => {
   });
 
   describe("RBAC - Review COI (Security Critical)", () => {
-    // Tests documenting security gap - these variables are for documentation
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const reviewDto = {
-      approved: true,
-      notes: "Approved",
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-    const mockRequest = {
-      user: { id: "user-123", email: "test@example.com", role: UserRole.ADMIN },
-    } as any;
-
     it("should note that reviewCOI endpoint lacks RolesGuard protection", () => {
       // This test documents a security concern: reviewCOI only has JwtAuthGuard
       // Any authenticated user can potentially review COIs

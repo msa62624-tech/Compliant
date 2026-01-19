@@ -8,8 +8,6 @@ import { UserRole } from "@prisma/client";
 
 describe("RemindersController - RBAC Tests", () => {
   let controller: RemindersController;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let remindersService: jest.Mocked<RemindersService>;
   let rolesGuard: RolesGuard;
   let reflector: Reflector;
 
@@ -37,9 +35,6 @@ describe("RemindersController - RBAC Tests", () => {
     }).compile();
 
     controller = module.get<RemindersController>(RemindersController);
-    remindersService = module.get(
-      RemindersService,
-    ) as jest.Mocked<RemindersService>;
     rolesGuard = module.get<RolesGuard>(RolesGuard);
     reflector = module.get<Reflector>(Reflector);
   });

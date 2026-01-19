@@ -8,8 +8,6 @@ import { UserRole } from "@prisma/client";
 
 describe("HoldHarmlessController - RBAC Tests", () => {
   let controller: HoldHarmlessController;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let holdHarmlessService: jest.Mocked<HoldHarmlessService>;
   let rolesGuard: RolesGuard;
   let reflector: Reflector;
 
@@ -41,9 +39,6 @@ describe("HoldHarmlessController - RBAC Tests", () => {
     }).compile();
 
     controller = module.get<HoldHarmlessController>(HoldHarmlessController);
-    holdHarmlessService = module.get(
-      HoldHarmlessService,
-    ) as jest.Mocked<HoldHarmlessService>;
     rolesGuard = module.get<RolesGuard>(RolesGuard);
     reflector = module.get<Reflector>(Reflector);
   });
