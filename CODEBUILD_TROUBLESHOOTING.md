@@ -6,7 +6,7 @@
 
 ```bash
 # Check what branches exist in the repository
-git ls-remote --heads https://github.com/hml-brokerage/Compliant-.git
+git ls-remote --heads https://github.com/hml-brokerage/compliant-.git
 
 # Expected output should include refs/heads/main
 ```
