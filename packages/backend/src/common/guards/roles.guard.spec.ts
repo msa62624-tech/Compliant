@@ -13,13 +13,17 @@ describe("RolesGuard", () => {
     guard = new RolesGuard(reflector);
   });
 
-  const createMockExecutionContext = (user: any): ExecutionContext => {
+  const createMockExecutionContext = (user: {
+    id: string;
+    role: UserRole;
+  }): ExecutionContext => {
     return {
       switchToHttp: () => ({
         getRequest: () => ({ user }),
       }),
       getHandler: jest.fn(),
       getClass: jest.fn(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
   };
 

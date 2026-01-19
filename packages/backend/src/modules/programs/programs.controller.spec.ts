@@ -49,7 +49,9 @@ describe("ProgramsController - RBAC Tests", () => {
     }).compile();
 
     controller = module.get<ProgramsController>(ProgramsController);
-    programsService = module.get(ProgramsService) as jest.Mocked<ProgramsService>;
+    programsService = module.get(
+      ProgramsService,
+    ) as jest.Mocked<ProgramsService>;
     rolesGuard = module.get<RolesGuard>(RolesGuard);
     reflector = module.get<Reflector>(Reflector);
   });
@@ -82,7 +84,7 @@ describe("ProgramsController - RBAC Tests", () => {
       const canActivate = rolesGuard.canActivate(context);
       expect(canActivate).toBe(true);
 
-      programsService.create.mockResolvedValue(mockProgram as any);
+      programsService.create.mockResolvedValue(mockProgram as any); // eslint-disable-line @typescript-eslint/no-explicit-any
       const result = controller.create(createProgramDto, mockRequest);
       expect(result).toBeDefined();
     });
@@ -162,7 +164,7 @@ describe("ProgramsController - RBAC Tests", () => {
       const canActivate = rolesGuard.canActivate(context);
       expect(canActivate).toBe(true);
 
-      programsService.update.mockResolvedValue(mockProgram as any);
+      programsService.update.mockResolvedValue(mockProgram as any); // eslint-disable-line @typescript-eslint/no-explicit-any
       const result = controller.update("program-123", updateProgramDto);
       expect(result).toBeDefined();
     });
@@ -224,7 +226,7 @@ describe("ProgramsController - RBAC Tests", () => {
       const canActivate = rolesGuard.canActivate(context);
       expect(canActivate).toBe(true);
 
-      programsService.remove.mockResolvedValue(mockProgram as any);
+      programsService.remove.mockResolvedValue(mockProgram as any); // eslint-disable-line @typescript-eslint/no-explicit-any
       const result = controller.remove("program-123");
       expect(result).toBeDefined();
     });
@@ -331,7 +333,9 @@ describe("ProgramsController - RBAC Tests", () => {
   });
 
   describe("RBAC - Assign Program to Project", () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const assignDto = { projectId: "project-123" };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
     const mockRequest = {
       user: { id: "user-123", role: UserRole.ADMIN },
     } as any;
@@ -421,13 +425,17 @@ describe("ProgramsController - RBAC Tests", () => {
   });
 
   // Helper function to create mock execution context
-  function createMockExecutionContext(user: any): ExecutionContext {
+  function createMockExecutionContext(user: {
+    id: string;
+    role: UserRole;
+  }): ExecutionContext {
     return {
       switchToHttp: () => ({
         getRequest: () => ({ user }),
       }),
       getHandler: jest.fn(),
       getClass: jest.fn(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
   }
 });

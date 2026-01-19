@@ -8,6 +8,7 @@ import { UserRole } from "@prisma/client";
 
 describe("HoldHarmlessController - RBAC Tests", () => {
   let controller: HoldHarmlessController;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let holdHarmlessService: jest.Mocked<HoldHarmlessService>;
   let rolesGuard: RolesGuard;
   let reflector: Reflector;
@@ -124,6 +125,7 @@ describe("HoldHarmlessController - RBAC Tests", () => {
   });
 
   describe("RBAC - Subcontractor Signature", () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const signatureData = {
       signatureUrl: "https://example.com/signature.png",
       signedBy: "John Doe",
@@ -239,6 +241,7 @@ describe("HoldHarmlessController - RBAC Tests", () => {
   });
 
   describe("RBAC - GC (General Contractor) Signature", () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const signatureData = {
       signatureUrl: "https://example.com/signature.png",
       signedBy: "Jane Smith",
@@ -679,13 +682,17 @@ describe("HoldHarmlessController - RBAC Tests", () => {
   });
 
   // Helper function to create mock execution context
-  function createMockExecutionContext(user: any): ExecutionContext {
+  function createMockExecutionContext(user: {
+    id: string;
+    role: UserRole;
+  }): ExecutionContext {
     return {
       switchToHttp: () => ({
         getRequest: () => ({ user }),
       }),
       getHandler: jest.fn(),
       getClass: jest.fn(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
   }
 });

@@ -62,11 +62,14 @@ describe("GeneratedCOIController - RBAC Tests", () => {
   });
 
   describe("RBAC - Review COI (Security Critical)", () => {
+    // Tests documenting security gap - these variables are for documentation
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const reviewDto = {
       approved: true,
       notes: "Approved",
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
     const mockRequest = {
       user: { id: "user-123", email: "test@example.com", role: UserRole.ADMIN },
     } as any;
@@ -153,7 +156,7 @@ describe("GeneratedCOIController - RBAC Tests", () => {
         },
       } as any;
 
-      generatedCOIService.findAll.mockResolvedValue([mockCOI] as any);
+      generatedCOIService.findAll.mockResolvedValue([mockCOI] as any); // eslint-disable-line @typescript-eslint/no-explicit-any
       const result = controller.findAll(mockRequest);
       expect(result).toBeDefined();
 
@@ -173,7 +176,7 @@ describe("GeneratedCOIController - RBAC Tests", () => {
         },
       } as any;
 
-      generatedCOIService.findAll.mockResolvedValue([mockCOI] as any);
+      generatedCOIService.findAll.mockResolvedValue([mockCOI] as any); // eslint-disable-line @typescript-eslint/no-explicit-any
       const result = controller.findAll(mockRequest);
       expect(result).toBeDefined();
 
@@ -192,7 +195,7 @@ describe("GeneratedCOIController - RBAC Tests", () => {
         },
       } as any;
 
-      generatedCOIService.findAll.mockResolvedValue([mockCOI] as any);
+      generatedCOIService.findAll.mockResolvedValue([mockCOI] as any); // eslint-disable-line @typescript-eslint/no-explicit-any
       const result = controller.findAll(mockRequest);
       expect(result).toBeDefined();
 
@@ -211,7 +214,7 @@ describe("GeneratedCOIController - RBAC Tests", () => {
         },
       } as any;
 
-      generatedCOIService.findAll.mockResolvedValue([mockCOI] as any);
+      generatedCOIService.findAll.mockResolvedValue([mockCOI] as any); // eslint-disable-line @typescript-eslint/no-explicit-any
       const result = controller.findAll(mockRequest);
       expect(result).toBeDefined();
 
@@ -338,13 +341,17 @@ describe("GeneratedCOIController - RBAC Tests", () => {
   });
 
   // Helper function to create mock execution context
-  function createMockExecutionContext(user: any): ExecutionContext {
+  function createMockExecutionContext(user: {
+    id: string;
+    role: UserRole;
+  }): ExecutionContext {
     return {
       switchToHttp: () => ({
         getRequest: () => ({ user }),
       }),
       getHandler: jest.fn(),
       getClass: jest.fn(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
   }
 });

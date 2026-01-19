@@ -59,23 +59,15 @@ describe("AuditController - RBAC Tests", () => {
       });
 
       // Note: Controller uses string literals "ADMIN", "MANAGER"
-      jest
-        .spyOn(reflector, "getAllAndOverride")
-        .mockReturnValue(["ADMIN", "MANAGER"]);
-
-      // RolesGuard checks user.role === requiredRole
-      // This will fail because UserRole.ADMIN !== "ADMIN"
-      // However, in the actual code, the guard receives UserRole enums
-      const canActivate = rolesGuard.canActivate(context);
-      
       // For proper testing, we need to mock with actual UserRole values
       jest
         .spyOn(reflector, "getAllAndOverride")
         .mockReturnValue([UserRole.ADMIN, UserRole.MANAGER]);
 
-      const canActivateFixed = rolesGuard.canActivate(context);
-      expect(canActivateFixed).toBe(true);
+      const canActivate = rolesGuard.canActivate(context);
+      expect(canActivate).toBe(true);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       auditService.getAuditLogs.mockResolvedValue(mockAuditLogs as any);
       const result = controller.getAuditLogs();
       expect(result).toBeDefined();
@@ -189,8 +181,13 @@ describe("AuditController - RBAC Tests", () => {
       const canActivate = rolesGuard.canActivate(context);
       expect(canActivate).toBe(true);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       auditService.getResourceAuditLogs.mockResolvedValue(mockAuditLogs as any);
-      const result = controller.getResourceAuditLogs("PROJECT" as any, "proj-123");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = controller.getResourceAuditLogs(
+        "PROJECT" as any,
+        "proj-123",
+      );
       expect(result).toBeDefined();
     });
 
@@ -257,6 +254,7 @@ describe("AuditController - RBAC Tests", () => {
       const canActivate = rolesGuard.canActivate(context);
       expect(canActivate).toBe(true);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       auditService.getUserAuditLogs.mockResolvedValue(mockAuditLogs as any);
       const result = controller.getUserAuditLogs("user-123");
       expect(result).toBeDefined();
@@ -277,13 +275,17 @@ describe("AuditController - RBAC Tests", () => {
   });
 
   // Helper function to create mock execution context
-  function createMockExecutionContext(user: any): ExecutionContext {
+  function createMockExecutionContext(user: {
+    id: string;
+    role: UserRole;
+  }): ExecutionContext {
     return {
       switchToHttp: () => ({
         getRequest: () => ({ user }),
       }),
       getHandler: jest.fn(),
       getClass: jest.fn(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
   }
 });

@@ -79,7 +79,7 @@ describe("UsersController - RBAC Tests", () => {
       const canActivate = rolesGuard.canActivate(context);
       expect(canActivate).toBe(true);
 
-      usersService.create.mockResolvedValue(mockUser as any);
+      usersService.create.mockResolvedValue(mockUser as any); // eslint-disable-line @typescript-eslint/no-explicit-any
       const result = controller.create(createUserDto);
       expect(result).toBeDefined();
     });
@@ -160,7 +160,7 @@ describe("UsersController - RBAC Tests", () => {
       const canActivate = rolesGuard.canActivate(context);
       expect(canActivate).toBe(true);
 
-      usersService.update.mockResolvedValue(mockUser as any);
+      usersService.update.mockResolvedValue(mockUser as any); // eslint-disable-line @typescript-eslint/no-explicit-any
       const result = controller.update("user-123", updateUserDto);
       expect(result).toBeDefined();
     });
@@ -208,7 +208,7 @@ describe("UsersController - RBAC Tests", () => {
       const canActivate = rolesGuard.canActivate(context);
       expect(canActivate).toBe(true);
 
-      usersService.remove.mockResolvedValue(mockUser as any);
+      usersService.remove.mockResolvedValue(mockUser as any); // eslint-disable-line @typescript-eslint/no-explicit-any
       const result = controller.remove("user-123");
       expect(result).toBeDefined();
     });
@@ -299,13 +299,17 @@ describe("UsersController - RBAC Tests", () => {
   });
 
   // Helper function to create mock execution context
-  function createMockExecutionContext(user: any): ExecutionContext {
+  function createMockExecutionContext(user: {
+    id: string;
+    role: UserRole;
+  }): ExecutionContext {
     return {
       switchToHttp: () => ({
         getRequest: () => ({ user }),
       }),
       getHandler: jest.fn(),
       getClass: jest.fn(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
   }
 });
