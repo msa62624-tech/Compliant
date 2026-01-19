@@ -321,7 +321,7 @@ describe("ContractorsService", () => {
       cacheService.set.mockResolvedValue(undefined);
 
       const result = (await service.findAll()) as {
-        data: unknown[];
+        data: any[];
         total: number;
         page: number;
         limit: number;
