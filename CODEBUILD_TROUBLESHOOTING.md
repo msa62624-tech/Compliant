@@ -2,6 +2,20 @@
 
 ## Error: "reference not found for primary source"
 
+### ⚡ Automated Fix (Recommended)
+
+Run the automated fix script:
+
+```bash
+./scripts/fix-codebuild-source.sh
+```
+
+This interactive script will:
+- Check if your AWS CLI is configured
+- Verify your CodeBuild project exists
+- Update the source version to `refs/heads/main`
+- Optionally start a test build
+
 ### Quick Fix Commands
 
 ```bash
