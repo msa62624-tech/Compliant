@@ -107,6 +107,203 @@ describe("ContractorsService", () => {
       expect(result).toBeDefined();
       expect(prisma.contractor.create).toHaveBeenCalled();
     });
+
+    it("should auto-create user account for new contractor", async () => {
+      const createDto = {
+        name: "John Smith",
+        email: "john.smith@example.com",
+        phone: "555-1234",
+        company: "Smith Co",
+        contractorType: ContractorType.GENERAL_CONTRACTOR,
+        status: ContractorStatus.ACTIVE,
+      };
+
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+      (prisma.user.create as jest.Mock).mockResolvedValue({
+        id: "user-new",
+        email: createDto.email,
+        firstName: "John",
+        lastName: "Smith",
+        role: "CONTRACTOR",
+        password: "hashed",
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      (prisma.contractor.create as jest.Mock).mockResolvedValue({
+        ...mockContractor,
+        ...createDto,
+      });
+      cacheService.delPattern.mockResolvedValue(undefined);
+
+      const result = await service.create(createDto, "user-123");
+
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { email: createDto.email },
+      });
+      expect(prisma.user.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            email: createDto.email,
+            firstName: "John",
+            lastName: "Smith",
+            role: "CONTRACTOR",
+            isActive: true,
+          }),
+        }),
+      );
+      expect(result.userAccount).toBeDefined();
+      expect(result.userAccount.created).toBe(true);
+    });
+
+    it("should assign SUBCONTRACTOR role when contractorType is SUBCONTRACTOR", async () => {
+      const createDto = {
+        name: "Sub Contractor",
+        email: "sub@example.com",
+        phone: "555-1234",
+        company: "Sub Co",
+        contractorType: ContractorType.SUBCONTRACTOR,
+        status: ContractorStatus.ACTIVE,
+      };
+
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+      (prisma.user.create as jest.Mock).mockResolvedValue({
+        id: "user-sub",
+        email: createDto.email,
+        firstName: "Sub",
+        lastName: "Contractor",
+        role: "SUBCONTRACTOR",
+        password: "hashed",
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      (prisma.contractor.create as jest.Mock).mockResolvedValue({
+        ...mockContractor,
+        ...createDto,
+      });
+      cacheService.delPattern.mockResolvedValue(undefined);
+
+      await service.create(createDto, "user-123");
+
+      expect(prisma.user.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            role: "SUBCONTRACTOR",
+          }),
+        }),
+      );
+    });
+
+    it("should not create duplicate user account if user already exists", async () => {
+      const createDto = {
+        name: "Existing User",
+        email: "existing@example.com",
+        phone: "555-1234",
+        company: "Existing Co",
+        contractorType: ContractorType.GENERAL_CONTRACTOR,
+        status: ContractorStatus.ACTIVE,
+      };
+
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue({
+        id: "existing-user",
+        email: createDto.email,
+        firstName: "Existing",
+        lastName: "User",
+        role: "CONTRACTOR",
+        password: "hashed",
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      (prisma.contractor.create as jest.Mock).mockResolvedValue({
+        ...mockContractor,
+        ...createDto,
+      });
+      cacheService.delPattern.mockResolvedValue(undefined);
+
+      const result = await service.create(createDto, "user-123");
+
+      expect(prisma.user.create).not.toHaveBeenCalled();
+      expect(result.userAccount.created).toBe(false);
+    });
+
+    it("should generate secure password for new user account", async () => {
+      const createDto = {
+        name: "Test User",
+        email: "test@example.com",
+        phone: "555-1234",
+        company: "Test Co",
+        contractorType: ContractorType.GENERAL_CONTRACTOR,
+        status: ContractorStatus.ACTIVE,
+      };
+
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+      (prisma.user.create as jest.Mock).mockResolvedValue({
+        id: "user-test",
+        email: createDto.email,
+        firstName: "Test",
+        lastName: "User",
+        role: "CONTRACTOR",
+        password: "hashed",
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      (prisma.contractor.create as jest.Mock).mockResolvedValue({
+        ...mockContractor,
+        ...createDto,
+      });
+      cacheService.delPattern.mockResolvedValue(undefined);
+
+      const result = await service.create(createDto, "user-123");
+
+      // Verify password was generated and returned
+      expect(result.userAccount.password).toBeDefined();
+      if (result.userAccount.created) {
+        expect(result.userAccount.password.length).toBeGreaterThan(0);
+      }
+    });
+
+    it("should handle name parsing for firstName and lastName", async () => {
+      const createDto = {
+        name: "John Michael Smith Jr",
+        email: "jsmith@example.com",
+        phone: "555-1234",
+        company: "Smith Co",
+        contractorType: ContractorType.GENERAL_CONTRACTOR,
+        status: ContractorStatus.ACTIVE,
+      };
+
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+      (prisma.user.create as jest.Mock).mockResolvedValue({
+        id: "user-jsmith",
+        email: createDto.email,
+        firstName: "John",
+        lastName: "Michael Smith Jr",
+        role: "CONTRACTOR",
+        password: "hashed",
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      (prisma.contractor.create as jest.Mock).mockResolvedValue({
+        ...mockContractor,
+        ...createDto,
+      });
+      cacheService.delPattern.mockResolvedValue(undefined);
+
+      await service.create(createDto, "user-123");
+
+      expect(prisma.user.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            firstName: "John",
+            lastName: "Michael Smith Jr",
+          }),
+        }),
+      );
+    });
   });
 
   describe("findAll", () => {
