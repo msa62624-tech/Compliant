@@ -1,0 +1,39 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo "Installing pnpm..."
+      - npm install -g pnpm@8.15.0
+      
+  pre_build:
+    commands:
+      - echo "Installing dependencies..."
+      - pnpm install --frozen-lockfile
+      - echo "Building shared package (CRITICAL)..."
+      - cd packages/shared
+      - pnpm build
+      - cd ../..
+      
+  build:
+    commands:
+      - echo "Running tests..."
+      - pnpm test
+      - echo "Building all packages..."
+      - pnpm build
+      
+  post_build:
+    commands:
+      - echo "Build completed on `date`"
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: .
+
+cache:
+  paths:
+    - 'node_modules/**/*'
+    - 'packages/*/node_modules/**/*'
