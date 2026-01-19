@@ -2,7 +2,7 @@
 
 This directory contains Infrastructure as Code (IaC) templates to properly configure AWS CodeBuild for the Compliant platform and avoid the "reference not found for primary source" error.
 
-> **Note**: The repository URL `https://github.com/hml-brokerage/Compliant-` is correct and ends with a hyphen. This is the actual repository name.
+> **Note**: The repository URL `https://github.com/hml-brokerage/compliant-` is correct and ends with a hyphen. This is the actual repository name.
 
 ## 🎯 Problem Statement
 
@@ -23,7 +23,7 @@ aws cloudformation create-stack \
   --template-body file://cloudformation-codebuild.yaml \
   --parameters \
     ParameterKey=ProjectName,ParameterValue=compliant-build \
-    ParameterKey=GitHubRepositoryUrl,ParameterValue=https://github.com/hml-brokerage/Compliant- \
+    ParameterKey=GitHubRepositoryUrl,ParameterValue=https://github.com/hml-brokerage/compliant- \
     ParameterKey=SourceVersion,ParameterValue=refs/heads/main \
     ParameterKey=DatabaseUrl,ParameterValue=postgresql://user:pass@localhost:5432/dbname \
   --capabilities CAPABILITY_IAM \
@@ -49,7 +49,7 @@ Deploy using AWS Console:
 3. Choose "Upload a template file" and upload `cloudformation-codebuild.yaml`
 4. Fill in the parameters:
    - **ProjectName**: `compliant-build`
-   - **GitHubRepositoryUrl**: `https://github.com/hml-brokerage/Compliant-`
+   - **GitHubRepositoryUrl**: `https://github.com/hml-brokerage/compliant-`
    - **SourceVersion**: `refs/heads/main`
    - **GitHubTokenSecretArn**: Your GitHub token secret ARN
 5. Click through to create the stack
@@ -67,7 +67,7 @@ terraform init
 # Create a terraform.tfvars file with your variables
 cat > terraform.tfvars <<EOF
 project_name             = "compliant-build"
-github_repository_url    = "https://github.com/hml-brokerage/Compliant-"
+github_repository_url    = "https://github.com/hml-brokerage/compliant-"
 source_version          = "refs/heads/main"
 database_url            = "postgresql://user:pass@localhost:5432/dbname"
 aws_region              = "us-east-1"
@@ -226,7 +226,7 @@ If you still encounter the "reference not found" error after deployment:
 
 1. **Verify the branch exists**:
    ```bash
-   git ls-remote --heads https://github.com/hml-brokerage/Compliant-
+   git ls-remote --heads https://github.com/hml-brokerage/compliant-
    ```
 
 2. **Check CodeBuild configuration**:

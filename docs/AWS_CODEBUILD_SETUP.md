@@ -30,7 +30,21 @@ This error occurs during the `DOWNLOAD_SOURCE` phase, **before** the buildspec.y
 
 ### Solutions
 
-#### Recommended: Use Infrastructure as Code Templates
+#### Recommended: Automated Fix Script
+
+For the fastest fix, use our automated script:
+
+```bash
+./scripts/fix-codebuild-source.sh
+```
+
+This interactive script will:
+1. Check that AWS CLI is configured
+2. Verify your CodeBuild project exists
+3. Update the source version to `refs/heads/main`
+4. Optionally start a test build to verify the fix
+
+#### Alternative: Use Infrastructure as Code Templates
 
 The most reliable way to configure CodeBuild correctly is using our pre-configured IaC templates. These templates include all necessary settings and automatically configure the `source_version` to point to `refs/heads/main`.
 

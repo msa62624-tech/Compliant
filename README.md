@@ -303,6 +303,16 @@ After running the seed script, you can log in with these accounts:
 
 This repository includes AWS CodeBuild configuration for CI/CD:
 
+**⚡ Quick Fix for "reference not found" Error:**
+```bash
+./scripts/fix-codebuild-source.sh
+```
+
+**Configure Environment Variables (DATABASE_URL):**
+```bash
+./scripts/setup-codebuild-env-vars.sh
+```
+
 **Quick Start - Infrastructure as Code Templates:**
 - **CloudFormation**: `cloudformation-codebuild.yaml`
 - **Terraform**: `terraform-codebuild.tf`
