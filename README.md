@@ -308,6 +308,11 @@ This repository includes AWS CodeBuild configuration for CI/CD:
 ./scripts/fix-codebuild-source.sh
 ```
 
+**Configure Environment Variables (DATABASE_URL):**
+```bash
+./scripts/setup-codebuild-env-vars.sh
+```
+
 **Quick Start - Infrastructure as Code Templates:**
 - **CloudFormation**: `cloudformation-codebuild.yaml`
 - **Terraform**: `terraform-codebuild.tf`

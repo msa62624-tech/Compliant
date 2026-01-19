@@ -29,6 +29,17 @@ if ! command -v aws &> /dev/null; then
     exit 1
 fi
 
+# Check if jq is installed (needed for environment variable updates)
+if ! command -v jq &> /dev/null; then
+    echo -e "${YELLOW}⚠ Warning: jq is not installed${NC}"
+    echo "jq is needed for environment variable configuration."
+    echo "Install jq: https://stedolan.github.io/jq/download/"
+    echo ""
+    JQ_AVAILABLE=false
+else
+    JQ_AVAILABLE=true
+fi
+
 # Check if AWS credentials are configured
 if ! aws sts get-caller-identity &> /dev/null; then
     echo -e "${RED}❌ Error: AWS credentials are not configured${NC}"
@@ -96,6 +107,62 @@ echo ""
 # Verify the update
 NEW_SOURCE=$(aws codebuild batch-get-projects --names "${PROJECT_NAME}" --query 'projects[0].sourceVersion' --output text)
 echo -e "${GREEN}New source version: ${NEW_SOURCE}${NC}"
+echo ""
+
+# Check environment variables
+echo -e "${BLUE}Checking environment variables...${NC}"
+ENV_VARS=$(aws codebuild batch-get-projects --names "${PROJECT_NAME}" --query 'projects[0].environment.environmentVariables[*].[name,value]' --output text)
+
+if echo "$ENV_VARS" | grep -q "DATABASE_URL"; then
+    echo -e "${GREEN}✓ DATABASE_URL is configured${NC}"
+else
+    echo -e "${YELLOW}⚠ DATABASE_URL environment variable is not set${NC}"
+    echo ""
+    echo "The build requires DATABASE_URL for Prisma Client generation."
+    
+    if [ "$JQ_AVAILABLE" = false ]; then
+        echo -e "${YELLOW}Note: Automatic environment variable configuration requires jq${NC}"
+        echo "Manual setup instructions:"
+        echo "  1. Go to AWS CodeBuild Console"
+        echo "  2. Select your project: ${PROJECT_NAME}"
+        echo "  3. Click Edit > Environment"
+        echo "  4. Add environment variable:"
+        echo "     Name: DATABASE_URL"
+        echo "     Value: postgresql://user:pass@localhost:5432/dbname (for builds)"
+        echo "     Type: Plaintext (or use Secrets Manager for production)"
+    else
+        read -p "Would you like to set DATABASE_URL now? (y/N): " SET_DB_URL
+        
+        if [[ $SET_DB_URL =~ ^[Yy]$ ]]; then
+            echo ""
+            echo "Enter DATABASE_URL value (or press Enter for placeholder):"
+            echo "  For builds: postgresql://user:pass@localhost:5432/dbname (placeholder)"
+            echo "  For production: Use AWS Secrets Manager (recommended)"
+            read -p "DATABASE_URL: " DB_URL
+            DB_URL=${DB_URL:-postgresql://user:pass@localhost:5432/dbname}
+            
+            echo -e "${BLUE}Updating environment variables...${NC}"
+            
+            # Get current environment configuration
+            CURRENT_ENV=$(aws codebuild batch-get-projects --names "${PROJECT_NAME}" --query 'projects[0].environment' --output json)
+            
+            # Add DATABASE_URL to environment variables
+            UPDATED_ENV=$(echo "$CURRENT_ENV" | jq '.environmentVariables += [{"name":"DATABASE_URL","value":"'"$DB_URL"'","type":"PLAINTEXT"}]')
+            
+            # Update the project with new environment variables
+            if aws codebuild update-project \
+                --name "${PROJECT_NAME}" \
+                --environment "$UPDATED_ENV" \
+                --output json > /dev/null 2>&1; then
+                echo -e "${GREEN}✓ DATABASE_URL configured successfully${NC}"
+                echo -e "${YELLOW}Note: For production, store DATABASE_URL in AWS Secrets Manager and use type: SECRETS_MANAGER${NC}"
+            else
+                echo -e "${YELLOW}⚠ Could not update environment variables automatically${NC}"
+                echo "You can set it manually in AWS Console or via AWS CLI"
+            fi
+        fi
+    fi
+fi
 echo ""
 
 # Offer to start a test build
