@@ -5,18 +5,18 @@ Enterprise-grade insurance tracking application for General Contractors and thei
 ## 📊 Project Status
 
 ### Build & CI/CD
-[![CI](https://github.com/hml-brokerage/Compliant-/actions/workflows/ci.yml/badge.svg)](https://github.com/hml-brokerage/Compliant-/actions/workflows/ci.yml)
-[![Integration Tests](https://github.com/hml-brokerage/Compliant-/actions/workflows/integration-tests.yml/badge.svg)](https://github.com/hml-brokerage/Compliant-/actions/workflows/integration-tests.yml)
-[![E2E Tests](https://github.com/hml-brokerage/Compliant-/actions/workflows/e2e-tests.yml/badge.svg)](https://github.com/hml-brokerage/Compliant-/actions/workflows/e2e-tests.yml)
-[![Code Coverage](https://github.com/hml-brokerage/Compliant-/actions/workflows/code-coverage.yml/badge.svg)](https://github.com/hml-brokerage/Compliant-/actions/workflows/code-coverage.yml)
-[![Performance Tests](https://github.com/hml-brokerage/Compliant-/actions/workflows/performance-tests.yml/badge.svg)](https://github.com/hml-brokerage/Compliant-/actions/workflows/performance-tests.yml)
+[![CI](https://github.com/hml-brokerage/compliant-/actions/workflows/ci.yml/badge.svg)](https://github.com/hml-brokerage/compliant-/actions/workflows/ci.yml)
+[![Integration Tests](https://github.com/hml-brokerage/compliant-/actions/workflows/integration-tests.yml/badge.svg)](https://github.com/hml-brokerage/compliant-/actions/workflows/integration-tests.yml)
+[![E2E Tests](https://github.com/hml-brokerage/compliant-/actions/workflows/e2e-tests.yml/badge.svg)](https://github.com/hml-brokerage/compliant-/actions/workflows/e2e-tests.yml)
+[![Code Coverage](https://github.com/hml-brokerage/compliant-/actions/workflows/code-coverage.yml/badge.svg)](https://github.com/hml-brokerage/compliant-/actions/workflows/code-coverage.yml)
+[![Performance Tests](https://github.com/hml-brokerage/compliant-/actions/workflows/performance-tests.yml/badge.svg)](https://github.com/hml-brokerage/compliant-/actions/workflows/performance-tests.yml)
 
 ### Security
-[![Security Scan](https://github.com/hml-brokerage/Compliant-/actions/workflows/security-scan.yml/badge.svg)](https://github.com/hml-brokerage/Compliant-/actions/workflows/security-scan.yml)
-[![CodeQL](https://github.com/hml-brokerage/Compliant-/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/hml-brokerage/Compliant-/actions/workflows/codeql-analysis.yml)
+[![Security Scan](https://github.com/hml-brokerage/compliant-/actions/workflows/security-scan.yml/badge.svg)](https://github.com/hml-brokerage/compliant-/actions/workflows/security-scan.yml)
+[![CodeQL](https://github.com/hml-brokerage/compliant-/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/hml-brokerage/compliant-/actions/workflows/codeql-analysis.yml)
 
 ### Deployment
-[![Deploy](https://github.com/hml-brokerage/Compliant-/actions/workflows/deploy.yml/badge.svg)](https://github.com/hml-brokerage/Compliant-/actions/workflows/deploy.yml)
+[![Deploy](https://github.com/hml-brokerage/compliant-/actions/workflows/deploy.yml/badge.svg)](https://github.com/hml-brokerage/compliant-/actions/workflows/deploy.yml)
 
 ### Enterprise Readiness: 100% ✅
 
@@ -251,9 +251,9 @@ This project includes comprehensive CI/CD workflows for automated testing, secur
 
 ### Workflow Status
 
-[![CI](https://github.com/hml-brokerage/Compliant-/actions/workflows/ci.yml/badge.svg)](https://github.com/hml-brokerage/Compliant-/actions/workflows/ci.yml)
-[![Security Scan](https://github.com/hml-brokerage/Compliant-/actions/workflows/security-scan.yml/badge.svg)](https://github.com/hml-brokerage/Compliant-/actions/workflows/security-scan.yml)
-[![CodeQL](https://github.com/hml-brokerage/Compliant-/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/hml-brokerage/Compliant-/actions/workflows/codeql-analysis.yml)
+[![CI](https://github.com/hml-brokerage/compliant-/actions/workflows/ci.yml/badge.svg)](https://github.com/hml-brokerage/compliant-/actions/workflows/ci.yml)
+[![Security Scan](https://github.com/hml-brokerage/compliant-/actions/workflows/security-scan.yml/badge.svg)](https://github.com/hml-brokerage/compliant-/actions/workflows/security-scan.yml)
+[![CodeQL](https://github.com/hml-brokerage/compliant-/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/hml-brokerage/compliant-/actions/workflows/codeql-analysis.yml)
 
 ## 📊 Database Setup
 

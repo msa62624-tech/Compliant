@@ -40,7 +40,7 @@ This error occurs during the `DOWNLOAD_SOURCE` phase, **before** the buildspec.y
    **For automatic builds from main branch:**
    ```
    Source provider: GitHub (or your Git provider)
-   Repository: hml-brokerage/Compliant-
+   Repository: hml-brokerage/compliant-
    Source version: refs/heads/main
    ```
 
@@ -58,7 +58,7 @@ Update the CodeBuild project source version:
 ```bash
 aws codebuild update-project \
   --name your-project-name \
-  --source type=GITHUB,location=https://github.com/hml-brokerage/Compliant-.git,gitCloneDepth=1,buildspec=buildspec.yml
+  --source type=GITHUB,location=https://github.com/hml-brokerage/compliant-.git,gitCloneDepth=1,buildspec=buildspec.yml
 ```
 
 To set the default branch:
@@ -77,7 +77,7 @@ CodeBuildProject:
   Properties:
     Source:
       Type: GITHUB
-      Location: https://github.com/hml-brokerage/Compliant-.git
+      Location: https://github.com/hml-brokerage/compliant-.git
       BuildSpec: buildspec.yml
       GitCloneDepth: 1
     SourceVersion: refs/heads/main  # Ensure this points to an existing branch
@@ -90,7 +90,7 @@ resource "aws_codebuild_project" "compliant" {
   
   source {
     type            = "GITHUB"
-    location        = "https://github.com/hml-brokerage/Compliant-.git"
+    location        = "https://github.com/hml-brokerage/compliant-.git"
     buildspec       = "buildspec.yml"
     git_clone_depth = 1
   }
@@ -119,7 +119,7 @@ This repository uses the following branches:
 When setting up a new CodeBuild project:
 
 - [ ] Source provider is correctly set (GitHub)
-- [ ] Repository URL is correct: `https://github.com/hml-brokerage/Compliant-.git`
+- [ ] Repository URL is correct: `https://github.com/hml-brokerage/compliant-.git`
 - [ ] Source version points to `refs/heads/main` (or leave empty for PR builds)
 - [ ] Buildspec location: `buildspec.yml` (in root directory)
 - [ ] Service role has permissions to access the repository
@@ -152,7 +152,7 @@ After updating the configuration:
 
 If you continue to experience issues:
 
-1. Verify the branch exists: `git ls-remote --heads https://github.com/hml-brokerage/Compliant-.git`
+1. Verify the branch exists: `git ls-remote --heads https://github.com/hml-brokerage/compliant-.git`
 2. Check CodeBuild service role permissions
 3. Review CloudWatch logs for detailed error messages
 4. Contact the DevOps team for assistance
