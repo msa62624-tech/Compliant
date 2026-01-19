@@ -6,17 +6,17 @@ Parameters:
     Type: String
     Default: compliant-build
     Description: Name for the CodeBuild project
-    
+
   GitHubRepositoryUrl:
     Type: String
     Default: https://github.com/hml-brokerage/Compliant-
     Description: GitHub repository URL
-    
+
   SourceVersion:
     Type: String
     Default: refs/heads/main
     Description: Git reference to build (branch, tag, or commit). Use refs/heads/main for main branch.
-    
+
   GitHubTokenSecretArn:
     Type: String
     Description: ARN of AWS Secrets Manager secret containing GitHub personal access token
@@ -141,15 +141,15 @@ Outputs:
   CodeBuildProjectName:
     Description: Name of the CodeBuild project
     Value: !Ref CodeBuildProject
-    
+
   CodeBuildProjectArn:
     Description: ARN of the CodeBuild project
     Value: !GetAtt CodeBuildProject.Arn
-    
+
   ArtifactBucketName:
     Description: S3 bucket for build artifacts
     Value: !Ref ArtifactBucket
-    
+
   ServiceRoleArn:
     Description: ARN of the CodeBuild service role
     Value: !GetAtt CodeBuildServiceRole.Arn
