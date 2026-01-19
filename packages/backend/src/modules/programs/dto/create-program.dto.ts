@@ -79,6 +79,7 @@ export class CreateProgramDto {
   @ApiPropertyOptional({
     description: "Tier-based requirements",
     type: "object",
+    additionalProperties: true,
   })
   @IsObject()
   @IsOptional()
@@ -87,12 +88,17 @@ export class CreateProgramDto {
   @ApiPropertyOptional({
     description: "Trade-specific requirements",
     type: "object",
+    additionalProperties: true,
   })
   @IsObject()
   @IsOptional()
   tradeRequirements?: Record<string, unknown>;
 
-  @ApiPropertyOptional({ description: "Auto-approval rules", type: "object" })
+  @ApiPropertyOptional({
+    description: "Auto-approval rules",
+    type: "object",
+    additionalProperties: true,
+  })
   @IsObject()
   @IsOptional()
   autoApprovalRules?: Record<string, unknown>;

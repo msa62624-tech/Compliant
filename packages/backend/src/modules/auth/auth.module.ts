@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { JwtModule } from "@nestjs/jwt";
+import { JwtModule, JwtModuleOptions } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { ConfigService } from "@nestjs/config";
 import { AuthService } from "./auth.service";
@@ -12,10 +12,14 @@ import { UsersModule } from "../users/users.module";
     UsersModule,
     PassportModule,
     JwtModule.registerAsync({
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>("JWT_SECRET"),
+      useFactory: async (
+        configService: ConfigService,
+      ): Promise<JwtModuleOptions> => ({
+        secret: configService.get<string>("JWT_SECRET") as string,
         signOptions: {
-          expiresIn: configService.get<string>("JWT_EXPIRATION") || "15m",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          expiresIn: (configService.get<string>("JWT_EXPIRATION") ||
+            "15m") as any,
         },
       }),
       inject: [ConfigService],

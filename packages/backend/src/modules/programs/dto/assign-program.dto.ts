@@ -9,6 +9,7 @@ export class AssignProgramDto {
   @ApiPropertyOptional({
     description: "Custom requirements override for this project",
     type: "object",
+    additionalProperties: true,
   })
   @IsObject()
   @IsOptional()

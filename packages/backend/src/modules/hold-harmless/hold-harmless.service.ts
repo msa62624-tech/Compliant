@@ -60,7 +60,7 @@ export class HoldHarmlessService {
     });
 
     if (existing) {
-      console.log(
+      this.logger.log(
         `Hold harmless already exists for COI ${coiId}, skipping generation`,
       );
       return existing;
@@ -70,7 +70,9 @@ export class HoldHarmlessService {
     const program = coi.project.programs?.[0]?.program;
 
     if (!program?.requiresHoldHarmless) {
-      console.log(`Program does not require hold harmless for COI ${coiId}`);
+      this.logger.log(
+        `Program does not require hold harmless for COI ${coiId}`,
+      );
       return null;
     }
 

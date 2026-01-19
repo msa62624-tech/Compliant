@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, Logger } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { CacheService } from "../cache/cache.service";
 import { CreateContractorDto } from "./dto/create-contractor.dto";
@@ -36,6 +36,7 @@ type ContractorWithRelations = Prisma.ContractorGetPayload<{
 
 @Injectable()
 export class ContractorsService {
+  private readonly logger = new Logger(ContractorsService.name);
   private readonly CACHE_TTL = 300; // 5 minutes
   private readonly CACHE_PREFIX = "contractor:";
 
@@ -79,7 +80,7 @@ export class ContractorsService {
       });
 
       if (existingUser) {
-        console.log(
+        this.logger.log(
           `User account already exists for ${email} - using existing credentials`,
         );
         return { email, password: "", created: false };
@@ -112,10 +113,12 @@ export class ContractorsService {
         },
       });
 
-      console.log(`✓ Auto-created user account for ${email} with role ${role}`);
-      console.log(`  Email: ${email}`);
-      console.log(`  Password: ${password} (PERMANENT - save this!)`);
-      console.log(`  Note: User can change password later if forgotten`);
+      this.logger.log(
+        `✓ Auto-created user account for ${email} with role ${role}`,
+      );
+      this.logger.log(`  Email: ${email}`);
+      this.logger.log(`  Password: ${password} (PERMANENT - save this!)`);
+      this.logger.log(`  Note: User can change password later if forgotten`);
 
       // TODO: Send welcome email with permanent credentials
       // await this.emailService.sendWelcomeEmail(email, firstName, password);
@@ -123,7 +126,10 @@ export class ContractorsService {
 
       return { email, password, created: true };
     } catch (error) {
-      console.error(`Failed to auto-create user account for ${email}:`, error);
+      this.logger.error(
+        `Failed to auto-create user account for ${email}:`,
+        error,
+      );
       // Don't throw - contractor creation should succeed even if user creation fails
       return { email, password: "", created: false };
     }

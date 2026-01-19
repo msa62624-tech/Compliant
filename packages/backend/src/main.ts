@@ -75,12 +75,14 @@ async function bootstrap() {
   const port = process.env.PORT || 3001;
   await app.listen(port);
 
-  console.log("");
-  console.log("🚀 Backend server is running!");
-  console.log(`📍 API: http://localhost:${port}/api`);
-  console.log(`📚 Swagger Docs: http://localhost:${port}/api/docs`);
-  console.log(`💡 Tip: Use 'X-API-Version' header for versioning (default: 1)`);
-  console.log("");
+  // Get the Winston logger for startup messages
+  const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
+  logger.log("");
+  logger.log("🚀 Backend server is running!");
+  logger.log(`📍 API: http://localhost:${port}/api`);
+  logger.log(`📚 Swagger Docs: http://localhost:${port}/api/docs`);
+  logger.log(`💡 Tip: Use 'X-API-Version' header for versioning (default: 1)`);
+  logger.log("");
 }
 
 bootstrap();

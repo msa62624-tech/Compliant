@@ -47,7 +47,7 @@ export function isValidFileUrl(url: string | undefined): boolean {
     // For non-trusted domains, require valid file extensions
     // Trusted domains can have any path structure
     return hasValidExtension || isTrustedDomain;
-  } catch (error) {
+  } catch {
     return false;
   }
 }

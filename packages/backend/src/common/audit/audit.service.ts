@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 
 export enum AuditAction {
@@ -61,6 +61,8 @@ export interface AuditLogEntry {
  */
 @Injectable()
 export class AuditService {
+  private readonly logger = new Logger(AuditService.name);
+
   constructor(private prisma: PrismaService) {}
 
   /**
@@ -93,11 +95,11 @@ export class AuditService {
         },
       });
 
-      // Also log to console for development/debugging
-      console.log("[AUDIT]", JSON.stringify(auditLog, null, 2));
+      // Also log to logger for development/debugging
+      this.logger.debug(`[AUDIT] ${JSON.stringify(auditLog, null, 2)}`);
     } catch (error) {
       // Don't throw errors from audit logging to avoid disrupting main operations
-      console.error("[AUDIT ERROR]", error);
+      this.logger.error("[AUDIT ERROR]", error);
     }
   }
 
