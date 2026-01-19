@@ -37,7 +37,11 @@ variable "github_token_secret_arn" {
 }
 
 variable "database_url" {
-  description = "Database URL for build (placeholder only, no actual DB connection made during build)"
+  description = <<-EOT
+    Database URL for build (placeholder only for Prisma Client generation).
+    For production, store the actual DATABASE_URL in AWS Secrets Manager and
+    reference it using SECRETS_MANAGER type in environment variables instead of PLAINTEXT.
+  EOT
   type        = string
   default     = "postgresql://user:pass@localhost:5432/dbname"
   sensitive   = true
@@ -194,6 +198,8 @@ resource "aws_codebuild_project" "compliant" {
     privileged_mode             = false
     image_pull_credentials_type = "CODEBUILD"
 
+    # Note: For production use, store DATABASE_URL in AWS Secrets Manager
+    # and use SECRETS_MANAGER type instead of PLAINTEXT
     environment_variable {
       name  = "DATABASE_URL"
       value = var.database_url

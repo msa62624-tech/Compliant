@@ -25,7 +25,10 @@ Parameters:
   DatabaseUrl:
     Type: String
     Default: postgresql://user:pass@localhost:5432/dbname
-    Description: Database URL for build (placeholder only, no actual DB connection made during build)
+    Description: |
+      Database URL for build (placeholder only for Prisma Client generation).
+      For production, store the actual DATABASE_URL in AWS Secrets Manager and
+      reference it using SECRETS_MANAGER type in environment variables instead of PLAINTEXT.
     NoEcho: true
 
 Resources:
@@ -39,8 +42,6 @@ Resources:
             Principal:
               Service: codebuild.amazonaws.com
             Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
       Policies:
         - PolicyName: CodeBuildServicePolicy
           PolicyDocument:
@@ -111,6 +112,8 @@ Resources:
         Image: aws/codebuild/standard:7.0
         PrivilegedMode: false
         EnvironmentVariables:
+          # Note: For production use, store DATABASE_URL in AWS Secrets Manager
+          # and use Type: SECRETS_MANAGER instead of PLAINTEXT
           - Name: DATABASE_URL
             Value: !Ref DatabaseUrl
             Type: PLAINTEXT

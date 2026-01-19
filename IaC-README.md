@@ -2,6 +2,8 @@
 
 This directory contains Infrastructure as Code (IaC) templates to properly configure AWS CodeBuild for the Compliant platform and avoid the "reference not found for primary source" error.
 
+> **Note**: The repository URL `https://github.com/hml-brokerage/Compliant-` is correct and ends with a hyphen. This is the actual repository name.
+
 ## 🎯 Problem Statement
 
 The error "reference not found for primary source" occurs when AWS CodeBuild is configured to build from a git reference (branch, tag, or commit) that doesn't exist in the repository. This happens during the `DOWNLOAD_SOURCE` phase, before the buildspec.yml is even read.
@@ -98,6 +100,26 @@ Before deploying either template:
      --secret-string '{"token":"ghp_xxxxxxxxxxxxxxxxxxxx"}' \
      --region us-east-1
    ```
+
+## 🔒 Security Best Practices
+
+The templates include default configurations for getting started quickly, but for production use:
+
+1. **DATABASE_URL**: The templates use PLAINTEXT type with a placeholder value. For production:
+   - Store your actual DATABASE_URL in AWS Secrets Manager
+   - Update the environment variable to use `Type: SECRETS_MANAGER`
+   - Example:
+     ```yaml
+     - Name: DATABASE_URL
+       Value: arn:aws:secretsmanager:region:account:secret:database-url
+       Type: SECRETS_MANAGER
+     ```
+
+2. **GitHub Tokens**: Always use AWS Secrets Manager for GitHub tokens
+
+3. **IAM Permissions**: The templates follow least-privilege principles with specific permissions
+
+4. **Artifact Encryption**: S3 artifacts are encrypted by default with AES256
 
 ## ✅ Key Configuration
 
