@@ -18,6 +18,8 @@ import { ProgramsModule } from "./modules/programs/programs.module";
 import { RemindersModule } from "./modules/reminders/reminders.module";
 import { HoldHarmlessModule } from "./modules/hold-harmless/hold-harmless.module";
 import { TradesModule } from "./modules/trades/trades.module";
+import { DashboardModule } from "./modules/dashboard/dashboard.module";
+import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { EncryptionModule } from "./common/encryption/encryption.module";
 import { PrismaModule } from "./config/prisma.module";
 import { winstonConfig } from "./config/logger.config";
@@ -35,7 +37,12 @@ import { AllExceptionsFilter } from "./common/filters/http-exception.filter";
       {
         ttl: 60000, // 60 seconds in milliseconds
         // In test/development environments, allow more requests to support E2E tests
-        limit: process.env.NODE_ENV === 'test' ? 10000 : (process.env.NODE_ENV === 'development' ? 1000 : 10),
+        limit:
+          process.env.NODE_ENV === "test"
+            ? 10000
+            : process.env.NODE_ENV === "development"
+              ? 1000
+              : 10,
       },
     ]),
     PrismaModule,
@@ -54,6 +61,8 @@ import { AllExceptionsFilter } from "./common/filters/http-exception.filter";
     RemindersModule,
     HoldHarmlessModule,
     TradesModule,
+    DashboardModule,
+    NotificationsModule,
   ],
   providers: [
     {

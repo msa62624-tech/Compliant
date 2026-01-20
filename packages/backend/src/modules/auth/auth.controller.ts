@@ -75,7 +75,10 @@ export class AuthController {
 
     // In test/development mode, also return tokens in response body for API testing
     // In production, tokens are only in httpOnly cookies for security
-    if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
+    if (
+      process.env.NODE_ENV === "test" ||
+      process.env.NODE_ENV === "development"
+    ) {
       return {
         user: result.user,
         accessToken: result.accessToken,

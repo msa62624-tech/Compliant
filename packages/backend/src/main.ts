@@ -23,11 +23,11 @@ async function bootstrap() {
   app.use(cookieParser());
   // Enable CORS with credentials for cookie support
   // Support multiple origins for production flexibility
-  const corsOrigin = 
-    process.env.NODE_ENV === 'production'
-      ? (process.env.CORS_ORIGIN 
-          ? process.env.CORS_ORIGIN.split(",").map((origin) => origin.trim())
-          : "https://compliant.example.com")
+  const corsOrigin =
+    process.env.NODE_ENV === "production"
+      ? process.env.CORS_ORIGIN
+        ? process.env.CORS_ORIGIN.split(",").map((origin) => origin.trim())
+        : "https://compliant.example.com"
       : true; // Allow all origins in development
 
   app.enableCors({

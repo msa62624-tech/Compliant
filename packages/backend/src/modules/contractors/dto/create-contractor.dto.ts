@@ -1,4 +1,11 @@
-import { IsEmail, IsNotEmpty, IsString, IsOptional, IsEnum, IsArray } from "class-validator";
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsArray,
+} from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { SanitizeHtml } from "../../../common/sanitizers/string-sanitizer";
 import { ContractorStatus } from "@prisma/client";
@@ -51,20 +58,20 @@ export class CreateContractorDto {
   @IsOptional()
   zipCode?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: ["General Contracting", "Construction Management"],
     description: "List of trades/specialties",
-    type: [String]
+    type: [String],
   })
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
   trades?: string[];
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: "ACTIVE",
     enum: ContractorStatus,
-    description: "Status of the contractor"
+    description: "Status of the contractor",
   })
   @IsEnum(ContractorStatus)
   @IsOptional()

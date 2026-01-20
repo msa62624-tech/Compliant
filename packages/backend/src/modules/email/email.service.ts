@@ -179,8 +179,11 @@ export class EmailService {
     contractorType: string,
   ): Promise<boolean> {
     const loginLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/login`;
-    const roleLabel = contractorType === "GENERAL_CONTRACTOR" ? "General Contractor" : "Subcontractor";
-    
+    const roleLabel =
+      contractorType === "GENERAL_CONTRACTOR"
+        ? "General Contractor"
+        : "Subcontractor";
+
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #2563eb;">Welcome to Compliant Platform</h2>

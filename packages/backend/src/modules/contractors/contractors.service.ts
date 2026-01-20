@@ -158,7 +158,7 @@ export class ContractorsService {
     });
 
     if (!creator) {
-      throw new Error('Creator user not found');
+      throw new Error("Creator user not found");
     }
 
     // Automatically determine contractorType based on who is creating:
@@ -166,11 +166,11 @@ export class ContractorsService {
     // - CONTRACTOR (GC) creates → SUBCONTRACTOR (Sub)
     // For Subcontractors, their specific type is defined by the 'trades' field
     const contractorType =
-      creator.role === 'ADMIN' || 
-      creator.role === 'SUPER_ADMIN' || 
-      creator.role === 'MANAGER'
-        ? 'GENERAL_CONTRACTOR'
-        : 'SUBCONTRACTOR';
+      creator.role === "ADMIN" ||
+      creator.role === "SUPER_ADMIN" ||
+      creator.role === "MANAGER"
+        ? "GENERAL_CONTRACTOR"
+        : "SUBCONTRACTOR";
 
     // Create contractor record
     const contractor = await this.prisma.contractor.create({
