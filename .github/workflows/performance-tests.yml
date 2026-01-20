@@ -173,9 +173,9 @@ jobs:
 
       - name: Run Lighthouse performance audit
         run: |
-          echo "Skipping Lighthouse CI for API-only backend"
-          echo "Lighthouse is designed for web pages, not API endpoints"
-          echo "Performance metrics are covered by k6 load tests"
+          echo "⏭️  Skipping Lighthouse CI - designed for web pages, not API endpoints"
+          echo "💡 API performance is comprehensively covered by k6 load tests"
+          echo "📊 For frontend performance audits, use Lighthouse on the Next.js app separately"
         continue-on-error: true
 
       - name: Analyze performance metrics

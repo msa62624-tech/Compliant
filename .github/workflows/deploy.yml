@@ -139,23 +139,28 @@ jobs:
         env:
           DEPLOY_ENV: ${{ github.event.inputs.environment || 'production' }}
         run: |
-          echo "Deploying to ${DEPLOY_ENV}..."
-          # Add your deployment commands here
-          # Examples:
-          # - Deploy to AWS: aws deploy ...
-          # - Deploy to Vercel: vercel deploy --prod
-          # - Deploy to Heroku: git push heroku main
-          # - Deploy via SSH: rsync -avz ...
-          echo "Deployment placeholder - configure based on your infrastructure"
+          echo "🚀 Preparing deployment to ${DEPLOY_ENV}..."
+          # TODO: Configure deployment commands for your infrastructure
+          # Recommended deployment options:
+          # - AWS ECS/Fargate: aws ecs update-service ...
+          # - Vercel: vercel deploy --prod
+          # - Docker Registry: docker push && kubectl rollout restart
+          # - Heroku: git push heroku main
+          # - SSH/rsync: rsync -avz dist/ user@server:/path/
+          echo "⚠️  Deployment not configured - see workflow comments for setup instructions"
+          echo "📚 Refer to deployment documentation for configuration details"
 
       - name: Run smoke tests
         run: |
-          echo "Running smoke tests..."
-          # Add smoke test commands here
-          # Examples:
-          # - curl -f https://your-app.com/health
-          # - npm run test:e2e:production
-          echo "Smoke tests placeholder - configure based on your needs"
+          echo "🧪 Running smoke tests..."
+          # TODO: Configure smoke tests for your deployment
+          # Recommended smoke tests:
+          # - Health check: curl -f https://your-app.com/api/health
+          # - Database connectivity: curl -f https://your-app.com/api/health/db
+          # - Critical endpoints: npm run test:smoke
+          # - End-to-end validation: playwright test --grep @smoke
+          echo "⚠️  Smoke tests not configured - see workflow comments for setup"
+          echo "💡 Smoke tests validate that critical functionality works after deployment"
 
       - name: Notify deployment status
         if: always()
@@ -168,4 +173,10 @@ jobs:
           else
             echo "❌ Deployment to ${DEPLOY_ENV} failed!"
           fi
-          # Add notification commands here (Slack, email, etc.)
+          # TODO: Configure deployment notifications
+          # Recommended notification channels:
+          # - Slack webhook: curl -X POST -H 'Content-type: application/json' ...
+          # - Microsoft Teams: curl -X POST -H 'Content-type: application/json' ...
+          # - Email: aws ses send-email ...
+          # - GitHub deployment status: Already tracked by GitHub Actions
+          echo "💬 Notification channels not configured - deployment status logged to console"
