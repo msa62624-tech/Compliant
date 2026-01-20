@@ -1,0 +1,35 @@
+
+=== CONSOLE MONITORING SUMMARY ===
+Test: all_pages_public
+Generated: 2026-01-20T14:39:44.220Z
+
+Console Summary: 18 messages (13 errors, 0 warnings, 2 logs, 3 info, 0 debug)
+
+Breakdown by Type:
+- Errors: 13
+- Warnings: 0
+- Logs: 2
+- Info: 3
+- Debug: 0
+
+=== ALL MESSAGES ===
+[2026-01-20T14:39:41.272Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:39:41.879Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:39:41.880Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:39:41.882Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:39:41.882Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:39:42.300Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:39:42.889Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:39:42.892Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:39:42.892Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:39:42.895Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:39:43.005Z] [LOG] [Fast Refresh] rebuilding
+[2026-01-20T14:39:43.285Z] [LOG] [Fast Refresh] done in 281ms
+[2026-01-20T14:39:43.295Z] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found)
+[2026-01-20T14:39:43.591Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:39:44.152Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:39:44.153Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:39:44.153Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:39:44.154Z] [ERROR] Auth check failed: AxiosError
+
+=== END OF SUMMARY ===

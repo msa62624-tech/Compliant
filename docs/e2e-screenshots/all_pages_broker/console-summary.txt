@@ -1,0 +1,17 @@
+
+=== CONSOLE MONITORING SUMMARY ===
+Test: all_pages_broker
+Generated: 2026-01-20T14:41:30.378Z
+
+Console Summary: 0 messages (0 errors, 0 warnings, 0 logs, 0 info, 0 debug)
+
+Breakdown by Type:
+- Errors: 0
+- Warnings: 0
+- Logs: 0
+- Info: 0
+- Debug: 0
+
+
+
+=== END OF SUMMARY ===
