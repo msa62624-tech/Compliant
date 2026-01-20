@@ -20,6 +20,12 @@ services:
   app:
     image: mcr.microsoft.com/devcontainers/typescript-node:20
     command: sleep infinity
+    volumes:
+      - .:/workspace:cached
+      - node_modules:/workspace/node_modules
+    working_dir: /workspace
+    environment:
+      - NODE_ENV=development
     networks:
       - compliant-network
     depends_on:
@@ -32,3 +38,4 @@ networks:
 
 volumes:
   postgres-data:
+  node_modules:
