@@ -1,5 +1,38 @@
 import apiClient from './client';
 
+export interface UpdateBrokerInfoData {
+  brokerType: 'GLOBAL' | 'PER_POLICY';
+  brokerName?: string;
+  brokerEmail?: string;
+  brokerPhone?: string;
+  brokerCompany?: string;
+  brokerGlName?: string;
+  brokerGlEmail?: string;
+  brokerGlPhone?: string;
+  brokerAutoName?: string;
+  brokerAutoEmail?: string;
+  brokerAutoPhone?: string;
+  brokerUmbrellaName?: string;
+  brokerUmbrellaEmail?: string;
+  brokerUmbrellaPhone?: string;
+  brokerWcName?: string;
+  brokerWcEmail?: string;
+  brokerWcPhone?: string;
+}
+
+export interface UploadPoliciesData {
+  glPolicyUrl?: string;
+  umbrellaPolicyUrl?: string;
+  autoPolicyUrl?: string;
+  wcPolicyUrl?: string;
+  coiUrl?: string;
+  holdHarmlessUrl?: string;
+  glExpirationDate?: string;
+  umbrellaExpirationDate?: string;
+  autoExpirationDate?: string;
+  wcExpirationDate?: string;
+}
+
 export const coiApi = {
   // Get COI details by ID
   getById: async (id: string) => {
@@ -26,13 +59,13 @@ export const coiApi = {
   },
 
   // Update broker information
-  updateBrokerInfo: async (id: string, data: any) => {
+  updateBrokerInfo: async (id: string, data: UpdateBrokerInfoData) => {
     const response = await apiClient.patch(`/generated-coi/${id}/broker-info`, data);
     return response.data;
   },
 
   // Upload policies
-  uploadPolicies: async (id: string, data: any) => {
+  uploadPolicies: async (id: string, data: UploadPoliciesData) => {
     const response = await apiClient.patch(`/generated-coi/${id}/upload`, data);
     return response.data;
   },

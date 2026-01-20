@@ -25,7 +25,7 @@ export const adminApi = {
     return response.data;
   },
 
-  // Generate report
+  // Generate report (uses dashboard/contractors endpoint for data)
   generateReport: async (params: {
     reportType: string;
     startDate?: string;
@@ -33,6 +33,7 @@ export const adminApi = {
     projectId?: string;
     contractorId?: string;
   }) => {
+    // Reports are generated from dashboard/contractors data with filters
     const response = await apiClient.get('/dashboard/contractors', { params });
     return response.data;
   },
