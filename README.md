@@ -235,9 +235,10 @@ This project includes comprehensive CI/CD workflows for automated testing, secur
   
 - **Performance Tests** - `.github/workflows/performance-tests.yml`
   - K6 load testing (up to 100 concurrent users)
-  - Lighthouse performance audits
+  - API response time metrics and thresholds
   - Performance metrics tracking
   - Runs weekly and on main branch
+  - Note: Lighthouse audits are for frontend only (not API endpoints)
 
 ### Security Workflows
 
@@ -264,9 +265,10 @@ This project includes comprehensive CI/CD workflows for automated testing, secur
 
 - **Production Deployment** - `.github/workflows/deploy.yml`
   - Automated deployment to production/staging
-  - Pre-deployment testing
+  - Pre-deployment testing and validation
   - Build artifact management
   - Smoke tests after deployment
+  - Configurable deployment targets (see workflow comments for setup)
 
 ### Workflow Status
 
