@@ -1,6 +1,5 @@
 import { Injectable, Logger, BadRequestException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { Express } from "express";
 
 export interface ExtractedProgramData {
   name?: string;
@@ -36,11 +35,12 @@ export class AIExtractionService {
 
     if (openaiKey) {
       try {
-        // Lazy load OpenAI - only require if key exists
+        // Lazy load OpenAI - only import if key exists
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         const OpenAI = require("openai").default;
         this.openaiClient = new OpenAI({ apiKey: openaiKey });
         this.logger.log("OpenAI client initialized");
-      } catch (err) {
+      } catch {
         this.logger.warn(
           "OpenAI not available, install with: npm install openai",
         );
@@ -49,11 +49,12 @@ export class AIExtractionService {
 
     if (anthropicKey) {
       try {
-        // Lazy load Anthropic - only require if key exists
+        // Lazy load Anthropic - only import if key exists
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         const Anthropic = require("@anthropic-ai/sdk").default;
         this.anthropicClient = new Anthropic({ apiKey: anthropicKey });
         this.logger.log("Anthropic client initialized");
-      } catch (err) {
+      } catch {
         this.logger.warn(
           "Anthropic not available, install with: npm install @anthropic-ai/sdk",
         );
@@ -66,6 +67,7 @@ export class AIExtractionService {
    */
   private async extractTextFromPdf(file: any): Promise<string> {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const pdfParse = require("pdf-parse");
       const pdfData = await pdfParse(file.buffer);
       return pdfData.text || "";

@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Version } from "@nestjs/common";
+import { Controller, Get, Query } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags, ApiQuery } from "@nestjs/swagger";
 import { TradesService } from "./trades.service";
 
