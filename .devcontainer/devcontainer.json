@@ -7,7 +7,7 @@
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
   "forwardPorts": [3000, 3001, 5432],
-  "postCreateCommand": "npm install -g pnpm@8.15.0 && pnpm install",
+  "postCreateCommand": "npm install -g pnpm@8.15.0 && pnpm install && pnpm build:shared",
   "remoteUser": "node",
   "customizations": {
     "vscode": {
@@ -23,7 +23,35 @@
           "source.fixAll.eslint": "explicit"
         },
         "typescript.tsdk": "node_modules/typescript/lib",
-        "typescript.enablePromptUseWorkspaceTsdk": true
+        "typescript.enablePromptUseWorkspaceTsdk": true,
+        "eslint.workingDirectories": [
+          {"pattern": "packages/backend"},
+          {"pattern": "packages/frontend"},
+          {"pattern": "packages/shared"}
+        ],
+        "eslint.validate": [
+          "javascript",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact"
+        ],
+        "typescript.preferences.includePackageJsonAutoImports": "off",
+        "typescript.disableAutomaticTypeAcquisition": true,
+        "files.watcherExclude": {
+          "**/node_modules/**": true,
+          "**/.git/objects/**": true,
+          "**/.git/subtree-cache/**": true,
+          "**/dist/**": true,
+          "**/.next/**": true,
+          "**/.turbo/**": true
+        },
+        "search.exclude": {
+          "**/node_modules": true,
+          "**/dist": true,
+          "**/.next": true,
+          "**/.turbo": true,
+          "**/pnpm-lock.yaml": true
+        }
       }
     }
   },
