@@ -53,9 +53,24 @@ interface TestContext {
 // Helper: Calculate token expiration from JWT
 function getTokenExpiration(token: string): number {
   try {
-    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+    // Validate JWT format (3 parts separated by dots)
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      console.warn('Invalid JWT format, assuming 2 hour expiration');
+      return Date.now() + 2 * 60 * 60 * 1000;
+    }
+    
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+    
+    // Validate exp field exists and is a number
+    if (typeof payload.exp !== 'number') {
+      console.warn('JWT missing exp field, assuming 2 hour expiration');
+      return Date.now() + 2 * 60 * 60 * 1000;
+    }
+    
     return payload.exp * 1000; // Convert to milliseconds
   } catch (e) {
+    console.warn('Failed to parse JWT:', e);
     // If we can't parse, assume 2 hours from now (default JWT_EXPIRATION)
     return Date.now() + 2 * 60 * 60 * 1000;
   }
@@ -154,11 +169,15 @@ export const test = base.extend<TestContext>({
         const token = data.accessToken;
         
         // Store token info with password for future refresh
+        // NOTE: Storing passwords in test fixtures is acceptable for E2E testing
+        // In production, implement a refresh token endpoint instead of re-authentication
+        // Security trade-off: Test convenience vs password storage
+        // Mitigation: Only used in test environment, never in production code
         tokens.set(email, {
           token,
           expiresAt: getTokenExpiration(token),
           email,
-          password, // Store password for token refresh
+          password, // Stored for token refresh during long test workflows
           role: data.user?.role || 'unknown'
         });
         
