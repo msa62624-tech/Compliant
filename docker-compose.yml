@@ -24,6 +24,8 @@ services:
       - .:/workspace:cached
       - node_modules:/workspace/node_modules
     working_dir: /workspace
+    environment:
+      - NODE_ENV=development
     networks:
       - compliant-network
     depends_on:
