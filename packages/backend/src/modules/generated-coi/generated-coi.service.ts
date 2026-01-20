@@ -75,7 +75,7 @@ export class GeneratedCOIService {
       const lastName = nameParts.slice(1).join(" ") || "User";
 
       // Create broker user account with PERMANENT password
-      await this.prisma.user.create({
+      const brokerUser = await this.prisma.user.create({
         data: {
           email,
           password: hashedPassword,
@@ -94,7 +94,7 @@ export class GeneratedCOIService {
         // Generate a password reset token for broker to set their own password
         const resetToken = randomBytes(32).toString("hex");
         const resetTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-        
+
         // Store the reset token in the database
         await this.prisma.user.update({
           where: { id: brokerUser.id },
@@ -106,13 +106,13 @@ export class GeneratedCOIService {
 
         // Get the subcontractor name for context by finding the contractor with this broker email
         const subcontractor = await this.prisma.contractor.findFirst({
-          where: { 
+          where: {
             contractorType: "SUBCONTRACTOR",
-            brokerEmail: email 
+            brokerEmail: email,
           },
         });
-        
-        const subcontractorName = subcontractor 
+
+        const subcontractorName = subcontractor
           ? subcontractor.name
           : "a subcontractor";
 
