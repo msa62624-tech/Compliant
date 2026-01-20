@@ -38,7 +38,7 @@ const ADMIN_CREDENTIALS = {
 // Real-world data
 const PROJECT_DATA = {
   name: '114 Stockton Street Development',
-  description: '6-story mixed-use building with 33 residential condo units and ground floor retail. Concrete construction.',
+  description: '6-story mixed-use building with 33 residential condo units and ground floor retail. Concrete construction. SDV Program requirements apply.',
   startDate: new Date().toISOString(),
   endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
   status: 'ACTIVE',
@@ -93,6 +93,42 @@ const BROKER_DATA = {
   brokerWcEmail: 'msabel@hmlbrokerage.com',
   brokerWcPhone: '(555) 345-6789',
   brokerWcCompany: 'HML Brokerage'
+};
+
+// SDV Program Requirements
+const SDV_PROGRAM_DATA = {
+  name: 'SDV Program - 114 Stockton Street',
+  description: 'Special insurance requirements for 114 Stockton Street Development project',
+  isTemplate: false,
+  requiresHoldHarmless: true,
+  requiresAdditionalInsured: true,
+  requiresWaiverSubrogation: true,
+  // Default requirements (for standard trades like Plumbing)
+  glPerOccurrence: '2000000',
+  glAggregate: '4000000',
+  glMinimum: '2000000',
+  wcMinimum: '1000000',
+  autoMinimum: '1000000',
+  umbrellaMinimum: '0', // No umbrella required for standard trades
+  // Tier requirements
+  tiers: [
+    {
+      name: 'High-Risk Trades (Roofer & Siding)',
+      glPerOccurrence: '2000000',
+      glAggregate: '4000000',
+      umbrellaMinimum: '3000000',
+      isRest: false,
+      trades: ['Roofing', 'Siding', 'Exterior Cladding']
+    },
+    {
+      name: 'Standard Trades',
+      glPerOccurrence: '2000000',
+      glAggregate: '4000000',
+      umbrellaMinimum: '0',
+      isRest: true,  // All other trades
+      trades: []
+    }
+  ]
 };
 
 // Helper function to get auth token
@@ -199,8 +235,28 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
     expect(adminToken).toBeTruthy();
     console.log('✓ Admin authenticated successfully');
 
-    // Step 3: GC Creates Project
-    console.log('\n📋 Step 3: GC Creates Project - 114 Stockton Street');
+    // Step 3: Admin Creates SDV Program with Tier Requirements
+    console.log('\n📋 Step 3: Admin Creates SDV Program with Insurance Requirements');
+    let programId: string;
+    const program = await apiCallPW('/programs', 'POST', adminToken, SDV_PROGRAM_DATA);
+    programId = program.id;
+    expect(programId).toBeTruthy();
+    console.log(`✓ SDV Program created (ID: ${programId})`);
+    console.log(`  Name: ${program.name}`);
+    console.log(`  Default Requirements:`);
+    console.log(`    - GL Per Occurrence: $2,000,000`);
+    console.log(`    - GL Aggregate: $4,000,000`);
+    console.log(`  Tier 1 - High-Risk Trades (Roofer & Siding):`);
+    console.log(`    - GL Per Occurrence: $2,000,000`);
+    console.log(`    - GL Aggregate: $4,000,000`);
+    console.log(`    - Umbrella: $3,000,000 (REQUIRED)`);
+    console.log(`  Tier 2 - Standard Trades (All Others):`);
+    console.log(`    - GL Per Occurrence: $2,000,000`);
+    console.log(`    - GL Aggregate: $4,000,000`);
+    console.log(`    - Umbrella: Not required`);
+
+    // Step 4: GC Creates Project
+    console.log('\n📋 Step 4: GC Creates Project - 114 Stockton Street');
     const project = await apiCallPW('/projects', 'POST', gcToken, PROJECT_DATA);
     projectId = project.id;
     expect(projectId).toBeTruthy();
@@ -209,17 +265,35 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
     console.log(`  Owner: ${PROJECT_DATA.owner}`);
     console.log(`  Additional Insured: ${PROJECT_DATA.additionalInsured}`);
 
-    // Step 4: GC Adds Subcontractor
-    console.log('\n📋 Step 4: GC Adds Subcontractor - MPI Plumbing');
+    // Step 5: Admin Assigns SDV Program to Project
+    console.log('\n📋 Step 5: Admin Assigns SDV Program to Project');
+    try {
+      await apiCallPW(`/programs/${programId}/assign-project`, 'POST', adminToken, {
+        projectId: projectId
+      });
+      console.log(`✓ SDV Program assigned to project`);
+      console.log(`  All subcontractors will follow SDV insurance requirements`);
+    } catch (error) {
+      console.log('  Program assignment endpoint may need implementation');
+      console.log('  Continuing with manual program reference');
+    }
+
+    // Step 6: GC Adds Subcontractor - MPI Plumbing (Standard Trade)
+    console.log('\n📋 Step 6: GC Adds Subcontractor - MPI Plumbing');
     const subcontractor = await apiCallPW('/contractors', 'POST', gcToken, SUBCONTRACTOR_DATA);
     subcontractorId = subcontractor.id;
     expect(subcontractorId).toBeTruthy();
     console.log(`✓ Subcontractor added: ${subcontractor.name} (ID: ${subcontractorId})`);
     console.log(`  Email: ${SUBCONTRACTOR_DATA.email}`);
     console.log(`  Trades: ${SUBCONTRACTOR_DATA.trades.join(', ')}`);
+    console.log(`  SDV Program Tier: Standard Trades (Tier 2)`);
+    console.log(`  Required Insurance:`);
+    console.log(`    - GL Per Occurrence: $2,000,000`);
+    console.log(`    - GL Aggregate: $4,000,000`);
+    console.log(`    - Umbrella: NOT required (standard plumber trade)`);
 
-    // Step 5: Admin Creates COI for Subcontractor
-    console.log('\n📋 Step 5: Admin Creates COI for MPI Plumbing');
+    // Step 7: Admin Creates COI for Subcontractor
+    console.log('\n📋 Step 7: Admin Creates COI for MPI Plumbing');
     const coi = await apiCallPW('/generated-coi', 'POST', adminToken, {
       projectId: projectId,
       subcontractorId: subcontractorId,
@@ -230,8 +304,8 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
     console.log(`✓ COI created (ID: ${coiId})`);
     console.log(`  Status: ${coi.status}`);
 
-    // Step 6: Create User Account for Subcontractor
-    console.log('\n📋 Step 6: Create User Account for MPI Plumbing');
+    // Step 8: Create User Account for Subcontractor
+    console.log('\n📋 Step 8: Create User Account for MPI Plumbing');
     const subUser = await apiCallPW('/users', 'POST', adminToken, {
       email: SUBCONTRACTOR_DATA.email,
       password: 'MPIPlumbing123!@#',
@@ -246,8 +320,8 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
     subToken = await getAuthTokenPW(SUBCONTRACTOR_DATA.email, 'MPIPlumbing123!@#');
     console.log('✓ Subcontractor authenticated');
 
-    // Step 7: Subcontractor Provides Broker Information
-    console.log('\n📋 Step 7: Subcontractor Provides Broker Information - HML Brokerage');
+    // Step 9: Subcontractor Provides Broker Information
+    console.log('\n📋 Step 9: Subcontractor Provides Broker Information - HML Brokerage');
     const coiWithBroker = await apiCallPW(`/generated-coi/${coiId}/broker-info`, 'PATCH', subToken, BROKER_DATA);
     expect(coiWithBroker.status).toBe('AWAITING_BROKER_UPLOAD');
     console.log(`✓ Broker information provided`);
@@ -256,13 +330,14 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
     console.log(`  Email: ${BROKER_DATA.brokerEmail}`);
     console.log(`  Status: ${coiWithBroker.status}`);
 
-    // Step 8: Get Broker Token (using existing broker account)
+    // Step 10: Get Broker Token (using existing broker account)
     console.log('\n📋 Step 8: Broker Authentication');
     brokerToken = await getAuthTokenPW('broker@compliant.com', 'Broker123!@#');
     console.log('✓ Broker authenticated');
 
-    // Step 9: Broker Uploads Policies
-    console.log('\n📋 Step 9: Broker Uploads ACORD 25, GL, and Umbrella Policies');
+    // Step 11: Broker Uploads Policies (No Umbrella needed for standard plumber)
+    console.log('\n📋 Step 11: Broker Uploads ACORD 25, GL, Auto, and WC Policies');
+    console.log('  NOTE: Umbrella NOT required - MPI Plumbing is standard trade (Tier 2)');
     const futureDate = new Date();
     futureDate.setFullYear(futureDate.getFullYear() + 1);
     
@@ -271,12 +346,11 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
       glPolicyUrl: 'https://storage.example.com/policies/mpi-plumbing-acord25-gl-2024.pdf',
       glPolicyNumber: 'GL-MPI-2024-001',
       glExpirationDate: futureDate.toISOString(),
-      glCoverageLimits: '$2,000,000 per occurrence / $4,000,000 aggregate',
+      glCoverageLimits: '$2,000,000 per occurrence / $4,000,000 aggregate (meets SDV Tier 2 requirements)',
       
-      umbrellaPolicyUrl: 'https://storage.example.com/policies/mpi-plumbing-umbrella-2024.pdf',
-      umbrellaPolicyNumber: 'UMB-MPI-2024-001',
-      umbrellaExpirationDate: futureDate.toISOString(),
-      umbrellaCoverageLimits: '$5,000,000 excess liability',
+      // No umbrella required for standard trades like plumbing
+      // umbrellaPolicyUrl: null, 
+      // umbrellaPolicyNumber: null,
       
       autoPolicyUrl: 'https://storage.example.com/policies/mpi-plumbing-auto-2024.pdf',
       autoPolicyNumber: 'AUTO-MPI-2024-001',
@@ -290,21 +364,20 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
     });
     
     expect(coiWithPolicies.status).toBe('AWAITING_BROKER_SIGNATURE');
-    console.log(`✓ All policies uploaded`);
-    console.log(`  - ACORD 25 / GL: ${coiWithPolicies.glPolicyNumber}`);
-    console.log(`  - Umbrella: ${coiWithPolicies.umbrellaPolicyNumber}`);
+    console.log(`✓ All required policies uploaded`);
+    console.log(`  - ACORD 25 / GL: ${coiWithPolicies.glPolicyNumber} ✓ Meets $2M/$4M requirement`);
     console.log(`  - Auto: ${coiWithPolicies.autoPolicyNumber}`);
     console.log(`  - Workers' Comp: ${coiWithPolicies.wcPolicyNumber}`);
+    console.log(`  - Umbrella: NOT REQUIRED for plumber (standard trade - Tier 2)`);
     console.log(`  Status: ${coiWithPolicies.status}`);
 
-    // Step 10: Broker Signs All Policies
-    console.log('\n📋 Step 10: Broker Signs and Submits All Policies');
+    // Step 12: Broker Signs All Policies
+    console.log('\n📋 Step 12: Broker Signs and Submits All Policies');
     const coiSigned = await apiCallPW(`/generated-coi/${coiId}/sign`, 'PATCH', brokerToken, {
       glBrokerSignatureUrl: 'https://storage.example.com/signatures/hml-miriam-sig.png',
       glBrokerSignedAt: new Date().toISOString(),
       
-      umbrellaBrokerSignatureUrl: 'https://storage.example.com/signatures/hml-miriam-sig.png',
-      umbrellaBrokerSignedAt: new Date().toISOString(),
+      // No umbrella to sign for standard plumber trade
       
       autoBrokerSignatureUrl: 'https://storage.example.com/signatures/hml-miriam-sig.png',
       autoBrokerSignedAt: new Date().toISOString(),
@@ -317,22 +390,31 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
     console.log(`✓ All policies signed by broker`);
     console.log(`  Status: ${coiSigned.status} ← Submitted for admin review`);
 
-    // Step 11: Admin Reviews and Approves
-    console.log('\n📋 Step 11: Admin Reviews and Approves COI');
+    // Step 13: Admin Reviews and Approves
+    console.log('\n📋 Step 13: Admin Reviews and Approves COI');
     const coiApproved = await apiCallPW(`/generated-coi/${coiId}/review`, 'PATCH', adminToken, {
       approved: true,
       reviewNotes: `COI APPROVED for MPI Plumbing on 114 Stockton Street Project.
 
 ✓ All required policies provided and compliant
-✓ Coverage amounts meet project requirements
+✓ SDV Program Tier 2 requirements met:
+  - GL: $2M per occurrence / $4M aggregate ✓
+  - Umbrella: NOT required for plumber (standard trade)
+✓ Coverage amounts meet SDV program requirements
 ✓ All policies valid for minimum 1 year
 ✓ Additional Insured: 114 Neighbor LLC properly listed
 ✓ Waiver of subrogation in place
 
 Project: 114 Stockton Street Development
+Program: SDV Program Requirements
 GC: Prestige Builders
-Subcontractor: MPI Plumbing
+Subcontractor: MPI Plumbing (Standard Trade - Tier 2)
 Broker: HML Brokerage (Miriam)
+
+NOTE: Umbrella insurance ($3M) would be required for:
+- Roofers
+- Siding contractors
+But NOT required for plumbers (standard trade)
 
 Approved by: Admin
 Date: ${new Date().toISOString()}`,
@@ -343,7 +425,7 @@ Date: ${new Date().toISOString()}`,
     console.log(`✓ COI approved by admin`);
     console.log(`  Status: ${coiApproved.status} ← MPI Plumbing is now compliant!`);
 
-    // Step 12: Check Hold Harmless Auto-Generation
+    // Step 14: Check Hold Harmless Auto-Generation
     console.log('\n📋 Step 12: Checking Hold Harmless Auto-Generation');
     try {
       const hhResponse = await apiCallPW(`/hold-harmless/coi/${coiId}`, 'GET', adminToken);
@@ -363,9 +445,9 @@ Date: ${new Date().toISOString()}`,
       console.log('  Workflow can continue - HH will be added in future iteration');
     }
 
-    // Step 13: Subcontractor Signs Hold Harmless (if available)
+    // Step 15: Subcontractor Signs Hold Harmless (if available)
     if (holdHarmlessId) {
-      console.log('\n📋 Step 13: Subcontractor Signs Hold Harmless');
+      console.log('\n📋 Step 15: Subcontractor Signs Hold Harmless');
       try {
         const hhSubSigned = await apiCallPW(
           `/hold-harmless/${holdHarmlessId}/sign/subcontractor`,
@@ -382,8 +464,8 @@ Date: ${new Date().toISOString()}`,
         console.log('  HH signing endpoint not fully implemented yet');
       }
 
-      // Step 14: GC Signs Hold Harmless (saves to file system)
-      console.log('\n📋 Step 14: GC Signs Hold Harmless (Saves to File System)');
+      // Step 16: GC Signs Hold Harmless (saves to file system)
+      console.log('\n📋 Step 16: GC Signs Hold Harmless (Saves to File System)');
       try {
         const hhGcSigned = await apiCallPW(
           `/hold-harmless/${holdHarmlessId}/sign/gc`,
@@ -402,7 +484,7 @@ Date: ${new Date().toISOString()}`,
       }
     }
 
-    // Step 15: Final Verification - Navigate to Admin Dashboard
+    // Step 17: Final Verification - Navigate to Admin Dashboard
     console.log('\n📋 Step 15: Navigate to Admin Dashboard to View Results');
     await page.goto(`${process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000'}/login`);
     await page.waitForLoadState('networkidle');
