@@ -1,0 +1,88 @@
+
+=== CONSOLE MONITORING SUMMARY ===
+Test: complete_coi_workflow_with_ui
+Generated: 2026-01-20T07:14:26.418Z
+
+Console Summary: 71 messages (58 errors, 0 warnings, 2 logs, 11 info, 0 debug)
+
+Breakdown by Type:
+- Errors: 58
+- Warnings: 0
+- Logs: 2
+- Info: 11
+- Debug: 0
+
+=== ALL MESSAGES ===
+[2026-01-20T07:14:04.181Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T07:14:04.302Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:04.304Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:04.307Z] [LOG] [Fast Refresh] rebuilding
+[2026-01-20T07:14:04.314Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:04.315Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:05.239Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:05.241Z] [ERROR] Login failed: AxiosError
+[2026-01-20T07:14:05.532Z] [LOG] [Fast Refresh] done in 1225ms
+[2026-01-20T07:14:05.988Z] [ERROR] REQUEST FAILED: http://localhost:3000/login?_rsc=g0rnx - net::ERR_ABORTED
+[2026-01-20T07:14:06.006Z] [ERROR] REQUEST FAILED: http://localhost:3000/login?_rsc=g0rnx - net::ERR_ABORTED
+[2026-01-20T07:14:07.826Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T07:14:07.933Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:07.937Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:07.938Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:07.938Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:08.337Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T07:14:08.425Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:08.426Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:08.430Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:08.431Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:09.154Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:09.155Z] [ERROR] Login failed: AxiosError
+[2026-01-20T07:14:11.627Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T07:14:11.712Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:11.713Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:11.720Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:11.721Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:12.107Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T07:14:12.192Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:12.193Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:12.198Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:12.199Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:12.904Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:12.905Z] [ERROR] Login failed: AxiosError
+[2026-01-20T07:14:15.381Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T07:14:15.459Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:15.459Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:15.463Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:15.463Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:15.870Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T07:14:15.964Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:15.967Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:15.971Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:15.972Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:16.670Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:16.673Z] [ERROR] Login failed: AxiosError
+[2026-01-20T07:14:19.129Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T07:14:19.208Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:19.209Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:19.213Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:19.213Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:19.596Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T07:14:19.674Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:19.675Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:19.679Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:19.680Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:20.387Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:20.388Z] [ERROR] Login failed: AxiosError
+[2026-01-20T07:14:22.980Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T07:14:23.078Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:23.078Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:23.082Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:23.083Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:23.486Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T07:14:23.566Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:23.567Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:23.570Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:23.571Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T07:14:24.270Z] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-20T07:14:24.271Z] [ERROR] Login failed: AxiosError
+
+=== END OF SUMMARY ===
