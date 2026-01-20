@@ -6,11 +6,14 @@ export interface User {
   lastName: string;
   role: UserRole;
   isActive: boolean;
+  resetToken?: string | null;
+  resetTokenExpiry?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export enum UserRole {
+  SUPER_ADMIN = "SUPER_ADMIN",
   ADMIN = "ADMIN",
   MANAGER = "MANAGER",
   USER = "USER",
