@@ -25,12 +25,10 @@ const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3001';
 const API_PATH = '/api';
 const API_VERSION = '1';
 
-// Test credentials from seeded data
+// Only Admin has pre-seeded credentials
+// GC/Contractor, Subcontractor, and Broker accounts are auto-created when added
 const CREDENTIALS = {
   admin: { email: 'admin@compliant.com', password: 'Admin123!@#' },
-  contractor: { email: 'contractor@compliant.com', password: 'Contractor123!@#' },
-  subcontractor: { email: 'subcontractor@compliant.com', password: 'Subcontractor123!@#' },
-  broker: { email: 'broker@compliant.com', password: 'Broker123!@#' },
 };
 
 // Helper function to get auth token via API
@@ -84,26 +82,61 @@ test.describe('Complete COI Workflow Tests', () => {
   test.describe('1. COMPLIANT WORKFLOW - First-Time Submission', () => {
     let adminToken: string;
     let contractorToken: string;
+    let contractorEmail: string;
+    let contractorPassword: string;
     let subcontractorToken: string;
+    let subcontractorEmail: string;
+    let subcontractorPassword: string;
     let brokerToken: string;
     let projectId: string;
+    let contractorId: string;
     let subcontractorId: string;
     let coiId: string;
 
-    test('Setup: Authenticate all users', async () => {
+    test('Setup: Admin creates GC and authenticates', async () => {
       console.log('\n=== COMPLIANT WORKFLOW - First-Time Submission ===\n');
       
+      // Step 1: Admin authenticates (only admin has pre-seeded credentials)
       adminToken = await getAuthToken(CREDENTIALS.admin.email, CREDENTIALS.admin.password);
-      contractorToken = await getAuthToken(CREDENTIALS.contractor.email, CREDENTIALS.contractor.password);
-      subcontractorToken = await getAuthToken(CREDENTIALS.subcontractor.email, CREDENTIALS.subcontractor.password);
-      brokerToken = await getAuthToken(CREDENTIALS.broker.email, CREDENTIALS.broker.password);
-      
       expect(adminToken).toBeTruthy();
-      expect(contractorToken).toBeTruthy();
-      expect(subcontractorToken).toBeTruthy();
-      expect(brokerToken).toBeTruthy();
+      console.log('✓ Admin authenticated successfully');
       
-      console.log('✓ All users authenticated successfully');
+      // Step 2: Admin creates GC contractor - system generates credentials
+      const uniqueEmail = `gc.abc.construction.${Date.now()}@example.com`;
+      const gcContractor = await apiCall(
+        '/contractors',
+        'POST',
+        adminToken,
+        {
+          name: 'ABC Construction Inc.',
+          email: uniqueEmail,
+          phone: '(555) 999-1000',
+          company: 'ABC Construction Inc.',
+          address: '670 Myrtle Ave, Suite 163',
+          city: 'Brooklyn',
+          state: 'NY',
+          zipCode: '11205',
+          status: 'ACTIVE',
+          trades: ['General Construction'],
+        }
+      );
+      
+      contractorId = gcContractor.id;
+      contractorEmail = gcContractor.userAccount.email;
+      contractorPassword = gcContractor.userAccount.password;
+      
+      expect(contractorId).toBeTruthy();
+      expect(contractorEmail).toBe(uniqueEmail);
+      expect(contractorPassword).toBeTruthy();
+      expect(gcContractor.userAccount.created).toBe(true);
+      
+      console.log(`✓ GC contractor created: ${gcContractor.name} (ID: ${contractorId})`);
+      console.log(`  Auto-generated credentials: ${contractorEmail} / ${contractorPassword}`);
+      
+      // Step 3: GC authenticates with generated credentials
+      contractorToken = await getAuthToken(contractorEmail, contractorPassword);
+      expect(contractorToken).toBeTruthy();
+      console.log('✓ GC authenticated with generated credentials');
     });
 
     test('Step 1: GC creates a project', async () => {
@@ -131,31 +164,43 @@ test.describe('Complete COI Workflow Tests', () => {
     });
 
     test('Step 2: GC adds subcontractor to project', async () => {
+      const uniqueEmail = `elite.electrical.${Date.now()}@example.com`;
       const subcontractor = await apiCall(
         '/contractors',
         'POST',
         contractorToken,
         {
           name: 'Elite Electrical Services',
-          email: 'elite.electrical@example.com',
+          email: uniqueEmail,
           phone: '(555) 123-4567',
           company: 'Elite Electrical Services LLC',
-          contractorType: 'SUBCONTRACTOR',
+          address: '670 Myrtle Ave, Suite 163',
+          city: 'Brooklyn',
+          state: 'NY',
+          zipCode: '11205',
           status: 'ACTIVE',
-          address: '456 Industrial Blvd',
-          city: 'Construction City',
-          state: 'CA',
-          zipCode: '90210',
-          trades: ['Electrical', 'Low Voltage'],
+          trades: ['Electrical'],
         }
       );
 
       subcontractorId = subcontractor.id;
+      subcontractorEmail = subcontractor.userAccount.email;
+      subcontractorPassword = subcontractor.userAccount.password;
+      
       expect(subcontractorId).toBeTruthy();
       expect(subcontractor.contractorType).toBe('SUBCONTRACTOR');
       expect(subcontractor.status).toBe('ACTIVE');
+      expect(subcontractorEmail).toBe(uniqueEmail);
+      expect(subcontractorPassword).toBeTruthy();
+      expect(subcontractor.userAccount.created).toBe(true);
       
       console.log(`✓ Subcontractor added: ${subcontractor.name} (ID: ${subcontractorId})`);
+      console.log(`  Auto-generated credentials: ${subcontractorEmail} / ${subcontractorPassword}`);
+      
+      // Subcontractor authenticates with generated credentials
+      subcontractorToken = await getAuthToken(subcontractorEmail, subcontractorPassword);
+      expect(subcontractorToken).toBeTruthy();
+      console.log('✓ Subcontractor authenticated with generated credentials');
     });
 
     test('Step 3: Admin creates COI for subcontractor - Status: AWAITING_BROKER_INFO', async () => {
@@ -185,10 +230,10 @@ test.describe('Complete COI Workflow Tests', () => {
         'PATCH',
         subcontractorToken,
         {
+          brokerType: 'PER_POLICY',
           brokerGlName: 'John Smith',
           brokerGlEmail: 'john.smith@insurancepro.com',
           brokerGlPhone: '(555) 100-0001',
-          brokerCompany: 'Insurance Pro LLC',
           
           brokerAutoName: 'Jane Doe',
           brokerAutoEmail: 'jane.doe@insurancepro.com',
@@ -197,12 +242,10 @@ test.describe('Complete COI Workflow Tests', () => {
           brokerUmbrellaName: 'Bob Johnson',
           brokerUmbrellaEmail: 'bob.johnson@insurancepro.com',
           brokerUmbrellaPhone: '(555) 100-0003',
-          brokerUmbrellaCompany: 'Insurance Pro LLC',
           
           brokerWcName: 'Alice Williams',
           brokerWcEmail: 'alice.williams@insurancepro.com',
           brokerWcPhone: '(555) 100-0004',
-          brokerWcCompany: 'Insurance Pro LLC',
         }
       );
 
@@ -332,21 +375,65 @@ test.describe('Complete COI Workflow Tests', () => {
   test.describe('2. NON-COMPLIANT WORKFLOW - Deficiency and Resubmission', () => {
     let adminToken: string;
     let contractorToken: string;
+    let contractorEmail: string;
+    let contractorPassword: string;
     let subcontractorToken: string;
+    let subcontractorEmail: string;
+    let subcontractorPassword: string;
     let brokerToken: string;
     let projectId: string;
+    let contractorId: string;
     let subcontractorId: string;
     let coiId: string;
 
-    test('Setup: Authenticate all users', async () => {
+    test('Setup: Admin creates GC and authenticates', async () => {
       console.log('\n=== NON-COMPLIANT WORKFLOW - Deficiency Handling ===\n');
       
+      // Admin authenticates
       adminToken = await getAuthToken(CREDENTIALS.admin.email, CREDENTIALS.admin.password);
-      contractorToken = await getAuthToken(CREDENTIALS.contractor.email, CREDENTIALS.contractor.password);
-      subcontractorToken = await getAuthToken(CREDENTIALS.subcontractor.email, CREDENTIALS.subcontractor.password);
-      brokerToken = await getAuthToken(CREDENTIALS.broker.email, CREDENTIALS.broker.password);
+      expect(adminToken).toBeTruthy();
+      console.log('✓ Admin authenticated successfully');
       
-      console.log('✓ All users authenticated');
+      // Admin creates GC contractor - system generates credentials
+      const uniqueEmail = `westside.construction.${Date.now()}@example.com`;
+      const gcContractor = await apiCall(
+        '/contractors',
+        'POST',
+        adminToken,
+        {
+          name: 'Westside Construction LLC',
+          email: uniqueEmail,
+          phone: '(555) 900-1001',
+          company: 'Westside Construction LLC',
+          address: '670 Myrtle Ave, Suite 163',
+          city: 'Brooklyn',
+          state: 'NY',
+          zipCode: '11205',
+          status: 'ACTIVE',
+          trades: ['General Construction'],
+        }
+      );
+      
+      contractorId = gcContractor.id;
+      contractorEmail = gcContractor.userAccount.email;
+      contractorPassword = gcContractor.userAccount.password;
+      
+      expect(contractorId).toBeTruthy();
+      expect(contractorEmail).toBe(uniqueEmail);
+      expect(contractorPassword).toBeTruthy();
+      expect(gcContractor.userAccount.created).toBe(true);
+      
+      console.log(`✓ GC contractor created: ${gcContractor.name} (ID: ${contractorId})`);
+      console.log(`  Auto-generated credentials: ${contractorEmail} / ${contractorPassword}`);
+      
+      // GC authenticates with generated credentials
+      contractorToken = await getAuthToken(contractorEmail, contractorPassword);
+      expect(contractorToken).toBeTruthy();
+      console.log('✓ GC authenticated with generated credentials');
+      
+      // Broker uses pre-seeded admin account for workflow 2
+      brokerToken = adminToken;
+      console.log('✓ Using admin token for broker actions');
     });
 
     test('Step 1: GC creates project and adds subcontractor', async () => {
@@ -364,24 +451,40 @@ test.describe('Complete COI Workflow Tests', () => {
 
       projectId = project.id;
 
+      const uniqueEmail = `speedy.plumbing.${Date.now()}@example.com`;
       const subcontractor = await apiCall(
         '/contractors',
         'POST',
         contractorToken,
         {
           name: 'Speedy Plumbing Co',
-          email: 'speedy.plumbing@example.com',
+          email: uniqueEmail,
           company: 'Speedy Plumbing Company',
-          contractorType: 'SUBCONTRACTOR',
+          address: '670 Myrtle Ave, Suite 163',
+          city: 'Brooklyn',
+          state: 'NY',
+          zipCode: '11205',
           status: 'ACTIVE',
-          trades: ['Plumbing', 'HVAC'],
+          trades: ['Plumbing'],
         }
       );
 
       subcontractorId = subcontractor.id;
+      subcontractorEmail = subcontractor.userAccount.email;
+      subcontractorPassword = subcontractor.userAccount.password;
+      
+      expect(subcontractorEmail).toBe(uniqueEmail);
+      expect(subcontractorPassword).toBeTruthy();
+      expect(subcontractor.userAccount.created).toBe(true);
       
       console.log(`✓ Project created: ${project.name}`);
       console.log(`✓ Subcontractor added: ${subcontractor.name}`);
+      console.log(`  Auto-generated credentials: ${subcontractorEmail} / ${subcontractorPassword}`);
+      
+      // Subcontractor authenticates with generated credentials
+      subcontractorToken = await getAuthToken(subcontractorEmail, subcontractorPassword);
+      expect(subcontractorToken).toBeTruthy();
+      console.log('✓ Subcontractor authenticated with generated credentials');
     });
 
     test('Step 2-5: Create COI and complete through signing (fast-forward)', async () => {
@@ -402,6 +505,7 @@ test.describe('Complete COI Workflow Tests', () => {
         'PATCH',
         subcontractorToken,
         {
+          brokerType: 'PER_POLICY',
           brokerGlName: 'Mike Brown',
           brokerGlEmail: 'mike@quickinsurance.com',
           brokerGlPhone: '(555) 200-0001',
@@ -606,22 +710,66 @@ Contact admin if you have questions: admin@compliant.com`,
   test.describe('3. RENEWAL WORKFLOW - Second-Time Submission', () => {
     let adminToken: string;
     let contractorToken: string;
+    let contractorEmail: string;
+    let contractorPassword: string;
     let subcontractorToken: string;
+    let subcontractorEmail: string;
+    let subcontractorPassword: string;
     let brokerToken: string;
     let projectId: string;
+    let contractorId: string;
     let subcontractorId: string;
     let originalCoiId: string;
     let renewedCoiId: string;
 
-    test('Setup: Authenticate all users', async () => {
+    test('Setup: Admin creates GC and authenticates', async () => {
       console.log('\n=== RENEWAL WORKFLOW - Second-Time Submission ===\n');
       
+      // Admin authenticates
       adminToken = await getAuthToken(CREDENTIALS.admin.email, CREDENTIALS.admin.password);
-      contractorToken = await getAuthToken(CREDENTIALS.contractor.email, CREDENTIALS.contractor.password);
-      subcontractorToken = await getAuthToken(CREDENTIALS.subcontractor.email, CREDENTIALS.subcontractor.password);
-      brokerToken = await getAuthToken(CREDENTIALS.broker.email, CREDENTIALS.broker.password);
+      expect(adminToken).toBeTruthy();
+      console.log('✓ Admin authenticated successfully');
       
-      console.log('✓ All users authenticated');
+      // Admin creates GC contractor - system generates credentials
+      const uniqueEmail = `highway.builders.${Date.now()}@example.com`;
+      const gcContractor = await apiCall(
+        '/contractors',
+        'POST',
+        adminToken,
+        {
+          name: 'Highway Builders Inc.',
+          email: uniqueEmail,
+          phone: '(555) 800-1002',
+          company: 'Highway Builders Inc.',
+          address: '670 Myrtle Ave, Suite 163',
+          city: 'Brooklyn',
+          state: 'NY',
+          zipCode: '11205',
+          status: 'ACTIVE',
+          trades: ['General Construction'],
+        }
+      );
+      
+      contractorId = gcContractor.id;
+      contractorEmail = gcContractor.userAccount.email;
+      contractorPassword = gcContractor.userAccount.password;
+      
+      expect(contractorId).toBeTruthy();
+      expect(contractorEmail).toBe(uniqueEmail);
+      expect(contractorPassword).toBeTruthy();
+      expect(gcContractor.userAccount.created).toBe(true);
+      
+      console.log(`✓ GC contractor created: ${gcContractor.name} (ID: ${contractorId})`);
+      console.log(`  Auto-generated credentials: ${contractorEmail} / ${contractorPassword}`);
+      
+      // GC authenticates with generated credentials
+      contractorToken = await getAuthToken(contractorEmail, contractorPassword);
+      expect(contractorToken).toBeTruthy();
+      console.log('✓ GC authenticated with generated credentials');
+      
+      // Broker uses admin token for workflow 3
+      brokerToken = adminToken;
+      console.log('✓ Using admin token for broker actions');
     });
 
     test('Step 1: Create and approve original COI (fast-forward)', async () => {
@@ -639,21 +787,39 @@ Contact admin if you have questions: admin@compliant.com`,
 
       projectId = project.id;
 
+      const uniqueEmail = `concrete.masters.${Date.now()}@example.com`;
       const subcontractor = await apiCall(
         '/contractors',
         'POST',
         contractorToken,
         {
           name: 'Concrete Masters Inc',
-          email: 'concrete.masters@example.com',
+          email: uniqueEmail,
           company: 'Concrete Masters Incorporated',
-          contractorType: 'SUBCONTRACTOR',
+          address: '670 Myrtle Ave, Suite 163',
+          city: 'Brooklyn',
+          state: 'NY',
+          zipCode: '11205',
           status: 'ACTIVE',
-          trades: ['Concrete', 'Formwork'],
+          trades: ['Concrete'],
         }
       );
 
       subcontractorId = subcontractor.id;
+      subcontractorEmail = subcontractor.userAccount.email;
+      subcontractorPassword = subcontractor.userAccount.password;
+      
+      expect(subcontractorEmail).toBe(uniqueEmail);
+      expect(subcontractorPassword).toBeTruthy();
+      expect(subcontractor.userAccount.created).toBe(true);
+      
+      console.log(`✓ Subcontractor added: ${subcontractor.name}`);
+      console.log(`  Auto-generated credentials: ${subcontractorEmail} / ${subcontractorPassword}`);
+      
+      // Subcontractor authenticates with generated credentials
+      subcontractorToken = await getAuthToken(subcontractorEmail, subcontractorPassword);
+      expect(subcontractorToken).toBeTruthy();
+      console.log('✓ Subcontractor authenticated with generated credentials');
 
       // Create and complete original COI
       const coi = await apiCall(
@@ -673,10 +839,10 @@ Contact admin if you have questions: admin@compliant.com`,
         'PATCH',
         subcontractorToken,
         {
+          brokerType: 'PER_POLICY',
           brokerGlName: 'Sarah Johnson',
           brokerGlEmail: 'sarah.johnson@premiuminsurance.com',
           brokerGlPhone: '(555) 300-0001',
-          brokerCompany: 'Premium Insurance Group',
           
           brokerAutoName: 'Sarah Johnson',
           brokerAutoEmail: 'sarah.johnson@premiuminsurance.com',
@@ -685,12 +851,10 @@ Contact admin if you have questions: admin@compliant.com`,
           brokerUmbrellaName: 'Sarah Johnson',
           brokerUmbrellaEmail: 'sarah.johnson@premiuminsurance.com',
           brokerUmbrellaPhone: '(555) 300-0001',
-          brokerUmbrellaCompany: 'Premium Insurance Group',
           
           brokerWcName: 'Sarah Johnson',
           brokerWcEmail: 'sarah.johnson@premiuminsurance.com',
           brokerWcPhone: '(555) 300-0001',
-          brokerWcCompany: 'Premium Insurance Group',
         }
       );
 
@@ -766,7 +930,7 @@ Contact admin if you have questions: admin@compliant.com`,
       // Verify broker information was copied from original
       expect(renewedCoi.brokerGlName).toBe('Sarah Johnson');
       expect(renewedCoi.brokerGlEmail).toBe('sarah.johnson@premiuminsurance.com');
-      expect(renewedCoi.brokerCompany).toBe('Premium Insurance Group');
+      expect(renewedCoi.brokerType).toBe('PER_POLICY');
       
       // Renewal should skip AWAITING_BROKER_INFO since broker info is copied
       expect(renewedCoi.status).toBe('AWAITING_BROKER_UPLOAD');

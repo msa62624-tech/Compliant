@@ -1,0 +1,45 @@
+
+=== CONSOLE MONITORING SUMMARY ===
+Test: real_login_gc_navigation
+Generated: 2026-01-20T14:13:21.359Z
+
+Console Summary: 28 messages (23 errors, 0 warnings, 0 logs, 5 info, 0 debug)
+
+Breakdown by Type:
+- Errors: 23
+- Warnings: 0
+- Logs: 0
+- Info: 5
+- Debug: 0
+
+=== ALL MESSAGES ===
+[2026-01-20T14:13:13.577Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:13:13.682Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:13:13.683Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:13:13.688Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:13:13.688Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:13:14.619Z] [ERROR] REQUEST FAILED: http://localhost:3000/dashboard?_rsc=16jui - net::ERR_ABORTED
+[2026-01-20T14:13:17.105Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:13:17.213Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:13:17.215Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:13:17.216Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:13:17.217Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:13:18.155Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:13:18.254Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:13:18.255Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:13:18.264Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:13:18.266Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:13:19.266Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:13:19.357Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:13:19.358Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:13:19.360Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:13:19.360Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:13:19.403Z] [ERROR] REQUEST FAILED: http://localhost:3000/login?_rsc=tlsy5 - net::ERR_ABORTED
+[2026-01-20T14:13:20.424Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:13:20.538Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:13:20.539Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:13:20.546Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:13:20.547Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:13:20.569Z] [ERROR] REQUEST FAILED: http://localhost:3000/login?_rsc=ooyt9 - net::ERR_ABORTED
+
+=== END OF SUMMARY ===

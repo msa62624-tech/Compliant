@@ -6,13 +6,91 @@ import { ScreenshotHelper } from './screenshot-helper';
  * 
  * This test performs an actual login through the UI and captures screenshots
  * at every step of navigation through the application.
+ * 
+ * NOTE: Tests now create users dynamically since only Admin has pre-seeded credentials.
  */
+
+// API Configuration
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3001';
+const API_PATH = '/api';
+const API_VERSION = '1';
+
+// Only Admin has pre-seeded credentials
+const ADMIN_CREDENTIALS = {
+  email: 'admin@compliant.com',
+  password: 'Admin123!@#'
+};
+
+// Helper to get auth token via API
+async function getAuthToken(email: string, password: string): Promise<string> {
+  const response = await fetch(`${API_BASE_URL}${API_PATH}/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-API-Version': API_VERSION,
+    },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Login failed (${response.status}): ${error}`);
+  }
+
+  const data = await response.json();
+  return data.accessToken;
+}
+
+// Helper to create contractor (returns auto-generated credentials)
+async function createContractor(token: string, data: any): Promise<any> {
+  const response = await fetch(`${API_BASE_URL}${API_PATH}/contractors`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      'X-API-Version': API_VERSION,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Create contractor failed (${response.status}): ${error}`);
+  }
+
+  return await response.json();
+}
 
 test.describe('Real Login and Navigation with Screenshots', () => {
   
   test('Login as GC and navigate through the application', async ({ page }) => {
     const screenshots = new ScreenshotHelper('real-login-gc-navigation');
     screenshots.startConsoleMonitoring(page);
+
+    // Step 0: Setup - Admin creates GC contractor with auto-generated credentials
+    console.log('\n📋 Step 0: Setup - Admin creates GC contractor');
+    const adminToken = await getAuthToken(ADMIN_CREDENTIALS.email, ADMIN_CREDENTIALS.password);
+    
+    const uniqueEmail = `test.gc.navigation.${Date.now()}@example.com`;
+    const gcContractor = await createContractor(adminToken, {
+      name: 'Test GC Navigation Company',
+      email: uniqueEmail,
+      phone: '(555) 100-0001',
+      company: 'Test GC Navigation Company',
+      address: '670 Myrtle Ave, Suite 163',
+      city: 'Brooklyn',
+      state: 'NY',
+      zipCode: '11205',
+      status: 'ACTIVE',
+      trades: ['General Construction'],
+    });
+    
+    const gcEmail = gcContractor.userAccount.email;
+    const gcPassword = gcContractor.userAccount.password;
+    
+    console.log(`✓ GC contractor created with auto-generated credentials`);
+    console.log(`  Email: ${gcEmail}`);
+    console.log(`  Password: ${gcPassword}`);
 
     // Step 1: Navigate to login page
     console.log('\n📋 Step 1: Navigate to Login Page');
@@ -21,16 +99,16 @@ test.describe('Real Login and Navigation with Screenshots', () => {
     await screenshots.capture(page, '001-login-page-loaded', true);
     console.log('✓ Login page loaded');
 
-    // Step 2: Enter GC credentials (Prestige Builders)
-    console.log('\n📋 Step 2: Enter GC Credentials - Prestige Builders');
+    // Step 2: Enter GC credentials (dynamically created)
+    console.log('\n📋 Step 2: Enter GC Credentials');
     const emailInput = page.locator('input[type="email"], input[name="email"]').first();
     const passwordInput = page.locator('input[type="password"]').first();
     
-    await emailInput.fill('contractor@compliant.com');
+    await emailInput.fill(gcEmail);
     await screenshots.capture(page, '002-email-entered');
-    console.log('✓ Email entered: contractor@compliant.com');
+    console.log(`✓ Email entered: ${gcEmail}`);
     
-    await passwordInput.fill('Contractor123!@#');
+    await passwordInput.fill(gcPassword);
     await screenshots.capture(page, '003-password-entered');
     console.log('✓ Password entered');
 
@@ -134,7 +212,7 @@ test.describe('Real Login and Navigation with Screenshots', () => {
     console.log('✅ REAL LOGIN TEST COMPLETED SUCCESSFULLY');
     console.log('='.repeat(70));
     console.log(`\n📊 Test Summary:`);
-    console.log(`  Login Email: contractor@compliant.com (GC - Prestige Builders)`);
+    console.log(`  Login Email: ${gcEmail} (GC - Dynamically Created)`);
     console.log(`  Final URL: ${page.url()}`);
     console.log(`  Page Title: ${pageTitle}`);
     console.log(`\n📸 Screenshots: ${screenshots.getCount()} captured`);
@@ -155,12 +233,12 @@ test.describe('Real Login and Navigation with Screenshots', () => {
     await page.waitForLoadState('networkidle');
     await screenshots.capture(page, '001-admin-login-page', true);
 
-    // Login as admin
+    // Login as admin (admin has pre-seeded credentials)
     const emailInput = page.locator('input[type="email"], input[name="email"]').first();
     const passwordInput = page.locator('input[type="password"]').first();
     
-    await emailInput.fill('admin@compliant.com');
-    await passwordInput.fill('Admin123!@#');
+    await emailInput.fill(ADMIN_CREDENTIALS.email);
+    await passwordInput.fill(ADMIN_CREDENTIALS.password);
     await screenshots.capture(page, '002-admin-credentials-entered');
 
     const loginButton = page.locator('button[type="submit"]').first();
@@ -207,6 +285,31 @@ test.describe('Real Login and Navigation with Screenshots', () => {
 
     console.log('\n📋 Subcontractor Login Test Started');
     
+    // Step 0: Setup - Admin creates subcontractor with auto-generated credentials
+    console.log('\n📋 Step 0: Setup - Admin creates subcontractor');
+    const adminToken = await getAuthToken(ADMIN_CREDENTIALS.email, ADMIN_CREDENTIALS.password);
+    
+    const uniqueEmail = `test.sub.navigation.${Date.now()}@example.com`;
+    const subContractor = await createContractor(adminToken, {
+      name: 'Test Sub Navigation Company',
+      email: uniqueEmail,
+      phone: '(555) 200-0001',
+      company: 'Test Sub Navigation Company',
+      address: '670 Myrtle Ave, Suite 163',
+      city: 'Brooklyn',
+      state: 'NY',
+      zipCode: '11205',
+      status: 'ACTIVE',
+      trades: ['Electrical'],
+    });
+    
+    const subEmail = subContractor.userAccount.email;
+    const subPassword = subContractor.userAccount.password;
+    
+    console.log(`✓ Subcontractor created with auto-generated credentials`);
+    console.log(`  Email: ${subEmail}`);
+    console.log(`  Password: ${subPassword}`);
+    
     await page.goto('/login');
     await page.waitForLoadState('networkidle');
     await screenshots.capture(page, '001-subcontractor-login-page', true);
@@ -214,8 +317,8 @@ test.describe('Real Login and Navigation with Screenshots', () => {
     const emailInput = page.locator('input[type="email"], input[name="email"]').first();
     const passwordInput = page.locator('input[type="password"]').first();
     
-    await emailInput.fill('subcontractor@compliant.com');
-    await passwordInput.fill('Subcontractor123!@#');
+    await emailInput.fill(subEmail);
+    await passwordInput.fill(subPassword);
     await screenshots.capture(page, '002-subcontractor-credentials-entered');
 
     const loginButton = page.locator('button[type="submit"]').first();

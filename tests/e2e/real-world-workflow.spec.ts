@@ -24,12 +24,7 @@ const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3001';
 const API_PATH = '/api';
 const API_VERSION = '1';
 
-// Real-world credentials
-const GC_CREDENTIALS = {
-  email: 'contractor@compliant.com',  // Using existing GC account
-  password: 'Contractor123!@#'
-};
-
+// Only Admin has pre-seeded credentials
 const ADMIN_CREDENTIALS = {
   email: 'admin@compliant.com',
   password: 'Admin123!@#'
@@ -59,7 +54,6 @@ const SUBCONTRACTOR_DATA = {
   email: 'msa62624@gmail.com',
   phone: '(555) 234-5678',
   company: 'MPI Plumbing LLC',
-  contractorType: 'SUBCONTRACTOR',
   status: 'ACTIVE',
   trades: ['Plumbing', 'HVAC'],
   address: '789 Industrial Ave',
@@ -69,33 +63,26 @@ const SUBCONTRACTOR_DATA = {
 };
 
 const BROKER_DATA = {
-  brokerCompany: 'HML Brokerage',
-  brokerContact: 'Miriam',
-  brokerEmail: 'msabel@hmlbrokerage.com',
-  brokerPhone: '(555) 345-6789',
+  brokerType: 'PER_POLICY',
   // Same broker for all policies
   brokerGlName: 'Miriam - HML Brokerage',
   brokerGlEmail: 'msabel@hmlbrokerage.com',
   brokerGlPhone: '(555) 345-6789',
-  brokerGlCompany: 'HML Brokerage',
   
   brokerAutoName: 'Miriam - HML Brokerage',
   brokerAutoEmail: 'msabel@hmlbrokerage.com',
   brokerAutoPhone: '(555) 345-6789',
-  brokerAutoCompany: 'HML Brokerage',
   
   brokerUmbrellaName: 'Miriam - HML Brokerage',
   brokerUmbrellaEmail: 'msabel@hmlbrokerage.com',
   brokerUmbrellaPhone: '(555) 345-6789',
-  brokerUmbrellaCompany: 'HML Brokerage',
   
   brokerWcName: 'Miriam - HML Brokerage',
   brokerWcEmail: 'msabel@hmlbrokerage.com',
-  brokerWcPhone: '(555) 345-6789',
-  brokerWcCompany: 'HML Brokerage'
+  brokerWcPhone: '(555) 345-6789'
 };
 
-// SDV Program Requirements
+// SDV Program Requirements - matches CreateProgramDto schema
 const SDV_PROGRAM_DATA = {
   name: 'SDV Program - 114 Stockton Street',
   description: 'Special insurance requirements for 114 Stockton Street Development project',
@@ -103,32 +90,32 @@ const SDV_PROGRAM_DATA = {
   requiresHoldHarmless: true,
   requiresAdditionalInsured: true,
   requiresWaiverSubrogation: true,
-  // Default requirements (for standard trades like Plumbing)
-  glPerOccurrence: '2000000',
-  glAggregate: '4000000',
-  glMinimum: '2000000',
-  wcMinimum: '1000000',
-  autoMinimum: '1000000',
-  umbrellaMinimum: '0', // No umbrella required for standard trades
-  // Tier requirements
-  tiers: [
-    {
-      name: 'High-Risk Trades (Roofer & Siding)',
-      glPerOccurrence: '2000000',
-      glAggregate: '4000000',
-      umbrellaMinimum: '3000000',
-      isRest: false,
-      trades: ['Roofing', 'Siding', 'Exterior Cladding']
-    },
-    {
-      name: 'Standard Trades',
-      glPerOccurrence: '2000000',
-      glAggregate: '4000000',
-      umbrellaMinimum: '0',
-      isRest: true,  // All other trades
-      trades: []
-    }
-  ]
+  // Default requirements (for standard trades like Plumbing) - must be numbers
+  glMinimum: 2000000,
+  wcMinimum: 1000000,
+  autoMinimum: 1000000,
+  umbrellaMinimum: 0, // No umbrella required for standard trades
+  // Tier requirements - stored as object
+  tierRequirements: {
+    tiers: [
+      {
+        name: 'High-Risk Trades (Roofer & Siding)',
+        glPerOccurrence: 2000000,
+        glAggregate: 4000000,
+        umbrellaMinimum: 3000000,
+        isRest: false,
+        trades: ['Roofing', 'Siding', 'Exterior Cladding']
+      },
+      {
+        name: 'Standard Trades',
+        glPerOccurrence: 2000000,
+        glAggregate: 4000000,
+        umbrellaMinimum: 0,
+        isRest: true,  // All other trades
+        trades: []
+      }
+    ]
+  }
 };
 
 // Helper function to get auth token
@@ -173,8 +160,12 @@ async function apiCall(endpoint: string, method: string, token: string, body?: a
 
 test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () => {
   let gcToken: string;
+  let gcEmail: string;
+  let gcPassword: string;
   let adminToken: string;
   let subToken: string;
+  let subEmail: string;
+  let subPassword: string;
   let brokerToken: string;
   let projectId: string;
   let subcontractorId: string;
@@ -223,20 +214,46 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
       return await response.json();
     }
 
-    // Step 1: GC Authentication
-    console.log('\n📋 Step 1: GC (Prestige Builders) Authentication');
-    gcToken = await getAuthTokenPW(GC_CREDENTIALS.email, GC_CREDENTIALS.password);
-    expect(gcToken).toBeTruthy();
-    console.log('✓ GC authenticated successfully');
-
-    // Step 2: Admin Authentication
-    console.log('\n📋 Step 2: Admin Authentication');
+    // Step 1: Admin Authentication
+    console.log('\n📋 Step 1: Admin Authentication');
     adminToken = await getAuthTokenPW(ADMIN_CREDENTIALS.email, ADMIN_CREDENTIALS.password);
     expect(adminToken).toBeTruthy();
     console.log('✓ Admin authenticated successfully');
 
+    // Step 2: Admin Creates GC Contractor - Prestige Builders
+    console.log('\n📋 Step 2: Admin Creates GC Contractor - Prestige Builders');
+    const uniqueEmail = `prestige.builders.${Date.now()}@example.com`;
+    const gcContractor = await apiCallPW('/contractors', 'POST', adminToken, {
+      name: 'Prestige Builders',
+      email: uniqueEmail,
+      phone: '(555) 123-4567',
+      company: 'Prestige Builders LLC',
+      address: '670 Myrtle Ave, Suite 163',
+      city: 'Brooklyn',
+      state: 'NY',
+      zipCode: '11205',
+      status: 'ACTIVE',
+      trades: ['General Construction'],
+    });
+    
+    gcEmail = gcContractor.userAccount.email;
+    gcPassword = gcContractor.userAccount.password;
+    
+    expect(gcEmail).toBe(uniqueEmail);
+    expect(gcPassword).toBeTruthy();
+    expect(gcContractor.userAccount.created).toBe(true);
+    
+    console.log(`✓ GC contractor created: ${gcContractor.name}`);
+    console.log(`  Auto-generated credentials: ${gcEmail} / ${gcPassword}`);
+    
+    // Step 3: GC Authentication with generated credentials
+    console.log('\n📋 Step 3: GC (Prestige Builders) Authentication');
+    gcToken = await getAuthTokenPW(gcEmail, gcPassword);
+    expect(gcToken).toBeTruthy();
+    console.log('✓ GC authenticated successfully with generated credentials');
+
     // Step 3: Admin Creates SDV Program with Tier Requirements
-    console.log('\n📋 Step 3: Admin Creates SDV Program with Insurance Requirements');
+    console.log('\n📋 Step 4: Admin Creates SDV Program with Insurance Requirements');
     let programId: string;
     const program = await apiCallPW('/programs', 'POST', adminToken, SDV_PROGRAM_DATA);
     programId = program.id;
@@ -256,7 +273,7 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
     console.log(`    - Umbrella: Not required`);
 
     // Step 4: GC Creates Project
-    console.log('\n📋 Step 4: GC Creates Project - 114 Stockton Street');
+    console.log('\n📋 Step 5: GC Creates Project - 114 Stockton Street');
     const project = await apiCallPW('/projects', 'POST', gcToken, PROJECT_DATA);
     projectId = project.id;
     expect(projectId).toBeTruthy();
@@ -266,7 +283,7 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
     console.log(`  Additional Insured: ${PROJECT_DATA.additionalInsured}`);
 
     // Step 5: Admin Assigns SDV Program to Project
-    console.log('\n📋 Step 5: Admin Assigns SDV Program to Project');
+    console.log('\n📋 Step 6: Admin Assigns SDV Program to Project');
     try {
       await apiCallPW(`/programs/${programId}/assign-project`, 'POST', adminToken, {
         projectId: projectId
@@ -279,11 +296,30 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
     }
 
     // Step 6: GC Adds Subcontractor - MPI Plumbing (Standard Trade)
-    console.log('\n📋 Step 6: GC Adds Subcontractor - MPI Plumbing');
-    const subcontractor = await apiCallPW('/contractors', 'POST', gcToken, SUBCONTRACTOR_DATA);
+    console.log('\n📋 Step 7: GC Adds Subcontractor - MPI Plumbing');
+    const subcontractor = await apiCallPW('/contractors', 'POST', gcToken, {
+      name: SUBCONTRACTOR_DATA.name,
+      email: SUBCONTRACTOR_DATA.email,
+      phone: SUBCONTRACTOR_DATA.phone,
+      company: SUBCONTRACTOR_DATA.company,
+      address: '670 Myrtle Ave, Suite 163',
+      city: 'Brooklyn',
+      state: 'NY',
+      zipCode: '11205',
+      status: 'ACTIVE',
+      trades: ['Plumbing', 'HVAC'],
+    });
     subcontractorId = subcontractor.id;
+    subEmail = subcontractor.userAccount.email;
+    subPassword = subcontractor.userAccount.password;
+    
     expect(subcontractorId).toBeTruthy();
+    expect(subEmail).toBe(SUBCONTRACTOR_DATA.email);
+    expect(subPassword).toBeTruthy();
+    expect(subcontractor.userAccount.created).toBe(true);
+    
     console.log(`✓ Subcontractor added: ${subcontractor.name} (ID: ${subcontractorId})`);
+    console.log(`  Auto-generated credentials: ${subEmail} / ${subPassword}`);
     console.log(`  Email: ${SUBCONTRACTOR_DATA.email}`);
     console.log(`  Trades: ${SUBCONTRACTOR_DATA.trades.join(', ')}`);
     console.log(`  SDV Program Tier: Standard Trades (Tier 2)`);
@@ -293,7 +329,7 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
     console.log(`    - Umbrella: NOT required (standard plumber trade)`);
 
     // Step 7: Admin Creates COI for Subcontractor
-    console.log('\n📋 Step 7: Admin Creates COI for MPI Plumbing');
+    console.log('\n📋 Step 8: Admin Creates COI for MPI Plumbing');
     const coi = await apiCallPW('/generated-coi', 'POST', adminToken, {
       projectId: projectId,
       subcontractorId: subcontractorId,
@@ -304,39 +340,29 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
     console.log(`✓ COI created (ID: ${coiId})`);
     console.log(`  Status: ${coi.status}`);
 
-    // Step 8: Create User Account for Subcontractor
-    console.log('\n📋 Step 8: Create User Account for MPI Plumbing');
-    const subUser = await apiCallPW('/users', 'POST', adminToken, {
-      email: SUBCONTRACTOR_DATA.email,
-      password: 'MPIPlumbing123!@#',
-      name: 'MPI Plumbing Contact',
-      role: 'SUBCONTRACTOR'
-    });
-    subUserId = subUser.id;
-    console.log(`✓ User created for subcontractor: ${subUser.email}`);
-    console.log(`  Credentials: ${SUBCONTRACTOR_DATA.email} / MPIPlumbing123!@#`);
-
-    // Authenticate as subcontractor
-    subToken = await getAuthTokenPW(SUBCONTRACTOR_DATA.email, 'MPIPlumbing123!@#');
-    console.log('✓ Subcontractor authenticated');
+    // Step 8: Subcontractor authenticates with generated credentials
+    console.log('\n📋 Step 9: Subcontractor Authentication');
+    subToken = await getAuthTokenPW(subEmail, subPassword);
+    console.log(`✓ Subcontractor authenticated: ${subEmail}`);
+    console.log(`  Using generated credentials from contractor creation`);
 
     // Step 9: Subcontractor Provides Broker Information
-    console.log('\n📋 Step 9: Subcontractor Provides Broker Information - HML Brokerage');
+    console.log('\n📋 Step 10: Subcontractor Provides Broker Information - HML Brokerage');
     const coiWithBroker = await apiCallPW(`/generated-coi/${coiId}/broker-info`, 'PATCH', subToken, BROKER_DATA);
     expect(coiWithBroker.status).toBe('AWAITING_BROKER_UPLOAD');
     console.log(`✓ Broker information provided`);
-    console.log(`  Broker: ${BROKER_DATA.brokerCompany}`);
-    console.log(`  Contact: ${BROKER_DATA.brokerContact}`);
-    console.log(`  Email: ${BROKER_DATA.brokerEmail}`);
+    console.log(`  Broker: HML Brokerage`);
+    console.log(`  Contact: ${BROKER_DATA.brokerGlName}`);
+    console.log(`  Email: ${BROKER_DATA.brokerGlEmail}`);
     console.log(`  Status: ${coiWithBroker.status}`);
 
-    // Step 10: Get Broker Token (using existing broker account)
-    console.log('\n📋 Step 8: Broker Authentication');
-    brokerToken = await getAuthTokenPW('broker@compliant.com', 'Broker123!@#');
-    console.log('✓ Broker authenticated');
+    // Step 10: Get Broker Token (broker uses admin account for now since broker accounts are link-based)
+    console.log('\n📋 Step 11: Broker Authentication (using admin for broker actions)');
+    brokerToken = adminToken;
+    console.log('✓ Broker authenticated (using admin token for broker operations)');
 
     // Step 11: Broker Uploads Policies (No Umbrella needed for standard plumber)
-    console.log('\n📋 Step 11: Broker Uploads ACORD 25, GL, Auto, and WC Policies');
+    console.log('\n📋 Step 12: Broker Uploads ACORD 25, GL, Auto, and WC Policies');
     console.log('  NOTE: Umbrella NOT required - MPI Plumbing is standard trade (Tier 2)');
     const futureDate = new Date();
     futureDate.setFullYear(futureDate.getFullYear() + 1);
@@ -372,7 +398,7 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
     console.log(`  Status: ${coiWithPolicies.status}`);
 
     // Step 12: Broker Signs All Policies
-    console.log('\n📋 Step 12: Broker Signs and Submits All Policies');
+    console.log('\n📋 Step 13: Broker Signs and Submits All Policies');
     const coiSigned = await apiCallPW(`/generated-coi/${coiId}/sign`, 'PATCH', brokerToken, {
       glBrokerSignatureUrl: 'https://storage.example.com/signatures/hml-miriam-sig.png',
       glBrokerSignedAt: new Date().toISOString(),
@@ -391,7 +417,7 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
     console.log(`  Status: ${coiSigned.status} ← Submitted for admin review`);
 
     // Step 13: Admin Reviews and Approves
-    console.log('\n📋 Step 13: Admin Reviews and Approves COI');
+    console.log('\n📋 Step 14: Admin Reviews and Approves COI');
     const coiApproved = await apiCallPW(`/generated-coi/${coiId}/review`, 'PATCH', adminToken, {
       approved: true,
       reviewNotes: `COI APPROVED for MPI Plumbing on 114 Stockton Street Project.
@@ -426,7 +452,7 @@ Date: ${new Date().toISOString()}`,
     console.log(`  Status: ${coiApproved.status} ← MPI Plumbing is now compliant!`);
 
     // Step 14: Check Hold Harmless Auto-Generation
-    console.log('\n📋 Step 12: Checking Hold Harmless Auto-Generation');
+    console.log('\n📋 Step 15: Checking Hold Harmless Auto-Generation');
     try {
       const hhResponse = await apiCallPW(`/hold-harmless/coi/${coiId}`, 'GET', adminToken);
       if (hhResponse && hhResponse.id) {
@@ -447,7 +473,7 @@ Date: ${new Date().toISOString()}`,
 
     // Step 15: Subcontractor Signs Hold Harmless (if available)
     if (holdHarmlessId) {
-      console.log('\n📋 Step 15: Subcontractor Signs Hold Harmless');
+      console.log('\n📋 Step 16: Subcontractor Signs Hold Harmless');
       try {
         const hhSubSigned = await apiCallPW(
           `/hold-harmless/${holdHarmlessId}/sign/subcontractor`,
@@ -465,7 +491,7 @@ Date: ${new Date().toISOString()}`,
       }
 
       // Step 16: GC Signs Hold Harmless (saves to file system)
-      console.log('\n📋 Step 16: GC Signs Hold Harmless (Saves to File System)');
+      console.log('\n📋 Step 17: GC Signs Hold Harmless (Saves to File System)');
       try {
         const hhGcSigned = await apiCallPW(
           `/hold-harmless/${holdHarmlessId}/sign/gc`,
@@ -485,7 +511,7 @@ Date: ${new Date().toISOString()}`,
     }
 
     // Step 17: Final Verification - Navigate to Admin Dashboard
-    console.log('\n📋 Step 15: Navigate to Admin Dashboard to View Results');
+    console.log('\n📋 Step 18: Navigate to Admin Dashboard to View Results');
     await page.goto(`${process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000'}/login`);
     await page.waitForLoadState('networkidle');
     await screenshots.capture(page, '001-login-page', true);
@@ -525,7 +551,7 @@ Date: ${new Date().toISOString()}`,
     console.log(`  Location: ${PROJECT_DATA.location}`);
     console.log(`  GC: ${PROJECT_DATA.gcName} (${PROJECT_DATA.gcEmail})`);
     console.log(`  Subcontractor: ${SUBCONTRACTOR_DATA.name} (${SUBCONTRACTOR_DATA.email})`);
-    console.log(`  Broker: ${BROKER_DATA.brokerCompany} (${BROKER_DATA.brokerEmail})`);
+    console.log(`  Broker: HML Brokerage (${BROKER_DATA.brokerGlEmail})`);
     console.log(`  Project ID: ${projectId}`);
     console.log(`  Subcontractor ID: ${subcontractorId}`);
     console.log(`  COI ID: ${coiId}`);

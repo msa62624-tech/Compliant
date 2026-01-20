@@ -151,10 +151,32 @@ export class ContractorsService {
   }
 
   async create(createContractorDto: CreateContractorDto, userId: string) {
+    // Get creator's user info to auto-determine contractor type
+    const creator = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+
+    if (!creator) {
+      throw new Error('Creator user not found');
+    }
+
+    // Automatically determine contractorType based on who is creating:
+    // - ADMIN/SUPER_ADMIN/MANAGER creates → GENERAL_CONTRACTOR (GC)
+    // - CONTRACTOR (GC) creates → SUBCONTRACTOR (Sub)
+    // For Subcontractors, their specific type is defined by the 'trades' field
+    const contractorType =
+      creator.role === 'ADMIN' || 
+      creator.role === 'SUPER_ADMIN' || 
+      creator.role === 'MANAGER'
+        ? 'GENERAL_CONTRACTOR'
+        : 'SUBCONTRACTOR';
+
     // Create contractor record
     const contractor = await this.prisma.contractor.create({
       data: {
         ...createContractorDto,
+        contractorType,
         createdById: userId,
       },
       include: {

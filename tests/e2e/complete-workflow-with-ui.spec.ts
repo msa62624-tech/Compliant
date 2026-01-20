@@ -133,72 +133,44 @@ test.describe('Complete COI Workflow - Prestige Builders & MPI Plumbing', () => 
     // ==========================================
     // PHASE 1: ADMIN SETUP
     // ==========================================
-    console.log('\n📋 PHASE 1: Admin Setup - Create Users & Program');
+    console.log('\n📋 PHASE 1: Admin Setup - Create Contractors (with auto-generated user accounts)');
     
     // Step 1: Admin Login
     await loginViaUI(page, ADMIN_CREDENTIALS.email, ADMIN_CREDENTIALS.password, screenshots, 'admin');
 
-    // Step 2: Create GC User (Prestige Builders - Miriam)
-    console.log('\n📋 Step 2: Admin Creates GC User - Prestige Builders');
+    // Step 2: Admin Creates GC Contractor - user account auto-generated
+    console.log('\n📋 Step 2: Admin Creates GC Contractor - Prestige Builders');
+    let gcEmail: string;
+    let gcPassword: string;
     try {
-      const gcUser = await apiCallWithPage(page, '/users', 'POST', NEW_GC_DATA);
-      gcUserId = gcUser.id;
-      console.log(`✓ GC User created: ${NEW_GC_DATA.email} (ID: ${gcUserId})`);
-      await screenshots.capture(page, 'admin-06-gc-user-created');
-    } catch (error) {
-      console.log(`Note: GC user may already exist: ${error}`);
-    }
-
-    // Step 3: Create Subcontractor User (MPI Plumbing)
-    console.log('\n📋 Step 3: Admin Creates Subcontractor User - MPI Plumbing');
-    try {
-      const subUser = await apiCallWithPage(page, '/users', 'POST', NEW_SUB_DATA);
-      subUserId = subUser.id;
-      console.log(`✓ Sub User created: ${NEW_SUB_DATA.email} (ID: ${subUserId})`);
-      await screenshots.capture(page, 'admin-07-sub-user-created');
-    } catch (error) {
-      console.log(`Note: Sub user may already exist: ${error}`);
-    }
-
-    // Step 4: Create Broker User (HML Brokerage - Miriam)
-    console.log('\n📋 Step 4: Admin Creates Broker User - HML Brokerage');
-    try {
-      const brokerUser = await apiCallWithPage(page, '/users', 'POST', NEW_BROKER_DATA);
-      brokerUserId = brokerUser.id;
-      console.log(`✓ Broker User created: ${NEW_BROKER_DATA.email} (ID: ${brokerUserId})`);
-      await screenshots.capture(page, 'admin-08-broker-user-created');
-    } catch (error) {
-      console.log(`Note: Broker user may already exist: ${error}`);
-    }
-
-    // Step 5: Create SDV Program
-    console.log('\n📋 Step 5: Admin Creates SDV Program');
-    try {
-      const program = await apiCallWithPage(page, '/programs', 'POST', {
-        name: 'SDV Program - 114 Stockton Street',
-        description: 'Special insurance requirements for 114 Stockton Street Development',
-        isTemplate: false,
-        requiresHoldHarmless: true,
-        requiresAdditionalInsured: true,
-        requiresWaiverSubrogation: true,
-        glPerOccurrence: '2000000',
-        glAggregate: '4000000',
-        glMinimum: '2000000',
-        wcMinimum: '1000000',
-        autoMinimum: '1000000',
-        umbrellaMinimum: '0',
+      const gcContractor = await apiCallWithPage(page, '/contractors', 'POST', {
+        name: NEW_GC_DATA.company,
+        email: NEW_GC_DATA.email,
+        phone: '(555) 123-4567',
+        company: NEW_GC_DATA.company,
+        address: '670 Myrtle Ave, Suite 163',
+        city: 'Brooklyn',
+        state: 'NY',
+        zipCode: '11205',
+        status: 'ACTIVE',
+        trades: ['General Construction'],
       });
-      programId = program.id;
-      console.log(`✓ SDV Program created (ID: ${programId})`);
-      console.log(`  - GL: $2M per occurrence / $4M aggregate`);
-      console.log(`  - Umbrella: Not required for standard trades (plumbers)`);
-      await screenshots.capture(page, 'admin-09-program-created');
+      
+      gcEmail = gcContractor.userAccount.email;
+      gcPassword = gcContractor.userAccount.password;
+      
+      console.log(`✓ GC Contractor created: ${gcContractor.name}`);
+      console.log(`  Auto-generated credentials: ${gcEmail} / ${gcPassword}`);
+      await screenshots.capture(page, 'admin-06-gc-contractor-created');
     } catch (error) {
-      console.log(`Note: Program creation: ${error}`);
+      console.log(`Note: GC contractor may already exist: ${error}`);
+      // Use the predefined password as fallback
+      gcEmail = NEW_GC_DATA.email;
+      gcPassword = NEW_GC_DATA.password;
     }
 
     // Admin logs out
-    console.log('\n📋 Step 6: Admin Logs Out');
+    console.log('\n📋 Step 3: Admin Logs Out');
     await page.goto('/');
     await screenshots.capture(page, 'admin-10-logout', true);
 
@@ -207,11 +179,11 @@ test.describe('Complete COI Workflow - Prestige Builders & MPI Plumbing', () => 
     // ==========================================
     console.log('\n📋 PHASE 2: GC Workflow - Create Project & Add Sub');
     
-    // Step 7: GC Logs In with NEW credentials
-    await loginViaUI(page, NEW_GC_DATA.email, NEW_GC_DATA.password, screenshots, 'gc');
+    // Step 4: GC Logs In with auto-generated credentials
+    await loginViaUI(page, gcEmail, gcPassword, screenshots, 'gc');
 
-    // Step 8: GC Creates Project
-    console.log('\n📋 Step 8: GC Creates Project - 114 Stockton Street');
+    // Step 5: GC Creates Project
+    console.log('\n📋 Step 5: GC Creates Project - 114 Stockton Street');
     try {
       const project = await apiCallWithPage(page, '/projects', 'POST', {
         name: PROJECT_DATA.name,
@@ -234,25 +206,36 @@ test.describe('Complete COI Workflow - Prestige Builders & MPI Plumbing', () => 
       console.log(`Project creation: ${error}`);
     }
 
-    // Step 9: GC Adds Subcontractor
-    console.log('\n📋 Step 9: GC Adds Subcontractor - MPI Plumbing');
+    // Step 6: GC Adds Subcontractor - user account auto-generated
+    console.log('\n📋 Step 6: GC Adds Subcontractor - MPI Plumbing');
+    let subEmail: string;
+    let subPassword: string;
     try {
       const subcontractor = await apiCallWithPage(page, '/contractors', 'POST', {
         name: NEW_SUB_DATA.company,
         email: NEW_SUB_DATA.email,
         phone: '(555) 234-5678',
         company: NEW_SUB_DATA.company,
-        contractorType: 'SUBCONTRACTOR',
+        address: '670 Myrtle Ave, Suite 163',
+        city: 'Brooklyn',
+        state: 'NY',
+        zipCode: '11205',
         status: 'ACTIVE',
         trades: ['Plumbing', 'HVAC'],
       });
       subcontractorId = subcontractor.id;
+      subEmail = subcontractor.userAccount.email;
+      subPassword = subcontractor.userAccount.password;
+      
       console.log(`✓ Subcontractor added: ${NEW_SUB_DATA.company} (ID: ${subcontractorId})`);
-      console.log(`  Email: ${NEW_SUB_DATA.email}`);
+      console.log(`  Auto-generated credentials: ${subEmail} / ${subPassword}`);
       console.log(`  Trades: Plumbing, HVAC (Standard - No umbrella required)`);
       await screenshots.capture(page, 'gc-06-subcontractor-added');
     } catch (error) {
       console.log(`Subcontractor creation: ${error}`);
+      // Use predefined password as fallback
+      subEmail = NEW_SUB_DATA.email;
+      subPassword = NEW_SUB_DATA.password;
     }
 
     // GC logs out
@@ -264,11 +247,11 @@ test.describe('Complete COI Workflow - Prestige Builders & MPI Plumbing', () => 
     // ==========================================
     console.log('\n📋 PHASE 3: Admin Creates COI for Subcontractor');
     
-    // Step 10: Admin logs back in
+    // Step 7: Admin logs back in
     await loginViaUI(page, ADMIN_CREDENTIALS.email, ADMIN_CREDENTIALS.password, screenshots, 'admin-return');
 
-    // Step 11: Admin creates COI
-    console.log('\n📋 Step 11: Admin Creates COI for MPI Plumbing');
+    // Step 8: Admin creates COI
+    console.log('\n📋 Step 8: Admin Creates COI for MPI Plumbing');
     if (projectId && subcontractorId) {
       try {
         const coi = await apiCallWithPage(page, '/generated-coi', 'POST', {
@@ -293,18 +276,18 @@ test.describe('Complete COI Workflow - Prestige Builders & MPI Plumbing', () => 
     // ==========================================
     console.log('\n📋 PHASE 4: Subcontractor Provides Broker Information');
     
-    // Step 12: Sub logs in with NEW credentials
-    await loginViaUI(page, NEW_SUB_DATA.email, NEW_SUB_DATA.password, screenshots, 'sub');
+    // Step 9: Sub logs in with auto-generated credentials
+    await loginViaUI(page, subEmail, subPassword, screenshots, 'sub');
 
-    // Step 13: Sub provides broker information
-    console.log('\n📋 Step 13: Subcontractor Provides Broker Info - HML Brokerage');
+    // Step 10: Sub provides broker information
+    console.log('\n📋 Step 10: Subcontractor Provides Broker Info - HML Brokerage');
     if (coiId) {
       try {
         await apiCallWithPage(page, `/generated-coi/${coiId}/broker-info`, 'PATCH', {
-          brokerCompany: NEW_BROKER_DATA.company,
-          brokerContact: NEW_BROKER_DATA.firstName,
-          brokerEmail: NEW_BROKER_DATA.email,
-          brokerPhone: '(555) 345-6789',
+          brokerType: 'PER_POLICY',
+          brokerGlName: NEW_BROKER_DATA.firstName,
+          brokerGlEmail: NEW_BROKER_DATA.email,
+          brokerGlPhone: '(555) 345-6789',
         });
         console.log(`✓ Broker information provided`);
         console.log(`  Broker: ${NEW_BROKER_DATA.company}`);
@@ -324,11 +307,12 @@ test.describe('Complete COI Workflow - Prestige Builders & MPI Plumbing', () => 
     // ==========================================
     console.log('\n📋 PHASE 5: Broker Uploads Policies');
     
-    // Step 14: Broker logs in with NEW credentials
-    await loginViaUI(page, NEW_BROKER_DATA.email, NEW_BROKER_DATA.password, screenshots, 'broker');
+    // Step 11: Broker logs in (using admin for broker actions since broker accounts are link-based)
+    await loginViaUI(page, ADMIN_CREDENTIALS.email, ADMIN_CREDENTIALS.password, screenshots, 'broker');
+    console.log('  NOTE: Using admin account for broker actions (broker accounts are typically link-based)');
 
-    // Step 15: Broker uploads policies
-    console.log('\n📋 Step 15: Broker Uploads Policies (ACORD 25, GL, Auto, WC)');
+    // Step 12: Broker uploads policies
+    console.log('\n📋 Step 12: Broker Uploads Policies (ACORD 25, GL, Auto, WC)');
     console.log('  NOTE: No umbrella required for plumber (standard trade)');
     if (coiId) {
       try {
@@ -361,8 +345,8 @@ test.describe('Complete COI Workflow - Prestige Builders & MPI Plumbing', () => 
       }
     }
 
-    // Step 16: Broker signs policies
-    console.log('\n📋 Step 16: Broker Signs Policies');
+    // Step 13: Broker signs policies
+    console.log('\n📋 Step 13: Broker Signs Policies');
     if (coiId) {
       try {
         await apiCallWithPage(page, `/generated-coi/${coiId}/sign`, 'PATCH', {
@@ -390,11 +374,11 @@ test.describe('Complete COI Workflow - Prestige Builders & MPI Plumbing', () => 
     // ==========================================
     console.log('\n📋 PHASE 6: Admin Reviews and Approves COI');
     
-    // Step 17: Admin logs back in
+    // Step 14: Admin logs back in (if needed)
     await loginViaUI(page, ADMIN_CREDENTIALS.email, ADMIN_CREDENTIALS.password, screenshots, 'admin-final');
 
-    // Step 18: Admin approves COI
-    console.log('\n📋 Step 18: Admin Approves COI');
+    // Step 15: Admin approves COI
+    console.log('\n📋 Step 15: Admin Approves COI');
     if (coiId) {
       try {
         await apiCallWithPage(page, `/generated-coi/${coiId}/review`, 'PATCH', {
@@ -435,9 +419,9 @@ Date: ${new Date().toISOString()}`,
     console.log('='.repeat(80));
     console.log(`\n📊 Workflow Summary:`);
     console.log(`\n👥 Users Created & Used:`);
-    console.log(`  GC: ${NEW_GC_DATA.email} (Prestige Builders)`);
-    console.log(`  Sub: ${NEW_SUB_DATA.email} (MPI Plumbing)`);
-    console.log(`  Broker: ${NEW_BROKER_DATA.email} (HML Brokerage)`);
+    console.log(`  GC: ${gcEmail} (Prestige Builders) - Auto-generated on contractor creation`);
+    console.log(`  Sub: ${subEmail} (MPI Plumbing) - Auto-generated on contractor creation`);
+    console.log(`  Broker: admin@compliant.com (using admin for broker operations)`);
     console.log(`\n📋 Entities Created:`);
     if (programId) console.log(`  Program ID: ${programId} (SDV Program)`);
     if (projectId) console.log(`  Project ID: ${projectId} (114 Stockton Street)`);

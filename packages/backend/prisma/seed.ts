@@ -91,68 +91,23 @@ async function main() {
 
   console.log("✓ Created manager user:", manager.email);
 
-  // Create contractor user (GC role)
-  const contractorPassword = await bcrypt.hash("Contractor123!@#", 10);
-  const contractorUser = await prisma.user.upsert({
-    where: { email: "contractor@compliant.com" },
-    update: {},
-    create: {
-      email: "contractor@compliant.com",
-      password: contractorPassword,
-      firstName: "General",
-      lastName: "Contractor",
-      role: "CONTRACTOR",
-      isActive: true,
-    },
-  });
-
-  console.log("✓ Created contractor user:", contractorUser.email);
-
-  // Create subcontractor user
-  const subcontractorPassword = await bcrypt.hash("Subcontractor123!@#", 10);
-  const subcontractorUser = await prisma.user.upsert({
-    where: { email: "subcontractor@compliant.com" },
-    update: {},
-    create: {
-      email: "subcontractor@compliant.com",
-      password: subcontractorPassword,
-      firstName: "Sub",
-      lastName: "Contractor",
-      role: "SUBCONTRACTOR",
-      isActive: true,
-    },
-  });
-
-  console.log("✓ Created subcontractor user:", subcontractorUser.email);
-
-  // Create broker user
-  const brokerPassword = await bcrypt.hash("Broker123!@#", 10);
-  const brokerUser = await prisma.user.upsert({
-    where: { email: "broker@compliant.com" },
-    update: {},
-    create: {
-      email: "broker@compliant.com",
-      password: brokerPassword,
-      firstName: "Insurance",
-      lastName: "Broker",
-      role: "BROKER",
-      isActive: true,
-    },
-  });
-
-  console.log("✓ Created broker user:", brokerUser.email);
+  // NOTE: Contractor, Subcontractor, and Broker users are NOT pre-seeded
+  // They are auto-created by the system when:
+  // - Admin adds a GC/Contractor
+  // - GC adds a Subcontractor  
+  // - Subcontractor provides Broker information
+  // The system generates secure credentials and sends them via email
 
   console.log("✅ Database seeding completed!");
   console.log("");
-  console.log("📧 Login credentials:");
+  console.log("📧 Login credentials (Admin users only):");
   console.log("   Super Admin: superadmin@compliant.com / SuperAdmin123!@#");
   console.log("   Admin: admin@compliant.com / Admin123!@#");
   console.log("   Admin 2: admin2@compliant.com / Admin2123!@#");
   console.log("   Admin 3: admin3@compliant.com / Admin3123!@#");
   console.log("   Manager: manager@compliant.com / Manager123!@#");
-  console.log("   Contractor: contractor@compliant.com / Contractor123!@#");
-  console.log("   Subcontractor: subcontractor@compliant.com / Subcontractor123!@#");
-  console.log("   Broker: broker@compliant.com / Broker123!@#");
+  console.log("");
+  console.log("ℹ️  GC, Subcontractor, and Broker accounts are auto-created when added to the system.");
 }
 
 main()

@@ -1,354 +1,92 @@
 
 === CONSOLE MONITORING SUMMARY ===
 Test: complete_coi_workflow_with_ui
-Generated: 2026-01-20T07:35:15.765Z
+Generated: 2026-01-20T14:11:59.350Z
 
-Console Summary: 337 messages (337 errors, 0 warnings, 0 logs, 0 info, 0 debug)
+Console Summary: 75 messages (62 errors, 0 warnings, 0 logs, 13 info, 0 debug)
 
 Breakdown by Type:
-- Errors: 337
+- Errors: 62
 - Warnings: 0
 - Logs: 0
-- Info: 0
+- Info: 13
 - Debug: 0
 
 === ALL MESSAGES ===
-[2026-01-20T07:34:54.813Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:54.820Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:54.823Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:54.861Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:54.869Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:54.871Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:54.898Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:54.904Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:54.907Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:54.934Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:54.941Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:54.942Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:54.969Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:54.976Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:54.979Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.011Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.017Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.020Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.047Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.053Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.055Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.081Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.087Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.089Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.117Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.125Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.127Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.152Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.159Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.161Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.187Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.192Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.195Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.231Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.237Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.239Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.269Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.275Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.277Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.301Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.307Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.308Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.334Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.341Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.342Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.366Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.372Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.374Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.403Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.409Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.411Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.435Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.441Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.444Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.468Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.476Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.477Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.501Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.507Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.510Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.535Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.540Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:55.541Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.573Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.574Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:55.576Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.599Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.603Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:55.605Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.635Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.639Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:55.641Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.671Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.676Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:55.677Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.701Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.708Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:55.711Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.736Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.741Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:55.742Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.767Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.771Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:55.774Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.801Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.806Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:55.808Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.834Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.839Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:55.841Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.866Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.875Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:55.877Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.902Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.906Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:55.908Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.932Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.940Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:55.942Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.964Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:55.968Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:55.971Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:55.999Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.003Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.004Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.032Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.036Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.038Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.064Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.068Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.069Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.097Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.103Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.105Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.136Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.146Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.147Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.173Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.178Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.180Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.204Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.208Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.210Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.244Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.246Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.249Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.279Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.284Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.287Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.310Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.316Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.318Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.343Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.348Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.350Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.375Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.380Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.382Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.409Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.415Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.416Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.442Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.447Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.449Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.475Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.481Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.482Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.509Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.514Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.516Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.542Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.548Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.549Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.572Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.576Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.578Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.604Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.609Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.611Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.643Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.648Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.651Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.676Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.681Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.683Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.708Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.715Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.716Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.743Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.748Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.750Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.775Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.781Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.783Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.809Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.814Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.816Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.841Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.846Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.848Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.874Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.879Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.881Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.904Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.909Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.910Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.935Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.939Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.941Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.968Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:56.973Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:56.975Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:56.999Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.003Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.006Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.042Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.047Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.048Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.070Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.074Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.076Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.103Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.107Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.109Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.133Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.137Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.139Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.166Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.171Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.174Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.200Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.204Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.205Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.230Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.234Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.236Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.260Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.265Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.267Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.293Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.298Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.300Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.325Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.330Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.332Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.358Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.364Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.366Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.388Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.392Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.393Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.418Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.422Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.424Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.451Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.462Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.464Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.486Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.491Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.493Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.516Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.520Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.522Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.547Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.551Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.553Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.580Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.585Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.587Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.612Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.617Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.618Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.643Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.647Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.649Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.671Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.675Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.676Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.704Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.716Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.719Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.751Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.757Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.759Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.784Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.789Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.790Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.815Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.820Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.822Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.848Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.853Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.854Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.880Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.884Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.886Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.910Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.914Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.916Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.942Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.946Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.949Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:57.977Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:57.984Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:57.985Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:58.010Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:58.015Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:58.018Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:58.042Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:58.048Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:58.050Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:58.075Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:58.079Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:58.081Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:58.108Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:58.113Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:58.115Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:58.141Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:34:58.145Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:58.147Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:34:58.169Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:34:58.170Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:35:01.075Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:35:01.080Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:35:01.181Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:35:01.182Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:35:01.897Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:35:01.901Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:35:01.903Z] [ERROR] Login failed: Z
-[2026-01-20T07:35:01.931Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:35:01.931Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:35:04.071Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:35:04.072Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:35:04.154Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:35:04.155Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:35:06.979Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:35:06.979Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:35:07.083Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:35:07.086Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:35:07.779Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:35:07.784Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:35:07.786Z] [ERROR] Login failed: Z
-[2026-01-20T07:35:07.815Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:35:07.816Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:35:09.925Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:35:09.926Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:35:10.005Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:35:10.005Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:35:10.712Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
-[2026-01-20T07:35:10.717Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:35:10.719Z] [ERROR] Login failed: Z
-[2026-01-20T07:35:10.746Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:35:10.746Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:35:12.851Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:35:12.854Z] [ERROR] Auth check failed: Z
-[2026-01-20T07:35:12.938Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T07:35:12.939Z] [ERROR] Auth check failed: Z
+[2026-01-20T14:11:34.721Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:11:35.294Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:35.295Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:35.296Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:35.297Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:36.222Z] [ERROR] REQUEST FAILED: http://localhost:3000/dashboard?_rsc=1obve - net::ERR_ABORTED
+[2026-01-20T14:11:38.232Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:11:38.791Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:38.792Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:38.795Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:38.798Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:39.216Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:11:39.755Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:39.756Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:39.757Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:39.757Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:40.036Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+[2026-01-20T14:11:40.040Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:40.042Z] [ERROR] Login failed: AxiosError
+[2026-01-20T14:11:40.395Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:11:40.941Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:40.942Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:40.943Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:40.943Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:42.527Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:11:43.068Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:43.068Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:43.069Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:43.070Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:43.514Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:11:44.059Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:44.060Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:44.061Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:44.062Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:44.476Z] [ERROR] REQUEST FAILED: http://localhost:3000/dashboard?_rsc=1obve - net::ERR_ABORTED
+[2026-01-20T14:11:46.832Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:11:47.375Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:47.376Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:47.377Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:47.378Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:47.791Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:11:48.342Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:48.343Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:48.343Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:48.345Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:48.601Z] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+[2026-01-20T14:11:48.605Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:48.608Z] [ERROR] Login failed: AxiosError
+[2026-01-20T14:11:48.962Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:11:49.507Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:49.508Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:49.510Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:49.511Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:51.055Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:11:51.606Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:51.606Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:51.612Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:51.613Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:52.045Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:11:52.598Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:52.598Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:52.599Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:52.599Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:52.965Z] [ERROR] REQUEST FAILED: http://localhost:3000/dashboard?_rsc=1obve - net::ERR_ABORTED
+[2026-01-20T14:11:55.398Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:11:55.947Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:55.947Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:55.950Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:55.951Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:56.432Z] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-01-20T14:11:56.980Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:56.980Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:56.981Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T14:11:56.982Z] [ERROR] Auth check failed: AxiosError
+[2026-01-20T14:11:57.364Z] [ERROR] REQUEST FAILED: http://localhost:3000/dashboard?_rsc=16jui - net::ERR_ABORTED
 
 === END OF SUMMARY ===
