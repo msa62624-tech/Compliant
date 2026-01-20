@@ -69,7 +69,7 @@ describe("ProgramsController - RBAC Tests", () => {
 
     const mockRequest = {
       user: { id: "user-123", role: UserRole.ADMIN },
-    } as any;
+    } as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     it("should allow ADMIN to create program", () => {
       const context = createMockExecutionContext({

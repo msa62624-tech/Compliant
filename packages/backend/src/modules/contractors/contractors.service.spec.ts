@@ -360,7 +360,9 @@ describe("ContractorsService", () => {
       cacheService.get.mockResolvedValue(null);
       cacheService.set.mockResolvedValue(undefined);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = (await service.findAll()) as {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data: any[];
         total: number;
         page: number;

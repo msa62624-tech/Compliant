@@ -191,6 +191,7 @@ describe("AuditController - RBAC Tests", () => {
       auditService.getResourceAuditLogs.mockResolvedValue(mockAuditLogs as any);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = controller.getResourceAuditLogs(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         "PROJECT" as any,
         "proj-123",
       );
