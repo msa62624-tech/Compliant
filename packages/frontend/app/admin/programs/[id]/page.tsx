@@ -2,7 +2,7 @@
 
 import { useAuth } from '../../../../lib/auth/AuthContext';
 import { useRouter, useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import apiClient from '../../../../lib/api/client';
 
 interface Program {
@@ -43,6 +43,18 @@ export default function ProgramDetailPage() {
   const [loadingProgram, setLoadingProgram] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const loadProgram = useCallback(async () => {
+    try {
+      setLoadingProgram(true);
+      const response = await apiClient.get(`/programs/${programId}`);
+      setProgram(response.data);
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Failed to load program');
+    } finally {
+      setLoadingProgram(false);
+    }
+  }, [programId]);
+
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       router.push('/login');
@@ -53,19 +65,7 @@ export default function ProgramDetailPage() {
     if (isAuthenticated && programId) {
       loadProgram();
     }
-  }, [isAuthenticated, programId]);
-
-  const loadProgram = async () => {
-    try {
-      setLoadingProgram(true);
-      const response = await apiClient.get(`/programs/${programId}`);
-      setProgram(response.data);
-    } catch (err: any) {
-      setError(err?.response?.data?.message || 'Failed to load program');
-    } finally {
-      setLoadingProgram(false);
-    }
-  };
+  }, [isAuthenticated, programId, loadProgram]);
 
   const formatCurrency = (value?: number) => {
     if (!value) return 'Not set';

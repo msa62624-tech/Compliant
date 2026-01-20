@@ -6,11 +6,14 @@ export interface User {
   lastName: string;
   role: UserRole;
   isActive: boolean;
+  resetToken?: string | null;
+  resetTokenExpiry?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export enum UserRole {
+  SUPER_ADMIN = "SUPER_ADMIN",
   ADMIN = "ADMIN",
   MANAGER = "MANAGER",
   USER = "USER",
@@ -61,6 +64,11 @@ export interface Contractor {
   contractorType: ContractorType;
   status: ContractorStatus;
   insuranceStatus: InsuranceStatus;
+  trades?: string[];
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
   brokerName?: string;
   brokerEmail?: string;
   brokerPhone?: string;
@@ -78,6 +86,7 @@ export interface Contractor {
   brokerWcName?: string;
   brokerWcEmail?: string;
   brokerWcPhone?: string;
+  assignedAdminEmail?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -132,9 +141,23 @@ export interface Project {
   id: string;
   name: string;
   description?: string;
+  address?: string;
   startDate: Date;
   endDate?: Date;
   status: ProjectStatus;
+  gcName?: string;
+  location?: string;
+  borough?: string;
+  block?: string;
+  lot?: string;
+  buildingHeight?: string;
+  structureType?: string;
+  entity?: string;
+  additionalInsureds?: string;
+  contactPerson?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  assignedAdminEmail?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -213,6 +236,7 @@ export interface GeneratedCOI {
   gcName?: string;
   subcontractorName?: string;
   status: COIStatus;
+  brokerType?: BrokerType;
   brokerName?: string;
   brokerEmail?: string;
   brokerPhone?: string;
@@ -230,26 +254,52 @@ export interface GeneratedCOI {
   brokerWcEmail?: string;
   brokerWcPhone?: string;
   glPolicyUrl?: string;
+  glPolicyNumber?: string;
   umbrellaPolicyUrl?: string;
+  umbrellaPolicyNumber?: string;
   autoPolicyUrl?: string;
+  autoPolicyNumber?: string;
   wcPolicyUrl?: string;
+  wcPolicyNumber?: string;
   glBrokerSignatureUrl?: string;
+  glBrokerSignedAt?: Date;
   umbrellaBrokerSignatureUrl?: string;
+  umbrellaBrokerSignedAt?: Date;
   autoBrokerSignatureUrl?: string;
+  autoBrokerSignedAt?: Date;
   wcBrokerSignatureUrl?: string;
+  wcBrokerSignedAt?: Date;
   glExpirationDate?: Date;
+  glCoverageLimits?: string;
   umbrellaExpirationDate?: Date;
+  umbrellaCoverageLimits?: string;
   autoExpirationDate?: Date;
+  autoCoverageLimits?: string;
   wcExpirationDate?: Date;
+  wcStatutoryLimits?: string;
   firstCOIUploaded: boolean;
   firstCOIUrl?: string;
+  holdHarmlessDocumentUrl?: string;
+  holdHarmlessUploadedAt?: Date;
+  holdHarmlessStatus?: HoldHarmlessStatus;
   assignedAdminEmail?: string;
   deficiencyNotes?: string;
   rejectionReason?: string;
+  reviewNotes?: string;
+  reviewedAt?: Date;
   uploadedForReviewDate?: Date;
   brokerVerifiedAtRenewal: boolean;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export enum HoldHarmlessStatus {
+  PENDING_GENERATION = "PENDING_GENERATION",
+  PENDING_SUB_SIGNATURE = "PENDING_SUB_SIGNATURE",
+  PENDING_GC_SIGNATURE = "PENDING_GC_SIGNATURE",
+  COMPLETED = "COMPLETED",
+  REJECTED = "REJECTED",
+  EXPIRED = "EXPIRED",
 }
 
 export enum COIStatus {

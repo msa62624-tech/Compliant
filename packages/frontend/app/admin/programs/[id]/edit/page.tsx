@@ -2,7 +2,7 @@
 
 import { useAuth } from '../../../../../lib/auth/AuthContext';
 import { useRouter, useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import apiClient from '../../../../../lib/api/client';
 import { CONSTRUCTION_TRADES_ARRAY } from '@compliant/shared';
 
@@ -35,19 +35,7 @@ export default function EditProgramPage() {
   const [newTierUmbrella, setNewTierUmbrella] = useState('');
   const [newTierUmbrellaMin, setNewTierUmbrellaMin] = useState('');
 
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push('/login');
-    }
-  }, [loading, isAuthenticated, router]);
-
-  useEffect(() => {
-    if (isAuthenticated && programId) {
-      loadProgram();
-    }
-  }, [isAuthenticated, programId]);
-
-  const loadProgram = async () => {
+  const loadProgram = useCallback(async () => {
     try {
       setLoadingProgram(true);
       const response = await apiClient.get(`/programs/${programId}`);
@@ -84,7 +72,19 @@ export default function EditProgramPage() {
     } finally {
       setLoadingProgram(false);
     }
-  };
+  }, [programId]);
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [loading, isAuthenticated, router]);
+
+  useEffect(() => {
+    if (isAuthenticated && programId) {
+      loadProgram();
+    }
+  }, [isAuthenticated, programId, loadProgram]);
 
   // Get trades already assigned to earlier tiers
   const getAssignedTrades = (currentTierIndex: number): Set<string> => {
