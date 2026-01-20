@@ -36,8 +36,8 @@ append_if_missing packages/backend/.env JWT_REFRESH_SECRET "$(rand_secret)"
 if [ -n "${CODESPACE_NAME:-}" ] && [ -n "${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-}" ]; then
   # Validate environment variables contain only safe characters
   # CODESPACE_NAME: alphanumeric, hyphens, underscores
-  # GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN: valid domain format (no leading/trailing dots, no consecutive dots)
-  if [[ "${CODESPACE_NAME}" =~ ^[a-zA-Z0-9_-]+$ ]] && [[ "${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}" =~ ^[a-zA-Z0-9]([a-zA-Z0-9.-]*[a-zA-Z0-9])?$ ]]; then
+  # GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN: valid domain format (proper domain segments separated by dots)
+  if [[ "${CODESPACE_NAME}" =~ ^[a-zA-Z0-9_-]+$ ]] && [[ "${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}" =~ ^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*$ ]]; then
     log "Detected GitHub Codespaces environment"
     API_URL="https://${CODESPACE_NAME}-3001.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/api"
   else
