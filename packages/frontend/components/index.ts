@@ -21,8 +21,11 @@
  * - Data display (Table, DataGrid, Chart, etc.)
  * 
  * ## Current Implementation Status
- * No shared components have been implemented yet. All components are currently
- * co-located with their routes in the app directory.
+ * - Toast notification system for user feedback
+ * - FilterBar component for filtering lists
  */
 
-export {};
+export { ToastProvider, useToast } from './Toast';
+export type { ToastType } from './Toast';
+export { FilterBar, AdvancedFilter } from './FilterBar';
+export type { FilterOption } from './FilterBar';

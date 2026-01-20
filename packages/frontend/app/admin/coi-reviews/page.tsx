@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
+import { useToast, FilterBar } from '../../../components';
 
 interface COIReview {
   id: string;
@@ -34,9 +35,11 @@ interface COIReview {
 export default function AdminCOIReviewsPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [reviews, setReviews] = useState<COIReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('pending');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedReview, setSelectedReview] = useState<COIReview | null>(null);
   const [reviewAction, setReviewAction] = useState<'approve' | 'reject' | null>(null);
   const [rejectionNotes, setRejectionNotes] = useState<string>('');
@@ -66,7 +69,7 @@ export default function AdminCOIReviewsPage() {
     if (!selectedReview) return;
 
     if (action === 'reject' && !rejectionNotes.trim()) {
-      alert('Please provide rejection notes');
+      showToast('Please provide rejection notes', 'warning');
       return;
     }
 
@@ -77,9 +80,9 @@ export default function AdminCOIReviewsPage() {
       //   notes: rejectionNotes,
       // });
       
-      alert(
-        `COI ${action === 'approve' ? 'approved' : 'rejected'} successfully! ` +
-        `📧 Email notifications sent to GC, Subcontractor, and Broker.`
+      showToast(
+        `COI ${action === 'approve' ? 'approved' : 'rejected'} successfully! Email notifications sent to GC, Subcontractor, and Broker.`,
+        'success'
       );
       setSelectedReview(null);
       setReviewAction(null);
@@ -87,7 +90,7 @@ export default function AdminCOIReviewsPage() {
       fetchReviews();
     } catch (error) {
       console.error(`Failed to ${action} COI:`, error);
-      alert(`Failed to ${action} COI. Please try again.`);
+      showToast(`Failed to ${action} COI. Please try again.`, 'error');
     } finally {
       setProcessing(false);
     }
@@ -104,11 +107,28 @@ export default function AdminCOIReviewsPage() {
   };
 
   const filteredReviews = reviews.filter((review) => {
-    if (filter === 'pending') return review.status === 'AWAITING_ADMIN_REVIEW';
-    if (filter === 'approved') return review.status === 'ACTIVE';
-    if (filter === 'rejected') return review.status === 'DEFICIENCY_PENDING' || review.status === 'REJECTED';
-    return true;
+    // Apply status filter
+    let matchesFilter = true;
+    if (filter === 'pending') matchesFilter = review.status === 'AWAITING_ADMIN_REVIEW';
+    if (filter === 'approved') matchesFilter = review.status === 'ACTIVE';
+    if (filter === 'rejected') matchesFilter = review.status === 'DEFICIENCY_PENDING' || review.status === 'REJECTED';
+    
+    // Apply search filter
+    const matchesSearch = searchTerm === '' || 
+      review.subcontractorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      review.subcontractorCompany.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      review.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      review.gcName.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesFilter && matchesSearch;
   });
+
+  const filterOptions = [
+    { value: 'pending', label: 'Pending Review', count: reviews.filter((r) => r.status === 'AWAITING_ADMIN_REVIEW').length },
+    { value: 'approved', label: 'Approved', count: reviews.filter((r) => r.status === 'ACTIVE').length },
+    { value: 'rejected', label: 'Rejected', count: reviews.filter((r) => r.status === 'DEFICIENCY_PENDING' || r.status === 'REJECTED').length },
+    { value: 'all', label: 'All', count: reviews.length },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -133,50 +153,15 @@ export default function AdminCOIReviewsPage() {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           {/* Filters */}
-          <div className="bg-white rounded-lg shadow p-4 mb-6">
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setFilter('pending')}
-                className={`px-4 py-2 rounded-md transition ${
-                  filter === 'pending'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                Pending Review ({reviews.filter((r) => r.status === 'AWAITING_ADMIN_REVIEW').length})
-              </button>
-              <button
-                onClick={() => setFilter('approved')}
-                className={`px-4 py-2 rounded-md transition ${
-                  filter === 'approved'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                Approved ({reviews.filter((r) => r.status === 'ACTIVE').length})
-              </button>
-              <button
-                onClick={() => setFilter('rejected')}
-                className={`px-4 py-2 rounded-md transition ${
-                  filter === 'rejected'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                Rejected ({reviews.filter((r) => r.status === 'DEFICIENCY_PENDING' || r.status === 'REJECTED').length})
-              </button>
-              <button
-                onClick={() => setFilter('all')}
-                className={`px-4 py-2 rounded-md transition ${
-                  filter === 'all'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                All ({reviews.length})
-              </button>
-            </div>
-          </div>
+          <FilterBar
+            options={filterOptions}
+            selectedValue={filter}
+            onFilterChange={setFilter}
+            searchEnabled={true}
+            searchPlaceholder="Search by subcontractor, company, project, or GC..."
+            searchValue={searchTerm}
+            onSearchChange={setSearchTerm}
+          />
 
           {loading ? (
             <div className="bg-white rounded-lg shadow p-8 text-center">

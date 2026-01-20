@@ -31,6 +31,7 @@ model User {
   generatedCOIsAssigned GeneratedCOI[] @relation("AssignedAdmin")
   auditLogs             AuditLog[]
   refreshTokens         RefreshToken[]
+  notifications         Notification[] @relation("UserNotifications")
 
   @@map("users")
 }
@@ -164,6 +165,9 @@ model Project {
 
   // Admin assignment (for assistant admin filtering)
   assignedAdminEmail String?
+  
+  // Message threads stored as JSON array of thread IDs
+  messageThreads Json @default("[]")
 
   createdById String
   createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
@@ -208,6 +212,9 @@ model ProjectSubcontractor {
   subcontractor   Contractor @relation(fields: [subcontractorId], references: [id], onDelete: Cascade)
   role            String?
   assignedAt      DateTime   @default(now())
+  
+  // Message threads for this project-subcontractor relationship
+  messageThreads Json @default("[]")
 
   @@unique([projectId, subcontractorId])
   @@map("project_subcontractors")
@@ -540,4 +547,38 @@ model ProjectProgram {
 
   @@unique([projectId, programId])
   @@map("project_programs")
+}
+
+// Notification model for in-app and email notifications
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  message   String
+  metadata  Json     @default("{}")
+  read      Boolean  @default(false)
+  
+  // Threading support
+  threadId       String?       // Groups related messages
+  parentId       String?       // Reply to another notification
+  parent         Notification? @relation("NotificationThread", fields: [parentId], references: [id], onDelete: Cascade)
+  replies        Notification[] @relation("NotificationThread")
+  
+  // Entity relationships - where this thread belongs
+  projectId       String?
+  subcontractorId String?
+  coiId           String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+  @@index([threadId])
+  @@index([projectId])
+  @@index([subcontractorId])
+  @@index([coiId])
+  @@map("notifications")
 }

@@ -18,6 +18,8 @@ import { ProgramsModule } from "./modules/programs/programs.module";
 import { RemindersModule } from "./modules/reminders/reminders.module";
 import { HoldHarmlessModule } from "./modules/hold-harmless/hold-harmless.module";
 import { TradesModule } from "./modules/trades/trades.module";
+import { DashboardModule } from "./modules/dashboard/dashboard.module";
+import { NotificationModule } from "./modules/notifications/notification.module";
 import { EncryptionModule } from "./common/encryption/encryption.module";
 import { PrismaModule } from "./config/prisma.module";
 import { winstonConfig } from "./config/logger.config";
@@ -54,6 +56,8 @@ import { AllExceptionsFilter } from "./common/filters/http-exception.filter";
     RemindersModule,
     HoldHarmlessModule,
     TradesModule,
+    DashboardModule,
+    NotificationModule,
   ],
   providers: [
     {
