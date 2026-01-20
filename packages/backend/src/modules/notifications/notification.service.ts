@@ -124,6 +124,136 @@ export class NotificationService {
     });
   }
 
+  async replyToNotification(
+    notificationId: string,
+    userId: string,
+    replyMessage: string,
+    projectId?: string,
+    subcontractorId?: string,
+    coiId?: string,
+  ) {
+    this.logger.log(`Creating reply to notification ${notificationId} from user ${userId}`);
+
+    // Get the original notification to extract thread info
+    const originalNotification = await this.prisma.notification.findUnique({
+      where: { id: notificationId },
+    });
+
+    if (!originalNotification) {
+      throw new Error('Original notification not found');
+    }
+
+    // Determine threadId - use existing or create new
+    const threadId = originalNotification.threadId || originalNotification.id;
+
+    // Extract entity IDs from original if not provided
+    const finalProjectId = projectId || originalNotification.projectId;
+    const finalSubcontractorId = subcontractorId || originalNotification.subcontractorId;
+    const finalCoiId = coiId || originalNotification.coiId;
+
+    // Create reply notification
+    const reply = await this.prisma.notification.create({
+      data: {
+        userId,
+        type: 'reply',
+        title: `Re: ${originalNotification.title}`,
+        message: replyMessage,
+        metadata: {
+          originalNotificationId: notificationId,
+          ...originalNotification.metadata,
+        },
+        read: false,
+        threadId,
+        parentId: notificationId,
+        projectId: finalProjectId,
+        subcontractorId: finalSubcontractorId,
+        coiId: finalCoiId,
+      },
+    });
+
+    // Update original notification with threadId if it didn't have one
+    if (!originalNotification.threadId) {
+      await this.prisma.notification.update({
+        where: { id: notificationId },
+        data: {
+          threadId,
+          projectId: finalProjectId,
+          subcontractorId: finalSubcontractorId,
+          coiId: finalCoiId,
+        },
+      });
+    }
+
+    // Save thread to Project if projectId exists
+    if (finalProjectId) {
+      await this.saveThreadToProject(finalProjectId, threadId);
+    }
+
+    // Save thread to ProjectSubcontractor if both IDs exist
+    if (finalProjectId && finalSubcontractorId) {
+      await this.saveThreadToProjectSubcontractor(finalProjectId, finalSubcontractorId, threadId);
+    }
+
+    this.logger.log(`Reply created and saved to entities`);
+    return reply;
+  }
+
+  private async saveThreadToProject(projectId: string, threadId: string) {
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+    });
+
+    if (project) {
+      const threads = (project.messageThreads as string[]) || [];
+      if (!threads.includes(threadId)) {
+        threads.push(threadId);
+        await this.prisma.project.update({
+          where: { id: projectId },
+          data: { messageThreads: threads },
+        });
+        this.logger.log(`Thread ${threadId} saved to project ${projectId}`);
+      }
+    }
+  }
+
+  private async saveThreadToProjectSubcontractor(projectId: string, subcontractorId: string, threadId: string) {
+    const projectSub = await this.prisma.projectSubcontractor.findFirst({
+      where: {
+        projectId,
+        subcontractorId,
+      },
+    });
+
+    if (projectSub) {
+      const threads = (projectSub.messageThreads as string[]) || [];
+      if (!threads.includes(threadId)) {
+        threads.push(threadId);
+        await this.prisma.projectSubcontractor.update({
+          where: { id: projectSub.id },
+          data: { messageThreads: threads },
+        });
+        this.logger.log(`Thread ${threadId} saved to project-subcontractor relationship`);
+      }
+    }
+  }
+
+  async getThread(threadId: string) {
+    return this.prisma.notification.findMany({
+      where: { threadId },
+      orderBy: { createdAt: 'asc' },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
   // Helper methods for common notification scenarios
   async notifyCOIApproved(userId: string, coiId: string, subcontractorName: string) {
     return this.createNotification({

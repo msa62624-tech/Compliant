@@ -12,8 +12,10 @@ export default function MessagingInbox({ onClose }: MessagingInboxProps) {
   const { showToast } = useToast();
   const [messages, setMessages] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'unread'>('all');
+  const [filter, setFilter] = useState<'all' | 'unread'>('unread'); // Default to unread
   const [selectedMessage, setSelectedMessage] = useState<Notification | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const [sendingReply, setSendingReply] = useState(false);
 
   useEffect(() => {
     loadMessages();
