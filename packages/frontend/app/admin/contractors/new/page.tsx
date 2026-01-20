@@ -43,7 +43,9 @@ export default function NewContractorPage() {
     setErrorStatusCode(undefined);
 
     try {
-      await apiClient.post('/contractors', formData);
+      // Only send fields that the backend DTO expects
+      const { name, email, phone, company } = formData;
+      await apiClient.post('/contractors', { name, email, phone, company });
       setSuccess(true);
       setTimeout(() => {
         router.push('/admin/general-contractors');
