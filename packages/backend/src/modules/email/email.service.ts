@@ -171,6 +171,54 @@ export class EmailService {
     });
   }
 
+  // Welcome email for new contractor with permanent credentials
+  async sendContractorWelcomeEmail(
+    email: string,
+    name: string,
+    password: string,
+    contractorType: string,
+  ): Promise<boolean> {
+    const loginLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/login`;
+    const roleLabel = contractorType === "GENERAL_CONTRACTOR" ? "General Contractor" : "Subcontractor";
+    
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #2563eb;">Welcome to Compliant Platform</h2>
+        <p>Hello ${name},</p>
+        <p>Your ${roleLabel} account has been created. You can now access the Compliant Platform to manage your insurance compliance and projects.</p>
+        <div style="background-color: #dbeafe; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #2563eb;">
+          <h3 style="margin-top: 0; color: #1e40af;">Your Login Credentials</h3>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Password:</strong> <code style="background: white; padding: 4px 8px; border-radius: 4px;">${password}</code></p>
+          <p style="margin: 20px 0;">
+            <a href="${loginLink}" 
+               style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
+              Log In to Dashboard
+            </a>
+          </p>
+          <p style="color: #1e40af; font-size: 13px; background: #fff; padding: 12px; border-radius: 4px;">
+            <strong>⚠️ Important:</strong> These are your permanent credentials. Please save them securely. You can change your password anytime from your account settings.
+          </p>
+        </div>
+        <p><strong>Next Steps:</strong></p>
+        <ol>
+          <li>Log in to the platform using the credentials above</li>
+          <li>Complete your profile information</li>
+          <li>Add your insurance broker details</li>
+          <li>Manage your projects and insurance compliance</li>
+        </ol>
+        <p>If you have any questions or need assistance, please contact your administrator.</p>
+        <p>Best regards,<br>Compliant Platform Team</p>
+      </div>
+    `;
+
+    return this.sendEmail({
+      to: email,
+      subject: "Welcome to Compliant Platform - Your Account Credentials",
+      html,
+    });
+  }
+
   // Compliance confirmation (to GC, Sub, Broker)
   async sendComplianceConfirmationEmail(
     recipients: { gc: string; sub: string; broker: string },

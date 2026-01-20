@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, Logger } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { CacheService } from "../cache/cache.service";
+import { EmailService } from "../email/email.service";
 import { CreateContractorDto } from "./dto/create-contractor.dto";
 import { UpdateContractorDto } from "./dto/update-contractor.dto";
 import { InsuranceStatus } from "@compliant/shared";
@@ -43,6 +44,7 @@ export class ContractorsService {
   constructor(
     private prisma: PrismaService,
     private cacheService: CacheService,
+    private emailService: EmailService,
   ) {}
 
   /**
@@ -120,9 +122,22 @@ export class ContractorsService {
       this.logger.log(`  Password: ${password} (PERMANENT - save this!)`);
       this.logger.log(`  Note: User can change password later if forgotten`);
 
-      // TODO: Send welcome email with permanent credentials
-      // await this.emailService.sendWelcomeEmail(email, firstName, password);
-      // Email should say: "These are your permanent credentials. Keep them safe. You can change your password anytime."
+      // Send welcome email with permanent credentials
+      try {
+        await this.emailService.sendContractorWelcomeEmail(
+          email,
+          name,
+          password,
+          contractorType,
+        );
+        this.logger.log(`✓ Welcome email sent to ${email}`);
+      } catch (emailError) {
+        this.logger.error(
+          `Failed to send welcome email to ${email}:`,
+          emailError,
+        );
+        // Don't fail contractor creation if email fails
+      }
 
       return { email, password, created: true };
     } catch (error) {

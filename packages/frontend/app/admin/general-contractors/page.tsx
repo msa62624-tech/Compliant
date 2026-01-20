@@ -44,7 +44,9 @@ export default function GeneralContractorsPage() {
       setError(null);
       setErrorStatusCode(undefined);
       const response = await apiClient.get('/contractors');
-      setContractors(response.data);
+      // Handle paginated response - extract data array
+      const contractorsData = response.data.data || response.data;
+      setContractors(Array.isArray(contractorsData) ? contractorsData : []);
     } catch (err) {
       const axiosError = err as AxiosError;
       const status = axiosError.response?.status;
