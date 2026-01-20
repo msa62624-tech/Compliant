@@ -60,7 +60,7 @@ export class AIExtractionService {
   /**
    * Extract text from PDF using pdfparse library
    */
-  private async extractTextFromPdf(file: Express.Multer.File): Promise<string> {
+  private async extractTextFromPdf(file: any): Promise<string> {
     try {
       const pdfParse = require('pdf-parse');
       const pdfData = await pdfParse(file.buffer);
@@ -75,7 +75,7 @@ export class AIExtractionService {
   /**
    * Extract program data from PDF using AI
    */
-  async extractProgramFromPdf(file: Express.Multer.File): Promise<ExtractedProgramData> {
+  async extractProgramFromPdf(file: any): Promise<ExtractedProgramData> {
     try {
       if (!file || !file.buffer || file.size === 0) {
         throw new BadRequestException('PDF file not found');
