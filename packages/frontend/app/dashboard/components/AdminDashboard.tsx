@@ -3,94 +3,66 @@
 import { User } from '@compliant/shared';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useState } from 'react';
-import { FilterBar } from '../../../components';
+import { useState, useEffect } from 'react';
+import { FilterBar, useToast } from '../../../components';
+import { dashboardApi, DashboardItem, DashboardStats } from '../../../lib/api/dashboard';
 
 interface AdminDashboardProps {
   user: User;
   onLogout: () => void;
 }
 
-interface DashboardItem {
-  id: string;
-  name: string;
-  type: 'gc' | 'project' | 'coi' | 'compliance';
-  status: string;
-  date: string;
-  description: string;
-}
-
 export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [filter, setFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [items, setItems] = useState<DashboardItem[]>([]);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data for dashboard items - would come from API in real implementation
-  const mockItems: DashboardItem[] = [
-    {
-      id: '1',
-      name: 'ABC Construction',
-      type: 'gc',
-      status: 'active',
-      date: '2026-01-15',
-      description: 'General Contractor with 5 active projects'
-    },
-    {
-      id: '2',
-      name: 'Downtown Office Build',
-      type: 'project',
-      status: 'active',
-      date: '2026-01-10',
-      description: 'Commercial construction project'
-    },
-    {
-      id: '3',
-      name: 'Smith Electrical COI',
-      type: 'coi',
-      status: 'pending',
-      date: '2026-01-18',
-      description: 'COI awaiting review for approval'
-    },
-    {
-      id: '4',
-      name: 'Johnson Plumbing',
-      type: 'compliance',
-      status: 'expiring',
-      date: '2026-01-25',
-      description: 'Insurance expiring in 7 days'
-    },
-    {
-      id: '5',
-      name: 'Riverside Mall Project',
-      type: 'project',
-      status: 'active',
-      date: '2026-01-12',
-      description: 'Retail construction project'
-    },
-    {
-      id: '6',
-      name: 'XYZ Contractors',
-      type: 'gc',
-      status: 'active',
-      date: '2026-01-08',
-      description: 'General Contractor with 3 active projects'
-    },
-  ];
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
 
-  const filteredItems = mockItems.filter((item) => {
-    const matchesFilter = filter === 'all' || item.type === filter;
-    const matchesSearch = searchTerm === '' ||
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
+  useEffect(() => {
+    loadItems();
+  }, [filter, searchTerm]);
+
+  const loadDashboardData = async () => {
+    try {
+      const [statsData, itemsData] = await Promise.all([
+        dashboardApi.getStats(),
+        dashboardApi.getItems({ type: filter as any, search: searchTerm }),
+      ]);
+      setStats(statsData);
+      setItems(itemsData);
+    } catch (error: any) {
+      showToast('Failed to load dashboard data', 'error');
+      console.error('Error loading dashboard:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadItems = async () => {
+    try {
+      const itemsData = await dashboardApi.getItems({ 
+        type: filter === 'all' ? undefined : (filter as any), 
+        search: searchTerm || undefined 
+      });
+      setItems(itemsData);
+    } catch (error: any) {
+      console.error('Error loading items:', error);
+    }
+  };
 
   const filterOptions = [
-    { value: 'all', label: 'All Items', count: mockItems.length },
-    { value: 'gc', label: 'General Contractors', count: mockItems.filter(i => i.type === 'gc').length },
-    { value: 'project', label: 'Projects', count: mockItems.filter(i => i.type === 'project').length },
-    { value: 'coi', label: 'COI Reviews', count: mockItems.filter(i => i.type === 'coi').length },
-    { value: 'compliance', label: 'Compliance', count: mockItems.filter(i => i.type === 'compliance').length },
+    { value: 'all', label: 'All Items', count: items.length },
+    { value: 'gc', label: 'General Contractors', count: items.filter(i => i.type === 'gc').length },
+    { value: 'project', label: 'Projects', count: items.filter(i => i.type === 'project').length },
+    { value: 'coi', label: 'COI Reviews', count: items.filter(i => i.type === 'coi').length },
+    { value: 'compliance', label: 'Compliance', count: items.filter(i => i.type === 'compliance').length },
   ];
 
   const getTypeIcon = (type: string) => {
@@ -108,9 +80,21 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
       active: 'bg-green-100 text-green-800',
       pending: 'bg-orange-100 text-orange-800',
       expiring: 'bg-red-100 text-red-800',
+      expired: 'bg-red-100 text-red-800',
     };
     return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -160,12 +144,12 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-gray-700">General Contractors</h3>
-              <p className="text-3xl font-bold text-blue-600 mt-2">12</p>
+              <p className="text-3xl font-bold text-blue-600 mt-2">{stats?.generalContractors || 0}</p>
               <p className="text-sm text-gray-500 mt-1">Active GCs</p>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-gray-700">Active Projects</h3>
-              <p className="text-3xl font-bold text-green-600 mt-2">8</p>
+              <p className="text-3xl font-bold text-green-600 mt-2">{stats?.activeProjects || 0}</p>
               <p className="text-sm text-gray-500 mt-1">Ongoing jobs</p>
             </div>
             <button
@@ -173,13 +157,13 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
               className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition cursor-pointer text-left"
             >
               <h3 className="text-lg font-semibold text-gray-700">Pending COI Reviews</h3>
-              <p className="text-3xl font-bold text-orange-600 mt-2">5</p>
+              <p className="text-3xl font-bold text-orange-600 mt-2">{stats?.pendingCOIReviews || 0}</p>
               <p className="text-sm text-gray-500 mt-1">Awaiting approval</p>
               <p className="text-xs text-blue-600 mt-2 hover:underline">Click to view all →</p>
             </button>
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-gray-700">Compliance Rate</h3>
-              <p className="text-3xl font-bold text-purple-600 mt-2">87%</p>
+              <p className="text-3xl font-bold text-purple-600 mt-2">{stats?.complianceRate || 0}%</p>
               <p className="text-sm text-gray-500 mt-1">Overall</p>
             </div>
           </div>
@@ -202,12 +186,12 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
           <div className="bg-white rounded-lg shadow mb-8">
             <div className="p-6">
               <div className="space-y-4">
-                {filteredItems.length === 0 ? (
+                {items.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-gray-500">No items found matching your filters</p>
                   </div>
                 ) : (
-                  filteredItems.map((item) => (
+                  items.map((item) => (
                     <div
                       key={item.id}
                       className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow transition"

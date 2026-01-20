@@ -31,6 +31,7 @@ model User {
   generatedCOIsAssigned GeneratedCOI[] @relation("AssignedAdmin")
   auditLogs             AuditLog[]
   refreshTokens         RefreshToken[]
+  notifications         Notification[] @relation("UserNotifications")
 
   @@map("users")
 }
@@ -534,4 +535,22 @@ model ProjectProgram {
 
   @@unique([projectId, programId])
   @@map("project_programs")
+}
+
+// Notification model for in-app and email notifications
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  message   String
+  metadata  Json     @default("{}")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+  @@map("notifications")
 }
