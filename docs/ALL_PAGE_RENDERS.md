@@ -297,37 +297,31 @@ These pages are accessible across multiple roles with role-based content filteri
    
    ![Generic COI](e2e-screenshots/all_pages_shared/004-061_coi_generic.png)
 
-3. **Generic Contractors**
-   - **Route:** `/contractors`
-   - **Description:** View contractors list
-   
-   ![Generic Contractors](e2e-screenshots/all_pages_shared/005-062_contractors_generic.png)
-
-4. **Generic Projects**
+3. **Generic Projects**
    - **Route:** `/projects`
-   - **Description:** View projects list
+   - **Description:** View projects list (note: `/contractors` redirects to `/admin/general-contractors`)
    
    ![Generic Projects](e2e-screenshots/all_pages_shared/006-063_projects_generic.png)
 
-5. **Generic Programs**
+4. **Generic Programs**
    - **Route:** `/programs`
    - **Description:** View programs list
    
    ![Generic Programs](e2e-screenshots/all_pages_shared/007-064_programs_generic.png)
 
-6. **Generic Documents**
+5. **Generic Documents**
    - **Route:** `/documents`
    - **Description:** Documents management
    
    ![Generic Documents](e2e-screenshots/all_pages_shared/008-065_documents_generic.png)
 
-7. **Generic Compliance**
+6. **Generic Compliance**
    - **Route:** `/compliance`
    - **Description:** Compliance tracking
    
    ![Generic Compliance](e2e-screenshots/all_pages_shared/009-066_compliance_generic.png)
 
-8. **Generic Settings**
+7. **Generic Settings**
    - **Route:** `/settings`
    - **Description:** User settings
    
@@ -345,7 +339,7 @@ These pages are accessible across multiple roles with role-based content filteri
 | **Subcontractor** | 5 | Yes (Subcontractor role) |
 | **Contractor** | 4 | Yes (Contractor role) |
 | **Broker** | 7 | Yes (Broker role) |
-| **Shared/Generic** | 8 | Yes (Any authenticated role) |
+| **Shared/Generic** | 7 | Yes (Any authenticated role) |
 | **TOTAL** | **44 Unique Pages** | |
 
 ---

@@ -493,47 +493,43 @@ test.describe('Comprehensive Page Renders - All Pages in System', () => {
     await page.waitForTimeout(1000);
     await screenshots.capture(page, '061-coi-generic', true);
 
-    // Contractors (generic)
-    console.log('📋 Capturing: Generic Contractors');
-    await page.goto('/contractors');
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
-    await screenshots.capture(page, '062-contractors-generic', true);
+    // Note: /contractors redirects to /admin/general-contractors
+    // Skipping duplicate screenshot
 
     // Projects (generic)
     console.log('📋 Capturing: Generic Projects');
     await page.goto('/projects');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1000);
-    await screenshots.capture(page, '063-projects-generic', true);
+    await screenshots.capture(page, '062-projects-generic', true);
 
     // Programs (generic)
     console.log('📋 Capturing: Generic Programs');
     await page.goto('/programs');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1000);
-    await screenshots.capture(page, '064-programs-generic', true);
+    await screenshots.capture(page, '063-programs-generic', true);
 
     // Documents (generic)
     console.log('📋 Capturing: Generic Documents');
     await page.goto('/documents');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1000);
-    await screenshots.capture(page, '065-documents-generic', true);
+    await screenshots.capture(page, '064-documents-generic', true);
 
     // Compliance (generic)
     console.log('📋 Capturing: Generic Compliance');
     await page.goto('/compliance');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1000);
-    await screenshots.capture(page, '066-compliance-generic', true);
+    await screenshots.capture(page, '065-compliance-generic', true);
 
     // Settings (generic)
     console.log('📋 Capturing: Generic Settings');
     await page.goto('/settings');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1000);
-    await screenshots.capture(page, '067-settings-generic', true);
+    await screenshots.capture(page, '066-settings-generic', true);
 
     // Users (generic)
     console.log('📋 Capturing: Generic Users');
