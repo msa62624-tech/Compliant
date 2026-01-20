@@ -3,6 +3,7 @@ import { NotFoundException } from "@nestjs/common";
 import { ContractorsService } from "./contractors.service";
 import { PrismaService } from "../../config/prisma.service";
 import { CacheService } from "../cache/cache.service";
+import { EmailService } from "../email/email.service";
 import { ContractorStatus, ContractorType } from "@prisma/client";
 import { InsuranceStatus } from "@compliant/shared";
 
@@ -61,6 +62,13 @@ describe("ContractorsService", () => {
             invalidate: jest.fn(),
           },
         },
+        {
+          provide: EmailService,
+          useValue: {
+            sendEmail: jest.fn(),
+            sendWelcomeEmail: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -84,7 +92,10 @@ describe("ContractorsService", () => {
         status: ContractorStatus.ACTIVE,
       };
 
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+      // Mock the creator user lookup and the check for existing user with the email
+      (prisma.user.findUnique as jest.Mock)
+        .mockResolvedValueOnce({ id: "user-123", role: "ADMIN" }) // Creator lookup
+        .mockResolvedValueOnce(null); // Email check - no existing user
       (prisma.user.create as jest.Mock).mockResolvedValue({
         id: "user-456",
         email: createDto.email,
@@ -93,6 +104,8 @@ describe("ContractorsService", () => {
         role: "CONTRACTOR",
         password: "hashed",
         isActive: true,
+        resetToken: null,
+        resetTokenExpiry: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -115,7 +128,10 @@ describe("ContractorsService", () => {
         status: ContractorStatus.ACTIVE,
       };
 
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+      // Mock the creator user lookup and the check for existing user with the email
+      (prisma.user.findUnique as jest.Mock)
+        .mockResolvedValueOnce({ id: "user-123", role: "ADMIN" }) // Creator lookup
+        .mockResolvedValueOnce(null); // Email check - no existing user
       (prisma.user.create as jest.Mock).mockResolvedValue({
         id: "user-new",
         email: createDto.email,
@@ -124,6 +140,8 @@ describe("ContractorsService", () => {
         role: "CONTRACTOR",
         password: "hashed",
         isActive: true,
+        resetToken: null,
+        resetTokenExpiry: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -163,7 +181,10 @@ describe("ContractorsService", () => {
         status: ContractorStatus.ACTIVE,
       };
 
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+      // Mock the creator user lookup and the check for existing user with the email
+      (prisma.user.findUnique as jest.Mock)
+        .mockResolvedValueOnce({ id: "user-123", role: "ADMIN" }) // Creator lookup
+        .mockResolvedValueOnce(null); // Email check - no existing user
       (prisma.user.create as jest.Mock).mockResolvedValue({
         id: "user-sub",
         email: createDto.email,
@@ -172,6 +193,8 @@ describe("ContractorsService", () => {
         role: "SUBCONTRACTOR",
         password: "hashed",
         isActive: true,
+        resetToken: null,
+        resetTokenExpiry: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -202,17 +225,23 @@ describe("ContractorsService", () => {
         status: ContractorStatus.ACTIVE,
       };
 
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue({
-        id: "existing-user",
-        email: createDto.email,
-        firstName: "Existing",
-        lastName: "User",
-        role: "CONTRACTOR",
-        password: "hashed",
-        isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      // Mock the creator user lookup and the check for existing user with the email
+      (prisma.user.findUnique as jest.Mock)
+        .mockResolvedValueOnce({ id: "user-123", role: "ADMIN" }) // Creator lookup
+        .mockResolvedValueOnce({
+          // Email check - existing user found
+          id: "existing-user",
+          email: createDto.email,
+          firstName: "Existing",
+          lastName: "User",
+          role: "CONTRACTOR",
+          password: "hashed",
+          isActive: true,
+          resetToken: null,
+          resetTokenExpiry: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
       (prisma.contractor.create as jest.Mock).mockResolvedValue({
         ...mockContractor,
         ...createDto,
@@ -235,7 +264,10 @@ describe("ContractorsService", () => {
         status: ContractorStatus.ACTIVE,
       };
 
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+      // Mock the creator user lookup and the check for existing user with the email
+      (prisma.user.findUnique as jest.Mock)
+        .mockResolvedValueOnce({ id: "user-123", role: "ADMIN" }) // Creator lookup
+        .mockResolvedValueOnce(null); // Email check - no existing user
       (prisma.user.create as jest.Mock).mockResolvedValue({
         id: "user-test",
         email: createDto.email,
@@ -244,6 +276,8 @@ describe("ContractorsService", () => {
         role: "CONTRACTOR",
         password: "hashed",
         isActive: true,
+        resetToken: null,
+        resetTokenExpiry: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -272,7 +306,10 @@ describe("ContractorsService", () => {
         status: ContractorStatus.ACTIVE,
       };
 
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+      // Mock the creator user lookup and the check for existing user with the email
+      (prisma.user.findUnique as jest.Mock)
+        .mockResolvedValueOnce({ id: "user-123", role: "ADMIN" }) // Creator lookup
+        .mockResolvedValueOnce(null); // Email check - no existing user
       (prisma.user.create as jest.Mock).mockResolvedValue({
         id: "user-jsmith",
         email: createDto.email,
@@ -281,6 +318,8 @@ describe("ContractorsService", () => {
         role: "CONTRACTOR",
         password: "hashed",
         isActive: true,
+        resetToken: null,
+        resetTokenExpiry: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -478,6 +517,8 @@ describe("ContractorsService", () => {
       role: "USER" as const,
       isActive: true,
       password: "hashed",
+      resetToken: null,
+      resetTokenExpiry: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

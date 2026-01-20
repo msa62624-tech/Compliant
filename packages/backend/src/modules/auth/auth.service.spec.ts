@@ -36,6 +36,8 @@ describe("AuthService", () => {
     lastName: "User",
     role: UserRole.USER,
     isActive: true,
+    resetToken: null,
+    resetTokenExpiry: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };

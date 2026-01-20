@@ -239,6 +239,8 @@ describe("ProjectsService", () => {
       role: "USER" as const,
       isActive: true,
       password: "hashed",
+      resetToken: null,
+      resetTokenExpiry: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
