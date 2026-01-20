@@ -13,15 +13,61 @@ const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3001';
 const API_PATH = '/api';
 const API_VERSION = '1';
 
+// Rate limiting configuration
+const API_RATE_LIMIT_DELAY = 1000; // 1 second between API calls
+const API_MAX_RETRIES = 3;
+const API_RETRY_DELAY_BASE = 2000; // Base delay for exponential backoff (2 seconds)
+
 // Admin credentials (pre-seeded)
 const ADMIN_CREDENTIALS = {
   email: 'admin@compliant.com',
   password: 'Admin123!@#'
 };
 
+/**
+ * Sleep helper for adding delays
+ */
+async function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Rate-limited fetch with retry logic and exponential backoff
+ * Handles 429 (Too Many Requests) errors gracefully
+ */
+async function rateLimitedFetch(url: string, options: RequestInit, retryCount = 0): Promise<Response> {
+  try {
+    const response = await fetch(url, options);
+    
+    // If we get a 429 (rate limit), retry with exponential backoff
+    if (response.status === 429 && retryCount < API_MAX_RETRIES) {
+      const retryDelay = API_RETRY_DELAY_BASE * Math.pow(2, retryCount);
+      console.log(`⚠️  Rate limited (429), retrying in ${retryDelay}ms... (attempt ${retryCount + 1}/${API_MAX_RETRIES})`);
+      await sleep(retryDelay);
+      return rateLimitedFetch(url, options, retryCount + 1);
+    }
+    
+    // Add delay after successful request to prevent rate limiting
+    if (response.ok) {
+      await sleep(API_RATE_LIMIT_DELAY);
+    }
+    
+    return response;
+  } catch (error) {
+    // Network errors - retry with exponential backoff
+    if (retryCount < API_MAX_RETRIES) {
+      const retryDelay = API_RETRY_DELAY_BASE * Math.pow(2, retryCount);
+      console.log(`⚠️  Network error, retrying in ${retryDelay}ms... (attempt ${retryCount + 1}/${API_MAX_RETRIES})`);
+      await sleep(retryDelay);
+      return rateLimitedFetch(url, options, retryCount + 1);
+    }
+    throw error;
+  }
+}
+
 // Helper to get auth token via API
 async function getAuthToken(email: string, password: string): Promise<string> {
-  const response = await fetch(`${API_BASE_URL}${API_PATH}/auth/login`, {
+  const response = await rateLimitedFetch(`${API_BASE_URL}${API_PATH}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -41,7 +87,7 @@ async function getAuthToken(email: string, password: string): Promise<string> {
 
 // Helper to create contractor (returns auto-generated credentials)
 async function createContractor(token: string, data: any): Promise<any> {
-  const response = await fetch(`${API_BASE_URL}${API_PATH}/contractors`, {
+  const response = await rateLimitedFetch(`${API_BASE_URL}${API_PATH}/contractors`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -61,7 +107,7 @@ async function createContractor(token: string, data: any): Promise<any> {
 
 // Helper to create subcontractor
 async function createSubcontractor(token: string, data: any): Promise<any> {
-  const response = await fetch(`${API_BASE_URL}${API_PATH}/subcontractors`, {
+  const response = await rateLimitedFetch(`${API_BASE_URL}${API_PATH}/subcontractors`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
