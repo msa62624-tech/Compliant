@@ -20,7 +20,7 @@ services:
   app:
     image: mcr.microsoft.com/devcontainers/typescript-node:20
     volumes:
-      - ..:/workspace:cached
+      - .:/workspace:cached
     command: sleep infinity
     networks:
       - compliant-network
