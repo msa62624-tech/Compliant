@@ -17,17 +17,17 @@ These pages are accessible without authentication.
 ### 1. Home Page
 **Route:** `/`
 
-![Home Page](e2e-screenshots/all_pages_public/001-001_home_page.png)
+![Home Page](docs/e2e-screenshots/all_pages_public/001-001_home_page.png)
 
 ### 2. Login Page
 **Route:** `/login`
 
-![Login Page](e2e-screenshots/all_pages_public/002-002_login_page.png)
+![Login Page](docs/e2e-screenshots/all_pages_public/002-002_login_page.png)
 
 ### 3. 404 Not Found Page
 **Route:** `/non-existent-page`
 
-![404 Page](e2e-screenshots/all_pages_public/003-003_404_page.png)
+![404 Page](docs/e2e-screenshots/all_pages_public/003-003_404_page.png)
 
 ---
 
@@ -39,95 +39,95 @@ Full administrative access with complete CRUD operations for all entities.
 
 **Login Page:**
 
-![Admin Login](e2e-screenshots/all_pages_admin/001-admin_login_page.png)
+![Admin Login](docs/e2e-screenshots/all_pages_admin/001-admin_login_page.png)
 
 **Login Form Filled:**
 
-![Admin Login Form Filled](e2e-screenshots/all_pages_admin/002-admin_login_form_filled.png)
+![Admin Login Form Filled](docs/e2e-screenshots/all_pages_admin/002-admin_login_form_filled.png)
 
 ### Dashboard & Overview
 1. **Admin Dashboard**
    - **Route:** `/admin/dashboard`
    - **Description:** Main administrative dashboard with overview stats
    
-   ![Admin Dashboard](e2e-screenshots/all_pages_admin/003-010_admin_dashboard.png)
+   ![Admin Dashboard](docs/e2e-screenshots/all_pages_admin/003-010_admin_dashboard.png)
 
 ### Contractors Management
 2. **Contractors List**
    - **Route:** `/admin/contractors`
    - **Description:** List and manage all contractors
    
-   ![Admin Contractors List](e2e-screenshots/all_pages_admin/004-011_admin_contractors_list.png)
+   ![Admin Contractors List](docs/e2e-screenshots/all_pages_admin/004-011_admin_contractors_list.png)
 
 3. **New Contractor Form**
    - **Route:** `/admin/contractors/new`
    - **Description:** Create new contractor with details
    
-   ![New Contractor Form](e2e-screenshots/all_pages_admin/005-012_admin_contractors_new.png)
+   ![New Contractor Form](docs/e2e-screenshots/all_pages_admin/005-012_admin_contractors_new.png)
 
 4. **General Contractors List**
    - **Route:** `/admin/general-contractors`
    - **Description:** Manage general contractors specifically
    
-   ![General Contractors List](e2e-screenshots/all_pages_admin/006-013_admin_general_contractors_list.png)
+   ![General Contractors List](docs/e2e-screenshots/all_pages_admin/006-013_admin_general_contractors_list.png)
 
 ### Projects Management
 5. **Projects List**
    - **Route:** `/admin/projects`
    - **Description:** View and manage all projects
    
-   ![Admin Projects List](e2e-screenshots/all_pages_admin/007-014_admin_projects_list.png)
+   ![Admin Projects List](docs/e2e-screenshots/all_pages_admin/007-014_admin_projects_list.png)
 
 6. **New Project Form**
    - **Route:** `/admin/projects/new`
    - **Description:** Create new construction project
    
-   ![New Project Form](e2e-screenshots/all_pages_admin/008-015_admin_projects_new.png)
+   ![New Project Form](docs/e2e-screenshots/all_pages_admin/008-015_admin_projects_new.png)
 
 ### Programs Management
 7. **Programs List**
    - **Route:** `/admin/programs`
    - **Description:** Manage insurance programs
    
-   ![Admin Programs List](e2e-screenshots/all_pages_admin/009-016_admin_programs_list.png)
+   ![Admin Programs List](docs/e2e-screenshots/all_pages_admin/009-016_admin_programs_list.png)
 
 8. **New Program Form**
    - **Route:** `/admin/programs/new`
    - **Description:** Create new insurance program
    
-   ![New Program Form](e2e-screenshots/all_pages_admin/010-017_admin_programs_new.png)
+   ![New Program Form](docs/e2e-screenshots/all_pages_admin/010-017_admin_programs_new.png)
 
 ### COI Management
 9. **COI List**
    - **Route:** `/admin/coi`
    - **Description:** View all Certificates of Insurance
    
-   ![Admin COI List](e2e-screenshots/all_pages_admin/011-018_admin_coi_list.png)
+   ![Admin COI List](docs/e2e-screenshots/all_pages_admin/011-018_admin_coi_list.png)
 
 10. **COI Reviews**
     - **Route:** `/admin/coi-reviews`
     - **Description:** Review and approve pending COIs
     
-    ![COI Reviews](e2e-screenshots/all_pages_admin/012-019_admin_coi_reviews.png)
+    ![COI Reviews](docs/e2e-screenshots/all_pages_admin/012-019_admin_coi_reviews.png)
 
 ### User & System Management
 11. **Users List**
     - **Route:** `/admin/users`
     - **Description:** Manage system users and roles
     
-    ![Admin Users List](e2e-screenshots/all_pages_admin/013-020_admin_users_list.png)
+    ![Admin Users List](docs/e2e-screenshots/all_pages_admin/013-020_admin_users_list.png)
 
 12. **Reports**
     - **Route:** `/admin/reports`
     - **Description:** Generate and view system reports
     
-    ![Admin Reports](e2e-screenshots/all_pages_admin/014-021_admin_reports.png)
+    ![Admin Reports](docs/e2e-screenshots/all_pages_admin/014-021_admin_reports.png)
 
 13. **Settings**
     - **Route:** `/admin/settings`
     - **Description:** System configuration and settings
     
-    ![Admin Settings](e2e-screenshots/all_pages_admin/015-022_admin_settings.png)
+    ![Admin Settings](docs/e2e-screenshots/all_pages_admin/015-022_admin_settings.png)
 
 ---
 
@@ -139,36 +139,36 @@ Pages for general contractors managing their subcontractors and projects.
 
 **Login Page:**
 
-![GC Login](e2e-screenshots/all_pages_gc/001-gc_login_page.png)
+![GC Login](docs/e2e-screenshots/all_pages_gc/001-gc_login_page.png)
 
 **Login Form Filled:**
 
-![GC Login Form Filled](e2e-screenshots/all_pages_gc/002-gc_login_form_filled.png)
+![GC Login Form Filled](docs/e2e-screenshots/all_pages_gc/002-gc_login_form_filled.png)
 
 ### Main Pages
 1. **GC Dashboard**
    - **Route:** `/gc/dashboard`
    - **Description:** General contractor's overview dashboard
    
-   ![GC Dashboard](e2e-screenshots/all_pages_gc/003-030_gc_dashboard.png)
+   ![GC Dashboard](docs/e2e-screenshots/all_pages_gc/003-030_gc_dashboard.png)
 
 2. **GC Projects**
    - **Route:** `/gc/projects`
    - **Description:** Manage projects as a general contractor
    
-   ![GC Projects](e2e-screenshots/all_pages_gc/004-031_gc_projects.png)
+   ![GC Projects](docs/e2e-screenshots/all_pages_gc/004-031_gc_projects.png)
 
 3. **GC Subcontractors**
    - **Route:** `/gc/subcontractors`
    - **Description:** View and manage subcontractors
    
-   ![GC Subcontractors](e2e-screenshots/all_pages_gc/005-032_gc_subcontractors.png)
+   ![GC Subcontractors](docs/e2e-screenshots/all_pages_gc/005-032_gc_subcontractors.png)
 
 4. **GC Compliance**
    - **Route:** `/gc/compliance`
    - **Description:** Compliance tracking and status
    
-   ![GC Compliance](e2e-screenshots/all_pages_gc/006-033_gc_compliance.png)
+   ![GC Compliance](docs/e2e-screenshots/all_pages_gc/006-033_gc_compliance.png)
 
 ---
 
@@ -208,36 +208,36 @@ Pages for contractors (non-GC contractors).
 
 **Login Page:**
 
-![Contractor Login](e2e-screenshots/all_pages_contractor_role/001-contractor_login_page.png)
+![Contractor Login](docs/e2e-screenshots/all_pages_contractor_role/001-contractor_login_page.png)
 
 **Login Form Filled:**
 
-![Contractor Login Form Filled](e2e-screenshots/all_pages_contractor_role/002-contractor_login_form_filled.png)
+![Contractor Login Form Filled](docs/e2e-screenshots/all_pages_contractor_role/002-contractor_login_form_filled.png)
 
 ### Main Pages
 1. **Contractor Dashboard**
    - **Route:** `/contractor/dashboard`
    - **Description:** Contractor's main dashboard
    
-   ![Contractor Dashboard](e2e-screenshots/all_pages_contractor_role/003-050_contractor_dashboard.png)
+   ![Contractor Dashboard](docs/e2e-screenshots/all_pages_contractor_role/003-050_contractor_dashboard.png)
 
 2. **Contractor Projects**
    - **Route:** `/contractor/projects`
    - **Description:** View contractor's projects
    
-   ![Contractor Projects](e2e-screenshots/all_pages_contractor_role/004-051_contractor_projects.png)
+   ![Contractor Projects](docs/e2e-screenshots/all_pages_contractor_role/004-051_contractor_projects.png)
 
 3. **Contractor Documents**
    - **Route:** `/contractor/documents`
    - **Description:** Manage contractor documents
    
-   ![Contractor Documents](e2e-screenshots/all_pages_contractor_role/005-052_contractor_documents.png)
+   ![Contractor Documents](docs/e2e-screenshots/all_pages_contractor_role/005-052_contractor_documents.png)
 
 4. **Contractor Compliance**
    - **Route:** `/contractor/compliance`
    - **Description:** Compliance tracking for contractor
    
-   ![Contractor Compliance](e2e-screenshots/all_pages_contractor_role/006-053_contractor_compliance.png)
+   ![Contractor Compliance](docs/e2e-screenshots/all_pages_contractor_role/006-053_contractor_compliance.png)
 
 ---
 
@@ -284,60 +284,60 @@ These pages are accessible across multiple roles with role-based content filteri
 
 **Login Page:**
 
-![Shared Login](e2e-screenshots/all_pages_shared/001-shared_login_page.png)
+![Shared Login](docs/e2e-screenshots/all_pages_shared/001-shared_login_page.png)
 
 **Login Form Filled:**
 
-![Shared Login Form Filled](e2e-screenshots/all_pages_shared/002-shared_login_form_filled.png)
+![Shared Login Form Filled](docs/e2e-screenshots/all_pages_shared/002-shared_login_form_filled.png)
 
 ### Main Pages
 1. **Generic Dashboard**
    - **Route:** `/dashboard`
    - **Description:** Role-agnostic dashboard
    
-   ![Generic Dashboard](e2e-screenshots/all_pages_shared/003-060_dashboard_generic.png)
+   ![Generic Dashboard](docs/e2e-screenshots/all_pages_shared/003-060_dashboard_generic.png)
 
 2. **Generic COI**
    - **Route:** `/coi`
    - **Description:** View COI list
    
-   ![Generic COI](e2e-screenshots/all_pages_shared/004-061_coi_generic.png)
+   ![Generic COI](docs/e2e-screenshots/all_pages_shared/004-061_coi_generic.png)
 
 3. **Generic Contractors**
    - **Route:** `/contractors`
    - **Description:** View contractors list
    
-   ![Generic Contractors](e2e-screenshots/all_pages_shared/005-062_contractors_generic.png)
+   ![Generic Contractors](docs/e2e-screenshots/all_pages_shared/005-062_contractors_generic.png)
 
 4. **Generic Projects**
    - **Route:** `/projects`
    - **Description:** View projects list
    
-   ![Generic Projects](e2e-screenshots/all_pages_shared/006-063_projects_generic.png)
+   ![Generic Projects](docs/e2e-screenshots/all_pages_shared/006-063_projects_generic.png)
 
 5. **Generic Programs**
    - **Route:** `/programs`
    - **Description:** View programs list
    
-   ![Generic Programs](e2e-screenshots/all_pages_shared/007-064_programs_generic.png)
+   ![Generic Programs](docs/e2e-screenshots/all_pages_shared/007-064_programs_generic.png)
 
 6. **Generic Documents**
    - **Route:** `/documents`
    - **Description:** Documents management
    
-   ![Generic Documents](e2e-screenshots/all_pages_shared/008-065_documents_generic.png)
+   ![Generic Documents](docs/e2e-screenshots/all_pages_shared/008-065_documents_generic.png)
 
 7. **Generic Compliance**
    - **Route:** `/compliance`
    - **Description:** Compliance tracking
    
-   ![Generic Compliance](e2e-screenshots/all_pages_shared/009-066_compliance_generic.png)
+   ![Generic Compliance](docs/e2e-screenshots/all_pages_shared/009-066_compliance_generic.png)
 
 8. **Generic Settings**
    - **Route:** `/settings`
    - **Description:** User settings
    
-   ![Generic Settings](e2e-screenshots/all_pages_shared/010-067_settings_generic.png)
+   ![Generic Settings](docs/e2e-screenshots/all_pages_shared/010-067_settings_generic.png)
 
 ---
 
