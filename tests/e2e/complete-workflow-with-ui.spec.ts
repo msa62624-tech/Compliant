@@ -284,10 +284,10 @@ test.describe('Complete COI Workflow - Prestige Builders & MPI Plumbing', () => 
     if (coiId) {
       try {
         await apiCallWithPage(page, `/generated-coi/${coiId}/broker-info`, 'PATCH', {
-          brokerCompany: NEW_BROKER_DATA.company,
-          brokerContact: NEW_BROKER_DATA.firstName,
-          brokerEmail: NEW_BROKER_DATA.email,
-          brokerPhone: '(555) 345-6789',
+          brokerType: 'PER_POLICY',
+          brokerGlName: NEW_BROKER_DATA.firstName,
+          brokerGlEmail: NEW_BROKER_DATA.email,
+          brokerGlPhone: '(555) 345-6789',
         });
         console.log(`✓ Broker information provided`);
         console.log(`  Broker: ${NEW_BROKER_DATA.company}`);

@@ -63,30 +63,23 @@ const SUBCONTRACTOR_DATA = {
 };
 
 const BROKER_DATA = {
-  brokerCompany: 'HML Brokerage',
-  brokerContact: 'Miriam',
-  brokerEmail: 'msabel@hmlbrokerage.com',
-  brokerPhone: '(555) 345-6789',
+  brokerType: 'PER_POLICY',
   // Same broker for all policies
   brokerGlName: 'Miriam - HML Brokerage',
   brokerGlEmail: 'msabel@hmlbrokerage.com',
   brokerGlPhone: '(555) 345-6789',
-  brokerGlCompany: 'HML Brokerage',
   
   brokerAutoName: 'Miriam - HML Brokerage',
   brokerAutoEmail: 'msabel@hmlbrokerage.com',
   brokerAutoPhone: '(555) 345-6789',
-  brokerAutoCompany: 'HML Brokerage',
   
   brokerUmbrellaName: 'Miriam - HML Brokerage',
   brokerUmbrellaEmail: 'msabel@hmlbrokerage.com',
   brokerUmbrellaPhone: '(555) 345-6789',
-  brokerUmbrellaCompany: 'HML Brokerage',
   
   brokerWcName: 'Miriam - HML Brokerage',
   brokerWcEmail: 'msabel@hmlbrokerage.com',
-  brokerWcPhone: '(555) 345-6789',
-  brokerWcCompany: 'HML Brokerage'
+  brokerWcPhone: '(555) 345-6789'
 };
 
 // SDV Program Requirements - matches CreateProgramDto schema
@@ -358,9 +351,9 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
     const coiWithBroker = await apiCallPW(`/generated-coi/${coiId}/broker-info`, 'PATCH', subToken, BROKER_DATA);
     expect(coiWithBroker.status).toBe('AWAITING_BROKER_UPLOAD');
     console.log(`✓ Broker information provided`);
-    console.log(`  Broker: ${BROKER_DATA.brokerCompany}`);
-    console.log(`  Contact: ${BROKER_DATA.brokerContact}`);
-    console.log(`  Email: ${BROKER_DATA.brokerEmail}`);
+    console.log(`  Broker: HML Brokerage`);
+    console.log(`  Contact: ${BROKER_DATA.brokerGlName}`);
+    console.log(`  Email: ${BROKER_DATA.brokerGlEmail}`);
     console.log(`  Status: ${coiWithBroker.status}`);
 
     // Step 10: Get Broker Token (broker uses admin account for now since broker accounts are link-based)
@@ -558,7 +551,7 @@ Date: ${new Date().toISOString()}`,
     console.log(`  Location: ${PROJECT_DATA.location}`);
     console.log(`  GC: ${PROJECT_DATA.gcName} (${PROJECT_DATA.gcEmail})`);
     console.log(`  Subcontractor: ${SUBCONTRACTOR_DATA.name} (${SUBCONTRACTOR_DATA.email})`);
-    console.log(`  Broker: ${BROKER_DATA.brokerCompany} (${BROKER_DATA.brokerEmail})`);
+    console.log(`  Broker: HML Brokerage (${BROKER_DATA.brokerGlEmail})`);
     console.log(`  Project ID: ${projectId}`);
     console.log(`  Subcontractor ID: ${subcontractorId}`);
     console.log(`  COI ID: ${coiId}`);

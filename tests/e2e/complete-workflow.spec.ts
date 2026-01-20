@@ -230,10 +230,10 @@ test.describe('Complete COI Workflow Tests', () => {
         'PATCH',
         subcontractorToken,
         {
+          brokerType: 'PER_POLICY',
           brokerGlName: 'John Smith',
           brokerGlEmail: 'john.smith@insurancepro.com',
           brokerGlPhone: '(555) 100-0001',
-          brokerCompany: 'Insurance Pro LLC',
           
           brokerAutoName: 'Jane Doe',
           brokerAutoEmail: 'jane.doe@insurancepro.com',
@@ -242,12 +242,10 @@ test.describe('Complete COI Workflow Tests', () => {
           brokerUmbrellaName: 'Bob Johnson',
           brokerUmbrellaEmail: 'bob.johnson@insurancepro.com',
           brokerUmbrellaPhone: '(555) 100-0003',
-          brokerUmbrellaCompany: 'Insurance Pro LLC',
           
           brokerWcName: 'Alice Williams',
           brokerWcEmail: 'alice.williams@insurancepro.com',
           brokerWcPhone: '(555) 100-0004',
-          brokerWcCompany: 'Insurance Pro LLC',
         }
       );
 
@@ -507,6 +505,7 @@ test.describe('Complete COI Workflow Tests', () => {
         'PATCH',
         subcontractorToken,
         {
+          brokerType: 'PER_POLICY',
           brokerGlName: 'Mike Brown',
           brokerGlEmail: 'mike@quickinsurance.com',
           brokerGlPhone: '(555) 200-0001',
@@ -840,10 +839,10 @@ Contact admin if you have questions: admin@compliant.com`,
         'PATCH',
         subcontractorToken,
         {
+          brokerType: 'PER_POLICY',
           brokerGlName: 'Sarah Johnson',
           brokerGlEmail: 'sarah.johnson@premiuminsurance.com',
           brokerGlPhone: '(555) 300-0001',
-          brokerCompany: 'Premium Insurance Group',
           
           brokerAutoName: 'Sarah Johnson',
           brokerAutoEmail: 'sarah.johnson@premiuminsurance.com',
@@ -852,12 +851,10 @@ Contact admin if you have questions: admin@compliant.com`,
           brokerUmbrellaName: 'Sarah Johnson',
           brokerUmbrellaEmail: 'sarah.johnson@premiuminsurance.com',
           brokerUmbrellaPhone: '(555) 300-0001',
-          brokerUmbrellaCompany: 'Premium Insurance Group',
           
           brokerWcName: 'Sarah Johnson',
           brokerWcEmail: 'sarah.johnson@premiuminsurance.com',
           brokerWcPhone: '(555) 300-0001',
-          brokerWcCompany: 'Premium Insurance Group',
         }
       );
 
@@ -933,7 +930,7 @@ Contact admin if you have questions: admin@compliant.com`,
       // Verify broker information was copied from original
       expect(renewedCoi.brokerGlName).toBe('Sarah Johnson');
       expect(renewedCoi.brokerGlEmail).toBe('sarah.johnson@premiuminsurance.com');
-      expect(renewedCoi.brokerCompany).toBe('Premium Insurance Group');
+      expect(renewedCoi.brokerType).toBe('PER_POLICY');
       
       // Renewal should skip AWAITING_BROKER_INFO since broker info is copied
       expect(renewedCoi.status).toBe('AWAITING_BROKER_UPLOAD');
