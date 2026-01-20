@@ -10,7 +10,7 @@ const nextConfig = {
       fallback: [
         {
           source: '/api/:path*',
-          destination: 'http://localhost:3002/api/:path*',
+          destination: process.env.API_BASE_URL ? `${process.env.API_BASE_URL}/api/:path*` : 'http://localhost:3001/api/:path*',
         },
       ],
     };
