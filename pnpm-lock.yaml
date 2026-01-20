@@ -317,8 +317,8 @@ importers:
   packages/shared:
     dependencies:
       zod:
-        specifier: ^4.3.5
-        version: 4.3.5
+        specifier: ^3.24.1
+        version: 3.25.76
     devDependencies:
       '@types/jest':
         specifier: ^30.0.0
@@ -10135,10 +10135,6 @@ packages:
 
   /zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
-    dev: false
-
-  /zod@4.3.5:
-    resolution: {integrity: sha512-k7Nwx6vuWx1IJ9Bjuf4Zt1PEllcwe7cls3VNzm4CQ1/hgtFUK2bRNG3rvnpPUhFjmqJKAKtjV576KnUkHocg/g==}
     dev: false
 
   /zustand@5.0.10(@types/react@18.3.27)(react@18.3.1):

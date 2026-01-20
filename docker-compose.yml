@@ -22,7 +22,6 @@ services:
     command: sleep infinity
     volumes:
       - .:/workspace:cached
-      - node_modules:/workspace/node_modules
     working_dir: /workspace
     environment:
       - NODE_ENV=development
@@ -38,4 +37,3 @@ networks:
 
 volumes:
   postgres-data:
-  node_modules:
