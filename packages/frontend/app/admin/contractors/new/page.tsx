@@ -4,12 +4,14 @@ import { useAuth } from '../../../../lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import apiClient from '../../../../lib/api/client';
+import { AxiosError } from 'axios';
 
 export default function NewContractorPage() {
   const { user, loading, isAuthenticated } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorStatusCode, setErrorStatusCode] = useState<number | undefined>();
   const [success, setSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -38,6 +40,7 @@ export default function NewContractorPage() {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
+    setErrorStatusCode(undefined);
 
     try {
       await apiClient.post('/contractors', formData);
@@ -46,7 +49,32 @@ export default function NewContractorPage() {
         router.push('/admin/general-contractors');
       }, 2000);
     } catch (err) {
-      setError('Error connecting to server');
+      const axiosError = err as AxiosError<{ message: string | string[] }>;
+      const status = axiosError.response?.status;
+      const backendMessage = axiosError.response?.data?.message;
+      
+      setErrorStatusCode(status);
+      
+      // Handle different error types with specific messages
+      if (backendMessage) {
+        // Handle validation errors (array) or single error message
+        if (Array.isArray(backendMessage)) {
+          setError(backendMessage.join('. '));
+        } else {
+          setError(backendMessage);
+        }
+      } else if (status === 409) {
+        setError('A contractor with this email already exists. Please use a different email address.');
+      } else if (status === 400) {
+        setError('Invalid data provided. Please check all fields and try again.');
+      } else if (status === 403) {
+        setError('You do not have permission to create contractors.');
+      } else if (status && status >= 500) {
+        setError('Server error occurred. Please try again later.');
+      } else {
+        setError('Error connecting to server. Please check your connection and try again.');
+      }
+      
       console.error('Error creating contractor:', err);
     } finally {
       setIsSubmitting(false);
@@ -96,9 +124,18 @@ export default function NewContractorPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Contractor Information</h2>
 
             {error && (
-              <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-                <div className="flex">
-                  <div className="ml-3">
+              <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-lg">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <svg className="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="ml-3 flex-1">
+                    <h3 className="text-sm font-semibold text-red-800 mb-1">
+                      Error Creating Contractor
+                      {errorStatusCode && <span className="text-xs ml-2">({errorStatusCode})</span>}
+                    </h3>
                     <p className="text-sm text-red-700">{error}</p>
                   </div>
                 </div>
