@@ -1,7 +1,7 @@
 
 === CONSOLE MONITORING SUMMARY ===
 Test: responsive_design
-Generated: 2026-01-20T13:07:19.326Z
+Generated: 2026-01-20T13:25:44.516Z
 
 Console Summary: 8 messages (8 errors, 0 warnings, 0 logs, 0 info, 0 debug)
 
@@ -13,13 +13,13 @@ Breakdown by Type:
 - Debug: 0
 
 === ALL MESSAGES ===
-[2026-01-20T13:07:14.923Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T13:07:14.925Z] [ERROR] Auth check failed: Z
-[2026-01-20T13:07:16.071Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T13:07:16.071Z] [ERROR] Auth check failed: Z
-[2026-01-20T13:07:17.175Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T13:07:17.176Z] [ERROR] Auth check failed: Z
-[2026-01-20T13:07:18.269Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T13:07:18.270Z] [ERROR] Auth check failed: Z
+[2026-01-20T13:25:40.128Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T13:25:40.129Z] [ERROR] Auth check failed: Z
+[2026-01-20T13:25:41.273Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T13:25:41.274Z] [ERROR] Auth check failed: Z
+[2026-01-20T13:25:42.365Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T13:25:42.365Z] [ERROR] Auth check failed: Z
+[2026-01-20T13:25:43.463Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T13:25:43.463Z] [ERROR] Auth check failed: Z
 
 === END OF SUMMARY ===

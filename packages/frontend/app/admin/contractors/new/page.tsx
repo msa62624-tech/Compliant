@@ -19,6 +19,10 @@ export default function NewContractorPage() {
     email: '',
     phone: '',
     company: '',
+    address: '',
+    city: '',
+    state: '',
+    zipCode: '',
     contractorType: 'SUBCONTRACTOR',
     status: 'PENDING',
   });
@@ -44,8 +48,17 @@ export default function NewContractorPage() {
 
     try {
       // Only send fields that the backend DTO expects
-      const { name, email, phone, company } = formData;
-      await apiClient.post('/contractors', { name, email, phone, company });
+      const { name, email, phone, company, address, city, state, zipCode } = formData;
+      await apiClient.post('/contractors', { 
+        name, 
+        email, 
+        phone, 
+        company,
+        address,
+        city,
+        state,
+        zipCode
+      });
       setSuccess(true);
       setTimeout(() => {
         router.push('/admin/general-contractors');
@@ -217,6 +230,69 @@ export default function NewContractorPage() {
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2 border"
                   placeholder="ABC Construction"
                 />
+              </div>
+
+              <div>
+                <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  id="address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2 border"
+                  placeholder="670 Myrtle Ave, Suite 163"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                    City
+                  </label>
+                  <input
+                    type="text"
+                    id="city"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2 border"
+                    placeholder="Brooklyn"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+                    State
+                  </label>
+                  <input
+                    type="text"
+                    id="state"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleChange}
+                    maxLength={2}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2 border uppercase"
+                    placeholder="NY"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700">
+                    Zip Code
+                  </label>
+                  <input
+                    type="text"
+                    id="zipCode"
+                    name="zipCode"
+                    value={formData.zipCode}
+                    onChange={handleChange}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2 border"
+                    placeholder="11205"
+                  />
+                </div>
               </div>
 
               <div>

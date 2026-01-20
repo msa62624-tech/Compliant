@@ -54,7 +54,6 @@ const SUBCONTRACTOR_DATA = {
   email: 'msa62624@gmail.com',
   phone: '(555) 234-5678',
   company: 'MPI Plumbing LLC',
-  contractorType: 'SUBCONTRACTOR',
   status: 'ACTIVE',
   trades: ['Plumbing', 'HVAC'],
   address: '789 Industrial Ave',
@@ -235,6 +234,12 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
       email: 'prestige.builders@example.com',
       phone: '(555) 123-4567',
       company: 'Prestige Builders LLC',
+      address: '670 Myrtle Ave, Suite 163',
+      city: 'Brooklyn',
+      state: 'NY',
+      zipCode: '11205',
+      status: 'ACTIVE',
+      trades: ['General Construction'],
     });
     
     gcEmail = gcContractor.userAccount.email;
@@ -303,6 +308,12 @@ test.describe('Real-World COI Workflow - Prestige Builders & MPI Plumbing', () =
       email: SUBCONTRACTOR_DATA.email,
       phone: SUBCONTRACTOR_DATA.phone,
       company: SUBCONTRACTOR_DATA.company,
+      address: '670 Myrtle Ave, Suite 163',
+      city: 'Brooklyn',
+      state: 'NY',
+      zipCode: '11205',
+      status: 'ACTIVE',
+      trades: ['Plumbing', 'HVAC'],
     });
     subcontractorId = subcontractor.id;
     subEmail = subcontractor.userAccount.email;

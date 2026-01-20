@@ -111,6 +111,12 @@ test.describe('Complete COI Workflow Tests', () => {
           email: 'gc.abc.construction@example.com',
           phone: '(555) 999-1000',
           company: 'ABC Construction Inc.',
+          address: '670 Myrtle Ave, Suite 163',
+          city: 'Brooklyn',
+          state: 'NY',
+          zipCode: '11205',
+          status: 'ACTIVE',
+          trades: ['General Construction'],
         }
       );
       
@@ -166,6 +172,12 @@ test.describe('Complete COI Workflow Tests', () => {
           email: 'elite.electrical@example.com',
           phone: '(555) 123-4567',
           company: 'Elite Electrical Services LLC',
+          address: '670 Myrtle Ave, Suite 163',
+          city: 'Brooklyn',
+          state: 'NY',
+          zipCode: '11205',
+          status: 'ACTIVE',
+          trades: ['Electrical'],
         }
       );
 
@@ -392,6 +404,12 @@ test.describe('Complete COI Workflow Tests', () => {
           email: 'westside.construction@example.com',
           phone: '(555) 900-1001',
           company: 'Westside Construction LLC',
+          address: '670 Myrtle Ave, Suite 163',
+          city: 'Brooklyn',
+          state: 'NY',
+          zipCode: '11205',
+          status: 'ACTIVE',
+          trades: ['General Construction'],
         }
       );
       
@@ -440,6 +458,12 @@ test.describe('Complete COI Workflow Tests', () => {
           name: 'Speedy Plumbing Co',
           email: 'speedy.plumbing@example.com',
           company: 'Speedy Plumbing Company',
+          address: '670 Myrtle Ave, Suite 163',
+          city: 'Brooklyn',
+          state: 'NY',
+          zipCode: '11205',
+          status: 'ACTIVE',
+          trades: ['Plumbing'],
         }
       );
 
@@ -713,6 +737,12 @@ Contact admin if you have questions: admin@compliant.com`,
           email: 'highway.builders@example.com',
           phone: '(555) 800-1002',
           company: 'Highway Builders Inc.',
+          address: '670 Myrtle Ave, Suite 163',
+          city: 'Brooklyn',
+          state: 'NY',
+          zipCode: '11205',
+          status: 'ACTIVE',
+          trades: ['General Construction'],
         }
       );
       
@@ -761,6 +791,12 @@ Contact admin if you have questions: admin@compliant.com`,
           name: 'Concrete Masters Inc',
           email: 'concrete.masters@example.com',
           company: 'Concrete Masters Incorporated',
+          address: '670 Myrtle Ave, Suite 163',
+          city: 'Brooklyn',
+          state: 'NY',
+          zipCode: '11205',
+          status: 'ACTIVE',
+          trades: ['Concrete'],
         }
       );
 

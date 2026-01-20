@@ -1,7 +1,7 @@
 
 === CONSOLE MONITORING SUMMARY ===
 Test: frontend_navigation
-Generated: 2026-01-20T13:07:13.057Z
+Generated: 2026-01-20T13:25:38.231Z
 
 Console Summary: 2 messages (2 errors, 0 warnings, 0 logs, 0 info, 0 debug)
 
@@ -13,7 +13,7 @@ Breakdown by Type:
 - Debug: 0
 
 === ALL MESSAGES ===
-[2026-01-20T13:07:12.259Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
-[2026-01-20T13:07:12.262Z] [ERROR] Auth check failed: Z
+[2026-01-20T13:25:37.439Z] [ERROR] Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+[2026-01-20T13:25:37.441Z] [ERROR] Auth check failed: Z
 
 === END OF SUMMARY ===
