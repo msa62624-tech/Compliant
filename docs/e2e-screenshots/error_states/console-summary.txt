@@ -1,7 +1,7 @@
 
 === CONSOLE MONITORING SUMMARY ===
 Test: error_states
-Generated: 2026-01-20T12:24:59.800Z
+Generated: 2026-01-20T12:36:02.618Z
 
 Console Summary: 3 messages (3 errors, 0 warnings, 0 logs, 0 info, 0 debug)
 
@@ -13,8 +13,8 @@ Breakdown by Type:
 - Debug: 0
 
 === ALL MESSAGES ===
-[2026-01-20T12:24:59.085Z] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found)
-[2026-01-20T12:24:59.173Z] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found)
-[2026-01-20T12:24:59.174Z] [ERROR] Auth check failed: Z
+[2026-01-20T12:36:01.952Z] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found)
+[2026-01-20T12:36:01.991Z] [ERROR] Failed to load resource: the server responded with a status of 400 (Bad Request)
+[2026-01-20T12:36:01.992Z] [ERROR] REQUEST FAILED: http://localhost:3000/_next/static/chunks/app/layout-f16108658123e686.js - net::ERR_ABORTED
 
 === END OF SUMMARY ===

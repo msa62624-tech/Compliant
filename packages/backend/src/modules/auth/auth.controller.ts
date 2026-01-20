@@ -73,6 +73,16 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
+    // In test/development mode, also return tokens in response body for API testing
+    // In production, tokens are only in httpOnly cookies for security
+    if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
+      return {
+        user: result.user,
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+      };
+    }
+
     // Return user data without tokens (tokens are in cookies)
     return { user: result.user };
   }
