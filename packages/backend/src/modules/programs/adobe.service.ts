@@ -70,10 +70,11 @@ export class AdobeService {
 
       this.logger.log("Adobe access token obtained");
       return this.accessToken;
-    } catch (err: any) {
-      this.logger.error(`Failed to get Adobe access token: ${err.message}`);
+    } catch (err) {
+      const error = err as Error;
+      this.logger.error(`Failed to get Adobe access token: ${error.message}`);
       throw new BadRequestException(
-        `Adobe authentication failed: ${err.message}`,
+        `Adobe authentication failed: ${error.message}`,
       );
     }
   }
@@ -147,12 +148,13 @@ export class AdobeService {
 
       this.logger.log(`Document sent for signature: ${agreementId}`);
       return { agreementId, signUrl };
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as Error;
       this.logger.error(
-        `Failed to send document for signature: ${err.message}`,
+        `Failed to send document for signature: ${error.message}`,
       );
       throw new BadRequestException(
-        `Send for signature failed: ${err.message}`,
+        `Send for signature failed: ${error.message}`,
       );
     }
   }
@@ -193,9 +195,10 @@ export class AdobeService {
 
       const data = (await response.json()) as { transientDocumentId: string };
       return data.transientDocumentId;
-    } catch (err: any) {
-      this.logger.error(`Document upload failed: ${err.message}`);
-      throw new BadRequestException(`Document upload failed: ${err.message}`);
+    } catch (err) {
+      const error = err as Error;
+      this.logger.error(`Document upload failed: ${error.message}`);
+      throw new BadRequestException(`Document upload failed: ${error.message}`);
     }
   }
 
@@ -233,10 +236,11 @@ export class AdobeService {
       }
 
       return signingUrl;
-    } catch (err: any) {
-      this.logger.error(`Failed to get signing URL: ${err.message}`);
+    } catch (err) {
+      const error = err as Error;
+      this.logger.error(`Failed to get signing URL: ${error.message}`);
       throw new BadRequestException(
-        `Failed to get signing URL: ${err.message}`,
+        `Failed to get signing URL: ${error.message}`,
       );
     }
   }
@@ -282,10 +286,11 @@ export class AdobeService {
         status: data.status,
         signedDocumentUrl,
       };
-    } catch (err: any) {
-      this.logger.error(`Failed to get agreement status: ${err.message}`);
+    } catch (err) {
+      const error = err as Error;
+      this.logger.error(`Failed to get agreement status: ${error.message}`);
       throw new BadRequestException(
-        `Failed to get agreement status: ${err.message}`,
+        `Failed to get agreement status: ${error.message}`,
       );
     }
   }

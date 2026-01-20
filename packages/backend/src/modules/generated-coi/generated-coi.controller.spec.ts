@@ -184,7 +184,7 @@ describe("GeneratedCOIController - RBAC Tests", () => {
           email: "admin@example.com",
           role: UserRole.ADMIN,
         },
-      } as any;
+      } as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
       generatedCOIService.findAll.mockResolvedValue([mockCOI] as any); // eslint-disable-line @typescript-eslint/no-explicit-any
       const result = controller.findAll(mockRequest);
@@ -204,7 +204,7 @@ describe("GeneratedCOIController - RBAC Tests", () => {
           email: "superadmin@example.com",
           role: UserRole.SUPER_ADMIN,
         },
-      } as any;
+      } as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
       generatedCOIService.findAll.mockResolvedValue([mockCOI] as any); // eslint-disable-line @typescript-eslint/no-explicit-any
       const result = controller.findAll(mockRequest);
@@ -223,7 +223,7 @@ describe("GeneratedCOIController - RBAC Tests", () => {
           email: "contractor@example.com",
           role: UserRole.CONTRACTOR,
         },
-      } as any;
+      } as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
       generatedCOIService.findAll.mockResolvedValue([mockCOI] as any); // eslint-disable-line @typescript-eslint/no-explicit-any
       const result = controller.findAll(mockRequest);
@@ -242,7 +242,7 @@ describe("GeneratedCOIController - RBAC Tests", () => {
           email: "subcontractor@example.com",
           role: UserRole.SUBCONTRACTOR,
         },
-      } as any;
+      } as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
       generatedCOIService.findAll.mockResolvedValue([mockCOI] as any); // eslint-disable-line @typescript-eslint/no-explicit-any
       const result = controller.findAll(mockRequest);
@@ -268,7 +268,7 @@ describe("GeneratedCOIController - RBAC Tests", () => {
           email: "user@example.com",
           role: UserRole.USER,
         },
-      } as any;
+      } as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
       // No @Roles decorator on create endpoint
       const context = createMockExecutionContext({
@@ -281,8 +281,8 @@ describe("GeneratedCOIController - RBAC Tests", () => {
       const canActivate = rolesGuard.canActivate(context);
       expect(canActivate).toBe(true);
 
-      generatedCOIService.create.mockResolvedValue(mockCOI as any);
-      const result = controller.create(createDto as any, mockRequest);
+      generatedCOIService.create.mockResolvedValue(mockCOI as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+      const result = controller.create(createDto as any, mockRequest); // eslint-disable-line @typescript-eslint/no-explicit-any
       expect(result).toBeDefined();
     });
   });

@@ -1,6 +1,14 @@
 import { Injectable, Logger, BadRequestException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
+// Interface for uploaded file from Multer
+export interface UploadedFile {
+  buffer: Buffer;
+  mimetype: string;
+  originalname: string;
+  size: number;
+}
+
 export interface ExtractedProgramData {
   name?: string;
   description?: string;
@@ -11,8 +19,8 @@ export interface ExtractedProgramData {
   requiresHoldHarmless?: boolean;
   requiresAdditionalInsured?: boolean;
   requiresWaiverSubrogation?: boolean;
-  tierRequirements?: Record<string, any>;
-  tradeRequirements?: Record<string, any>;
+  tierRequirements?: Record<string, unknown>;
+  tradeRequirements?: Record<string, unknown>;
   extractedText?: string;
   confidence?: number;
 }
@@ -21,7 +29,9 @@ export interface ExtractedProgramData {
 export class AIExtractionService {
   private readonly logger = new Logger(AIExtractionService.name);
   private aiProvider: "openai" | "anthropic";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private openaiClient: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private anthropicClient: any;
 
   constructor(private configService: ConfigService) {
@@ -65,15 +75,16 @@ export class AIExtractionService {
   /**
    * Extract text from PDF using pdfparse library
    */
-  private async extractTextFromPdf(file: any): Promise<string> {
+  private async extractTextFromPdf(file: UploadedFile): Promise<string> {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const pdfParse = require("pdf-parse");
       const pdfData = await pdfParse(file.buffer);
       return pdfData.text || "";
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as Error;
       this.logger.warn(
-        `PDF text extraction failed (mimetype=${file.mimetype}, size=${file.size}): ${err?.message || err}`,
+        `PDF text extraction failed (mimetype=${file.mimetype}, size=${file.size}): ${error.message}`,
       );
       // Don't throw - let the caller handle gracefully by using filename fallback
       throw err;
@@ -83,7 +94,9 @@ export class AIExtractionService {
   /**
    * Extract program data from PDF using AI
    */
-  async extractProgramFromPdf(file: any): Promise<ExtractedProgramData> {
+  async extractProgramFromPdf(
+    file: UploadedFile,
+  ): Promise<ExtractedProgramData> {
     try {
       if (!file || !file.buffer || file.size === 0) {
         throw new BadRequestException("PDF file not found");
@@ -102,9 +115,10 @@ export class AIExtractionService {
       let pdfText: string;
       try {
         pdfText = await this.extractTextFromPdf(file);
-      } catch (err: any) {
+      } catch (err) {
+        const error = err as Error;
         this.logger.warn(
-          `Falling back after PDF text extraction error: ${err?.message || err}`,
+          `Falling back after PDF text extraction error: ${error.message}`,
         );
         pdfText = file.originalname || "Uploaded PDF";
       }
@@ -120,18 +134,20 @@ export class AIExtractionService {
       if (this.aiProvider === "anthropic" && this.anthropicClient) {
         try {
           return await this.extractWithAnthropic(pdfText);
-        } catch (err: any) {
+        } catch (err) {
+          const error = err as Error;
           this.logger.warn(
-            `Anthropic extraction failed, falling back to rule-based parser: ${err?.message || err}`,
+            `Anthropic extraction failed, falling back to rule-based parser: ${error.message}`,
           );
           return this.extractWithFallback(pdfText);
         }
       } else if (this.openaiClient) {
         try {
           return await this.extractWithOpenAI(pdfText);
-        } catch (err: any) {
+        } catch (err) {
+          const error = err as Error;
           this.logger.warn(
-            `OpenAI extraction failed, falling back to rule-based parser: ${err?.message || err}`,
+            `OpenAI extraction failed, falling back to rule-based parser: ${error.message}`,
           );
           return this.extractWithFallback(pdfText);
         }
@@ -141,13 +157,17 @@ export class AIExtractionService {
         );
         return this.extractWithFallback(pdfText);
       }
-    } catch (err: any) {
-      this.logger.error(`PDF extraction failed: ${err.message}`);
-      if (err.response?.status === 400 || err instanceof BadRequestException) {
+    } catch (err) {
+      const error = err as Error & { response?: { status?: number } };
+      this.logger.error(`PDF extraction failed: ${error.message}`);
+      if (
+        error.response?.status === 400 ||
+        err instanceof BadRequestException
+      ) {
         throw err;
       }
       throw new BadRequestException(
-        `Failed to extract data from PDF: ${err.message}`,
+        `Failed to extract data from PDF: ${error.message}`,
       );
     }
   }
@@ -176,9 +196,12 @@ export class AIExtractionService {
       }
 
       return this.parseExtractionResponse(content);
-    } catch (err: any) {
-      this.logger.error(`OpenAI extraction error: ${err.message}`);
-      throw new BadRequestException(`OpenAI extraction failed: ${err.message}`);
+    } catch (err) {
+      const error = err as Error;
+      this.logger.error(`OpenAI extraction error: ${error.message}`);
+      throw new BadRequestException(
+        `OpenAI extraction failed: ${error.message}`,
+      );
     }
   }
 
@@ -203,10 +226,11 @@ export class AIExtractionService {
       }
 
       return this.parseExtractionResponse(content);
-    } catch (err: any) {
-      this.logger.error(`Anthropic extraction error: ${err.message}`);
+    } catch (err) {
+      const error = err as Error;
+      this.logger.error(`Anthropic extraction error: ${error.message}`);
       throw new BadRequestException(
-        `Anthropic extraction failed: ${err.message}`,
+        `Anthropic extraction failed: ${error.message}`,
       );
     }
   }
@@ -300,10 +324,13 @@ START WITH THE JSON:
 
       this.logger.debug(`Extraction complete: ${JSON.stringify(result)}`);
       return result;
-    } catch (err: any) {
-      this.logger.error(`Failed to parse extraction response: ${err.message}`);
+    } catch (err) {
+      const error = err as Error;
+      this.logger.error(
+        `Failed to parse extraction response: ${error.message}`,
+      );
       throw new BadRequestException(
-        `Failed to parse AI response: ${err.message}`,
+        `Failed to parse AI response: ${error.message}`,
       );
     }
   }
@@ -331,9 +358,10 @@ START WITH THE JSON:
             const parsed = this.parseNumber(match[1]);
             if (parsed !== undefined) return parsed;
           }
-        } catch (regexErr: any) {
+        } catch (regexErr) {
+          const error = regexErr as Error;
           this.logger.warn(
-            `Regex build failed for keyword "${keyword}": ${regexErr?.message || regexErr}`,
+            `Regex build failed for keyword "${keyword}": ${error.message}`,
           );
           continue; // Skip bad keywords and keep trying others
         }
@@ -402,7 +430,7 @@ START WITH THE JSON:
   /**
    * Parse number from various formats
    */
-  private parseNumber(value: any): number | undefined {
+  private parseNumber(value: unknown): number | undefined {
     if (typeof value === "number") return value;
     if (typeof value === "string") {
       // Remove $, commas, spaces
