@@ -63,20 +63,20 @@
 # Netlify Functions Configuration
 # ------------------------------------------------------------------------------
 [functions]
-  # Disable bundling - NestJS dependencies don't work well with esbuild
-  # node_bundler = "esbuild"  # Commented out - using raw node_modules instead
-  # Include backend build, shared build, and root node_modules with NestJS dependencies
-  # Note: NestJS dependencies installed at root level for Netlify function access
+  # Enable esbuild bundler to optimize function size and stay under 250 MB limit
+  node_bundler = "esbuild"
+  # Include backend build, shared build, and specific dependencies
+  # esbuild will bundle only what's actually imported, significantly reducing size
   included_files = [
     "packages/backend/dist/**",
     "packages/shared/dist/**",
-    "../../node_modules/@nestjs/**",
-    "../../node_modules/@prisma/**",
-    "../../node_modules/reflect-metadata/**",
-    "../../node_modules/rxjs/**",
-    "../../node_modules/class-transformer/**",
-    "../../node_modules/class-validator/**",
-    "../../node_modules/consola/**"
+    "../../node_modules/.prisma/**",
+    "../../node_modules/@prisma/client/**"
+  ]
+  # External packages that should not be bundled (will be included from node_modules)
+  external_node_modules = [
+    "@prisma/client",
+    ".prisma"
   ]
 
 # ------------------------------------------------------------------------------
