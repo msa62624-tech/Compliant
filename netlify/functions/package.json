@@ -1,0 +1,8 @@
+{
+  "name": "netlify-functions",
+  "version": "1.0.0",
+  "description": "Netlify Functions for Compliant Platform",
+  "dependencies": {
+    "@nuxt/opencollective": "^0.3.2"
+  }
+}
