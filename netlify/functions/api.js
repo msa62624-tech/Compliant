@@ -9,9 +9,13 @@ let cachedHandler;
 async function bootstrap() {
   if (!cachedHandler) {
     try {
-      // Use environment variable or default path for backend module
+      // In Netlify Functions, included_files are relative to the function
+      // The function is deployed to /var/task, and included_files maintain repo structure
       const backendPath = process.env.BACKEND_DIST_PATH || 
-        path.join(__dirname, '..', '..', 'packages', 'backend', 'dist');
+        path.resolve(__dirname, 'packages', 'backend', 'dist');
+      
+      console.log('Backend path:', backendPath);
+      console.log('__dirname:', __dirname);
       
       const { NestFactory } = require('@nestjs/core');
       const { AppModule } = require(path.join(backendPath, 'app.module'));
