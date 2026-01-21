@@ -92,6 +92,8 @@
     "node_modules/rxjs/**",
     "node_modules/class-transformer/**",
     "node_modules/class-validator/**",
+    "node_modules/file-type/**",
+    "node_modules/load-esm/**",
     "node_modules/tslib/**",
     "node_modules/uid/**",
     "node_modules/@nuxt/opencollective/**"
@@ -124,6 +126,8 @@
     "rxjs",
     "class-transformer",
     "class-validator",
+    "file-type",
+    "load-esm",
     "tslib",
     "uid"
   ]
