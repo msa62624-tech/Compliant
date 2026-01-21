@@ -19,17 +19,17 @@
 # MODE 1: Full-Stack Build (Frontend + Backend on Netlify)
 # ------------------------------------------------------------------------------
 [build]
-  base = "packages/frontend"
-  # Build shared package, backend, and frontend from frontend directory
-  # Install root dependencies first for Netlify Functions (serverless-http)
+  base = "."
+  # Build shared package, backend, and frontend from repository root
+  # This ensures Netlify properly detects the Node.js monorepo setup
   command = """
-    cd ../../ && pnpm install &&
-    cd packages/shared && pnpm install && pnpm build &&
-    cd ../backend && pnpm install && pnpm build &&
-    cd ../frontend && pnpm install && pnpm build
+    pnpm install &&
+    cd packages/shared && pnpm build &&
+    cd ../backend && pnpm build &&
+    cd ../frontend && pnpm build
   """
-  publish = ".next"
-  functions = "../../netlify/functions"
+  publish = "packages/frontend/.next"
+  functions = "netlify/functions"
 
 # ------------------------------------------------------------------------------
 # MODE 2: Frontend Only Build (Uncomment to use)
@@ -70,8 +70,8 @@
   included_files = [
     "packages/backend/dist/**",
     "packages/shared/dist/**",
-    "../../node_modules/.prisma/**",
-    "../../node_modules/@prisma/client/**"
+    "node_modules/.prisma/**",
+    "node_modules/@prisma/client/**"
   ]
   # External packages that should not be bundled (will be included from node_modules)
   external_node_modules = [
@@ -138,28 +138,28 @@
 # Deploy previews (PR builds)
 [context.deploy-preview]
   command = """
-    cd ../../ && pnpm install &&
-    cd packages/shared && pnpm install && pnpm build &&
-    cd ../backend && pnpm install && pnpm build &&
-    cd ../frontend && pnpm install && pnpm build
+    pnpm install &&
+    cd packages/shared && pnpm build &&
+    cd ../backend && pnpm build &&
+    cd ../frontend && pnpm build
   """
 
 # Branch deploys
 [context.branch-deploy]
   command = """
-    cd ../../ && pnpm install &&
-    cd packages/shared && pnpm install && pnpm build &&
-    cd ../backend && pnpm install && pnpm build &&
-    cd ../frontend && pnpm install && pnpm build
+    pnpm install &&
+    cd packages/shared && pnpm build &&
+    cd ../backend && pnpm build &&
+    cd ../frontend && pnpm build
   """
 
 # Production context
 [context.production]
   command = """
-    cd ../../ && pnpm install &&
-    cd packages/shared && pnpm install && pnpm build &&
-    cd ../backend && pnpm install && pnpm build &&
-    cd ../frontend && pnpm install && pnpm build
+    pnpm install &&
+    cd packages/shared && pnpm build &&
+    cd ../backend && pnpm build &&
+    cd ../frontend && pnpm build
   """
 
 # ------------------------------------------------------------------------------
