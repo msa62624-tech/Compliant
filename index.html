@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Compliant.team - Insurance Tracking Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 60px 40px;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #667eea;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        p {
+            color: #666;
+            font-size: 1.125rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .features {
+            text-align: left;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .features h2 {
+            color: #667eea;
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+        }
+        
+        .features ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .features li {
+            padding: 8px 0;
+            color: #555;
+        }
+        
+        .features li:before {
+            content: "✓ ";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.125rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .links {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+        }
+        
+        .links a:hover {
+            text-decoration: underline;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status-badge">✓ Enterprise Ready</div>
+        <h1>Compliant.team</h1>
+        <p>Professional Insurance Tracking Platform for General Contractors and Subcontractors</p>
+        
+        <div class="features">
+            <h2>Key Features</h2>
+            <ul>
+                <li>Automated insurance tracking and compliance monitoring</li>
+                <li>Certificate of Insurance (COI) management</li>
+                <li>Renewal reminder system with email notifications</li>
+                <li>Hold Harmless Agreement workflow</li>
+                <li>Role-based access control (RBAC)</li>
+                <li>Comprehensive audit logging</li>
+            </ul>
+        </div>
+        
+        <p style="margin-top: 20px;">Built with NestJS, Next.js 14, and PostgreSQL</p>
+        
+        <a href="#" class="cta-button" id="launchApp">Launch Application</a>
+        
+        <div class="links">
+            <a href="https://github.com/hml-brokerage/Compliant-" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="#" id="apiDocs">API Docs</a>
+            <a href="./README.md">Documentation</a>
+        </div>
+    </div>
+    
+    <script>
+        // Environment-aware navigation for development and production
+        document.addEventListener('DOMContentLoaded', function() {
+            const hostname = window.location.hostname;
+            const protocol = window.location.protocol;
+            
+            // Launch Application button
+            document.getElementById('launchApp').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = protocol + '//' + hostname + ':3000';
+            });
+            
+            // API Documentation link
+            document.getElementById('apiDocs').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.open(protocol + '//' + hostname + ':3001/api/docs', '_blank', 'noopener,noreferrer');
+            });
+        });
+    </script>
+</body>
+</html>
