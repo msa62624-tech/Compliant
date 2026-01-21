@@ -22,11 +22,13 @@
   base = "packages/frontend"
   # Build shared package, backend, and frontend from frontend directory
   # Install root dependencies first for Netlify Functions (serverless-http)
+  # Also install dependencies in netlify/functions for the serverless function
   command = """
     cd ../../ && pnpm install &&
     cd packages/shared && pnpm install && pnpm build &&
     cd ../backend && pnpm install && pnpm build &&
-    cd ../frontend && pnpm install && pnpm build
+    cd ../frontend && pnpm install && pnpm build &&
+    cd ../../netlify/functions && pnpm install
   """
   publish = ".next"
   functions = "../../netlify/functions"
