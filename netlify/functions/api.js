@@ -6,16 +6,35 @@ const fs = require('fs');
 
 let cachedHandler;
 
-// Set up NODE_PATH to include netlify/functions/node_modules
-// This allows the backend code to find dependencies
-const netlifyFunctionsNodeModules = path.join(__dirname, 'node_modules');
-if (fs.existsSync(netlifyFunctionsNodeModules)) {
+// Set up NODE_PATH to include function's node_modules
+// The @netlify/plugin-functions-install-core plugin installs dependencies
+// from netlify/functions/package.json at deploy time
+// Try multiple possible locations for node_modules
+const possibleNodeModulesPaths = [
+  path.join(__dirname, 'node_modules'),  // Same directory as function
+  path.join(__dirname, '..', 'node_modules'),  // Parent directory
+  path.join(__dirname, '..', '..', 'netlify', 'functions', 'node_modules')  // Explicit path
+];
+
+let foundNodeModules = null;
+for (const modulePath of possibleNodeModulesPaths) {
+  if (fs.existsSync(modulePath)) {
+    foundNodeModules = modulePath;
+    console.log(`✓ Found node_modules at: ${modulePath}`);
+    break;
+  }
+}
+
+if (foundNodeModules) {
   const currentNodePath = process.env.NODE_PATH || '';
   process.env.NODE_PATH = currentNodePath
-    ? `${netlifyFunctionsNodeModules}:${currentNodePath}`
-    : netlifyFunctionsNodeModules;
+    ? `${foundNodeModules}:${currentNodePath}`
+    : foundNodeModules;
   require('module').Module._initPaths();
-  console.log('✓ Added netlify/functions/node_modules to NODE_PATH');
+  console.log('✓ Added node_modules to NODE_PATH');
+} else {
+  console.warn('⚠ No node_modules found in any expected location');
+  console.warn('Attempted paths:', possibleNodeModulesPaths);
 }
 
 // Helper function to recursively list directory contents
