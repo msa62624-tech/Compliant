@@ -93,7 +93,8 @@
     "node_modules/class-transformer/**",
     "node_modules/class-validator/**",
     "node_modules/tslib/**",
-    "node_modules/uid/**"
+    "node_modules/uid/**",
+    "node_modules/@nuxt/opencollective/**"
   ]
   # External packages that should not be bundled - they need to be available at runtime
   # Prisma needs these as-is for database access
