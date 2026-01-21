@@ -92,10 +92,10 @@ postgresql://postgres:postgres@postgres:5432/compliant_dev
 docker exec -it compliant-postgres psql -U postgres -d compliant_dev
 
 # Common commands:
-\dt              # List tables
-\d tablename     # Describe table
-\l               # List databases
-\q               # Quit
+\\dt              # List tables
+\\d tablename     # Describe table
+\\l               # List databases
+\\q               # Quit
 ```
 
 #### Using Prisma Studio
@@ -202,18 +202,14 @@ The devcontainer automatically installs these VS Code extensions:
 
 ### Recommended Additional Extensions
 
-You may want to install these manually:
+You may want to install these manually from VS Code:
 
-```bash
-# Database management
-ext install cweijan.vscode-postgresql-client2
-
-# Git integration
-ext install eamodio.gitlens
-
-# Testing
-ext install orta.vscode-jest
-```
+1. Open VS Code Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
+2. Type "Extensions: Install Extensions"
+3. Search for and install:
+   - **PostgreSQL Client** (`cweijan.vscode-postgresql-client2`) - Database management
+   - **GitLens** (`eamodio.gitlens`) - Enhanced Git integration
+   - **Jest** (`orta.vscode-jest`) - Testing support
 
 ## Troubleshooting
 
@@ -380,7 +376,7 @@ Edit `.devcontainer/postStart.sh` to customize what happens after the container 
 
 For more help:
 - **Project README**: [README.md](../README.md)
-- **Database Setup**: [README.md#-database-setup](../README.md#-database-setup)
+- **Database Setup**: [README.md#database-setup](../README.md#database-setup)
 - **Testing Guide**: [docs/TESTING_GUIDE.md](./TESTING_GUIDE.md)
 - **Implementation Guide**: [docs/IMPLEMENTATION_GUIDELINES.md](./IMPLEMENTATION_GUIDELINES.md)
 
