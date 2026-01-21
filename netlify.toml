@@ -65,10 +65,11 @@
 [functions]
   # Disable bundling - NestJS dependencies don't work well with esbuild
   # node_bundler = "esbuild"  # Commented out - using raw node_modules instead
-  # Include backend build, shared build, and ALL node_modules from root and netlify/functions
+  # Include backend build, shared build, ALL node_modules, and Prisma files
   # Note: ALL backend dependencies installed at root level AND netlify/functions for Netlify function access
   included_files = [
     "packages/backend/dist/**",
+    "packages/backend/prisma/**",
     "packages/shared/dist/**",
     "../../node_modules/**",
     "node_modules/**"
