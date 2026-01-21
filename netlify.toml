@@ -93,6 +93,7 @@
     "node_modules/class-transformer/**",
     "node_modules/class-validator/**",
     "node_modules/file-type/**",
+    "node_modules/iterare/**",
     "node_modules/load-esm/**",
     "node_modules/tslib/**",
     "node_modules/uid/**",
@@ -127,6 +128,7 @@
     "class-transformer",
     "class-validator",
     "file-type",
+    "iterare",
     "load-esm",
     "tslib",
     "uid"
