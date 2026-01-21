@@ -11,18 +11,108 @@ importers:
 
   .:
     dependencies:
+      '@anthropic-ai/sdk':
+        specifier: ^0.71.2
+        version: 0.71.2
+      '@nestjs/axios':
+        specifier: ^4.0.1
+        version: 4.0.1(@nestjs/common@11.1.12)(axios@1.13.2)(rxjs@7.8.2)
+      '@nestjs/bullmq':
+        specifier: ^11.0.4
+        version: 11.0.4(@nestjs/common@11.1.12)(@nestjs/core@11.1.12)(bullmq@5.66.5)
       '@nestjs/common':
         specifier: ^11.1.12
         version: 11.1.12(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/config':
+        specifier: ^4.0.2
+        version: 4.0.2(@nestjs/common@11.1.12)(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^11.1.12
         version: 11.1.12(@nestjs/common@11.1.12)(@nestjs/platform-express@11.1.12)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/jwt':
+        specifier: ^11.0.2
+        version: 11.0.2(@nestjs/common@11.1.12)
+      '@nestjs/passport':
+        specifier: ^11.0.5
+        version: 11.0.5(@nestjs/common@11.1.12)(passport@0.7.0)
       '@nestjs/platform-express':
         specifier: ^11.1.12
         version: 11.1.12(@nestjs/common@11.1.12)(@nestjs/core@11.1.12)
+      '@nestjs/schedule':
+        specifier: ^6.1.0
+        version: 6.1.0(@nestjs/common@11.1.12)(@nestjs/core@11.1.12)
+      '@nestjs/swagger':
+        specifier: ^11.2.5
+        version: 11.2.5(@nestjs/common@11.1.12)(@nestjs/core@11.1.12)(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)
+      '@nestjs/terminus':
+        specifier: ^11.0.0
+        version: 11.0.0(@nestjs/axios@4.0.1)(@nestjs/common@11.1.12)(@nestjs/core@11.1.12)(@prisma/client@5.22.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/throttler':
+        specifier: ^6.5.0
+        version: 6.5.0(@nestjs/common@11.1.12)(@nestjs/core@11.1.12)(reflect-metadata@0.2.2)
       '@prisma/client':
         specifier: ^5.22.0
         version: 5.22.0(prisma@5.22.0)
+      '@sendgrid/mail':
+        specifier: ^8.1.6
+        version: 8.1.6
+      aws-sdk:
+        specifier: ^2.1693.0
+        version: 2.1693.0
+      axios:
+        specifier: ^1.13.2
+        version: 1.13.2
+      bcrypt:
+        specifier: ^6.0.0
+        version: 6.0.0
+      bullmq:
+        specifier: ^5.66.5
+        version: 5.66.5
+      class-transformer:
+        specifier: ^0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: ^0.14.3
+        version: 0.14.3
+      cookie-parser:
+        specifier: ^1.4.7
+        version: 1.4.7
+      cron:
+        specifier: ^4.3.5
+        version: 4.3.5
+      handlebars:
+        specifier: ^4.7.8
+        version: 4.7.8
+      ioredis:
+        specifier: ^5.9.2
+        version: 5.9.2
+      isomorphic-dompurify:
+        specifier: ^2.35.0
+        version: 2.35.0
+      multer:
+        specifier: ^2.0.2
+        version: 2.0.2
+      nest-winston:
+        specifier: ^1.10.2
+        version: 1.10.2(@nestjs/common@11.1.12)(winston@3.19.0)
+      nodemailer:
+        specifier: ^7.0.12
+        version: 7.0.12
+      openai:
+        specifier: ^6.16.0
+        version: 6.16.0
+      passport:
+        specifier: ^0.7.0
+        version: 0.7.0
+      passport-jwt:
+        specifier: ^4.0.1
+        version: 4.0.1
+      pdf-parse:
+        specifier: ^2.4.5
+        version: 2.4.5
+      pdfkit:
+        specifier: ^0.17.2
+        version: 0.17.2
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -32,6 +122,9 @@ importers:
       serverless-http:
         specifier: ^3.2.0
         version: 3.2.0
+      winston:
+        specifier: ^3.19.0
+        version: 3.19.0
     devDependencies:
       '@playwright/test':
         specifier: ^1.57.0
