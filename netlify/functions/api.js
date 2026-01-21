@@ -1,6 +1,7 @@
 // Netlify Function for NestJS Backend
 // This wraps the NestJS application to run as a serverless function
 const serverless = require('serverless-http');
+const path = require('path');
 
 let cachedHandler;
 
@@ -8,8 +9,12 @@ let cachedHandler;
 async function bootstrap() {
   if (!cachedHandler) {
     try {
+      // Use environment variable or default path for backend module
+      const backendPath = process.env.BACKEND_DIST_PATH || 
+        path.join(__dirname, '..', '..', 'packages', 'backend', 'dist');
+      
       const { NestFactory } = require('@nestjs/core');
-      const { AppModule } = require('../../packages/backend/dist/app.module');
+      const { AppModule } = require(path.join(backendPath, 'app.module'));
       
       const app = await NestFactory.create(AppModule, {
         logger: ['error', 'warn', 'log'],
@@ -27,8 +32,8 @@ async function bootstrap() {
         allowedHeaders: ['Content-Type', 'Authorization'],
       });
       
-      // Set global prefix to match API structure
-      app.setGlobalPrefix('api');
+      // NOTE: Do NOT set globalPrefix here as the redirect already maps /api/* to this function
+      // The backend routes already have /api in them from the NestJS configuration
       
       await app.init();
       
