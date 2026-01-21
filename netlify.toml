@@ -92,7 +92,8 @@
     "node_modules/rxjs/**",
     "node_modules/class-transformer/**",
     "node_modules/class-validator/**",
-    "node_modules/tslib/**"
+    "node_modules/tslib/**",
+    "node_modules/uid/**"
   ]
   # External packages that should not be bundled - they need to be available at runtime
   # Prisma needs these as-is for database access
@@ -122,7 +123,8 @@
     "rxjs",
     "class-transformer",
     "class-validator",
-    "tslib"
+    "tslib",
+    "uid"
   ]
 
 # ------------------------------------------------------------------------------
