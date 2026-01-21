@@ -29,6 +29,9 @@ importers:
       '@prisma/client':
         specifier: ^5.22.0
         version: 5.22.0(prisma@5.22.0)
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.4.7
       fast-safe-stringify:
         specifier: ^2.1.1
         version: 2.1.1
