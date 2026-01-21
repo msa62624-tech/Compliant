@@ -20,9 +20,8 @@
 # ------------------------------------------------------------------------------
 [build]
   base = "packages/frontend"
-  # Build shared package, backend, and frontend from frontend directory
-  # Install root dependencies first for Netlify Functions (serverless-http)
-  # Also install dependencies in netlify/functions for the serverless function
+  # Build shared package, backend, and frontend
+  # Netlify will bundle the function with node_bundler = "esbuild"
   command = """
     cd ../../ && pnpm install &&
     cd packages/shared && pnpm install && pnpm build &&
@@ -65,18 +64,14 @@
 # Netlify Functions Configuration
 # ------------------------------------------------------------------------------
 [functions]
-  # Disable bundling - NestJS dependencies don't work well with esbuild
-  # node_bundler = "esbuild"  # Commented out - using raw node_modules instead
-  # Include only built files - dependencies managed by @netlify/plugin-functions-install-core
-  # The plugin installs dependencies from netlify/functions/package.json at runtime
-  # Paths are relative to base directory (packages/frontend), so use ../ to go up
+  # Use esbuild to bundle the function with all dependencies
+  node_bundler = "esbuild"
+  # Include backend dist files (needed for NestJS app) and Prisma schema
   included_files = [
     "../backend/dist/**",
     "../backend/prisma/**",
     "../shared/dist/**"
   ]
-  # node_bundler must remain unset so dependencies aren't bundled
-  # This allows the plugin to install them at deploy time
 
 # ------------------------------------------------------------------------------
 # Redirects and Rewrites
@@ -140,7 +135,8 @@
     cd ../../ && pnpm install &&
     cd packages/shared && pnpm install && pnpm build &&
     cd ../backend && pnpm install && pnpm build &&
-    cd ../frontend && pnpm install && pnpm build
+    cd ../frontend && pnpm install && pnpm build &&
+    cd ../../netlify/functions && pnpm install
   """
 
 # Branch deploys
@@ -149,7 +145,8 @@
     cd ../../ && pnpm install &&
     cd packages/shared && pnpm install && pnpm build &&
     cd ../backend && pnpm install && pnpm build &&
-    cd ../frontend && pnpm install && pnpm build
+    cd ../frontend && pnpm install && pnpm build &&
+    cd ../../netlify/functions && pnpm install
   """
 
 # Production context
@@ -158,15 +155,9 @@
     cd ../../ && pnpm install &&
     cd packages/shared && pnpm install && pnpm build &&
     cd ../backend && pnpm install && pnpm build &&
-    cd ../frontend && pnpm install && pnpm build
+    cd ../frontend && pnpm install && pnpm build &&
+    cd ../../netlify/functions && pnpm install
   """
-
-# ------------------------------------------------------------------------------
-# Plugins
-# ------------------------------------------------------------------------------
-# Install dependencies for Netlify Functions automatically
-[[plugins]]
-  package = "@netlify/plugin-functions-install-core"
 
 # ------------------------------------------------------------------------------
 # Optional Plugins (uncomment to enable)
