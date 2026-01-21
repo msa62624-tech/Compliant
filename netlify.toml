@@ -74,7 +74,7 @@
   # Also include NestJS packages for full backend functionality
   included_files = [
     "packages/backend/dist/**",
-    "packages/shared/dist/**",
+    "packages/shared/**",
     "node_modules/@compliant/**",
     "node_modules/.prisma/**",
     "node_modules/@anthropic-ai/sdk/**",
