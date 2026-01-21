@@ -1,0 +1,13 @@
+{
+  "scopes": {
+    "../": {
+      "https://ghuc.cc/worker-tools/resolvable-promise/index.ts": "./raw.githubusercontent.com/worker-tools/resolvable-promise/master/index.ts",
+      "https://deno.land/": "./deno.land/",
+      "https://esm.sh/": "./esm.sh/",
+      "https://raw.githubusercontent.com/": "./raw.githubusercontent.com/"
+    },
+    "./esm.sh/": {
+      "/v91/next@12.2.5/deno/dist/compiled/cookie.js": "./esm.sh/v91/next@12.2.5/deno/dist/compiled/cookie.js"
+    }
+  }
+}
