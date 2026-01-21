@@ -3,6 +3,8 @@ services:
     image: postgres:15
     container_name: compliant-postgres
     environment:
+      # PostgreSQL credentials for development
+      # User: postgres, Password: postgres, Database: compliant_dev
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: compliant_dev
     ports:

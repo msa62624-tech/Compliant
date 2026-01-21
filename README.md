@@ -64,6 +64,77 @@ pnpm dev
 - **API Docs**: http://localhost:3001/api/docs
 - **Database GUI**: Run `pnpm db:studio` then visit http://localhost:5555
 
+## 🔧 VS Code Development Setup
+
+This project includes a complete VS Code devcontainer configuration for a seamless development experience.
+
+### Using VS Code Dev Containers
+
+1. **Prerequisites**:
+   - Install [Visual Studio Code](https://code.visualstudio.com/)
+   - Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+   - Install the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
+2. **Open in Container**:
+   - Open this repository in VS Code
+   - Click the green button in the bottom-left corner
+   - Select "Reopen in Container"
+   - VS Code will build and start the development container
+
+3. **PostgreSQL Credentials** (Auto-configured):
+   - **Host**: `postgres` (container name)
+   - **Port**: `5432`
+   - **Database**: `compliant_dev`
+   - **User**: `postgres`
+   - **Password**: `postgres`
+   
+   These credentials are automatically configured in the devcontainer and don't require manual setup. The `DATABASE_URL` environment variable is pre-configured as:
+   ```
+   postgresql://postgres:postgres@postgres:5432/compliant_dev
+   ```
+
+4. **What Happens Automatically**:
+   - PostgreSQL 15 container starts and waits for health check
+   - Node.js 20 and pnpm 8 are installed
+   - All dependencies are installed (`pnpm install`)
+   - Database schema is pushed (`pnpm db:push`)
+   - Demo data is seeded
+   - Ports 3000, 3001, and 5432 are forwarded to your host
+
+5. **Start Development**:
+   ```bash
+   # Everything is already set up, just run:
+   pnpm dev
+   ```
+
+### VS Code Extensions
+
+The devcontainer includes these extensions:
+- ESLint (`dbaeumer.vscode-eslint`)
+- Prettier (`esbenp.prettier-vscode`)
+- Prisma (`Prisma.prisma`)
+
+### Troubleshooting VS Code Setup
+
+**Container fails to start:**
+- Ensure Docker Desktop is running
+- Check Docker has enough resources (4GB+ RAM recommended)
+- Try: Docker Desktop → Troubleshoot → Clean/Purge data
+
+**Database connection fails:**
+- The PostgreSQL container may still be initializing
+- Wait 10-20 seconds and try again
+- Check logs: `docker logs compliant-postgres`
+
+**Need to access PostgreSQL directly:**
+```bash
+# From inside the VS Code container terminal:
+docker exec -it compliant-postgres psql -U postgres -d compliant_dev
+
+# Or from your host machine:
+docker exec -it compliant-postgres psql -U postgres -d compliant_dev
+```
+
 ## 📦 Architecture
 
 This is a monorepo with three packages:
@@ -143,6 +214,7 @@ pnpm lint       # Lint code
 ## 📚 Documentation
 
 ### Development
+- **VS Code Setup**: See [docs/VSCODE_SETUP.md](./docs/VSCODE_SETUP.md) - Complete VS Code devcontainer guide
 - **API Documentation**: Visit http://localhost:3001/api/docs when backend is running
 - **Database Schema**: See `packages/backend/prisma/schema.prisma`
 - **Implementation Guide**: See [docs/IMPLEMENTATION_GUIDELINES.md](./docs/IMPLEMENTATION_GUIDELINES.md)
