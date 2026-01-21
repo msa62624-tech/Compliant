@@ -2,6 +2,7 @@
 
 import { User } from '@compliant/shared';
 import Link from 'next/link';
+import { formatToEasternTime } from '../../../lib/utils';
 
 interface ContractorDashboardProps {
   user: User;
@@ -78,7 +79,7 @@ export default function ContractorDashboard({ user, onLogout }: ContractorDashbo
                     <div className="flex-1">
                       <p className="font-semibold text-red-900">Smith & Sons HVAC</p>
                       <p className="text-sm text-gray-700">Project: Downtown Office Building</p>
-                      <p className="text-xs text-red-600 mt-1 font-medium">⏰ Insurance EXPIRED 5 days ago</p>
+                      <p className="text-xs text-red-600 mt-1 font-medium">⏰ Insurance EXPIRED on {formatToEasternTime(new Date(Date.now() - 5 * 24 * 60 * 60 * 1000))}</p>
                     </div>
                     <div className="text-right ml-4">
                       <span className="inline-block px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-lg">
@@ -137,7 +138,7 @@ export default function ContractorDashboard({ user, onLogout }: ContractorDashbo
                       <span className="inline-block px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-lg">
                         COMPLIANT
                       </span>
-                      <p className="text-xs text-gray-600 mt-2">Confirmed 1 day ago</p>
+                      <p className="text-xs text-gray-600 mt-2">Confirmed {formatToEasternTime(new Date(Date.now() - 1 * 24 * 60 * 60 * 1000))}</p>
                       <p className="text-xs text-green-600 font-medium">✉ Confirmation sent to all parties</p>
                     </div>
                   </div>
@@ -151,7 +152,7 @@ export default function ContractorDashboard({ user, onLogout }: ContractorDashbo
                       <span className="inline-block px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-lg">
                         COMPLIANT
                       </span>
-                      <p className="text-xs text-gray-600 mt-2">Confirmed 2 days ago</p>
+                      <p className="text-xs text-gray-600 mt-2">Confirmed {formatToEasternTime(new Date(Date.now() - 2 * 24 * 60 * 60 * 1000))}</p>
                       <p className="text-xs text-green-600 font-medium">✉ Confirmation sent to all parties</p>
                     </div>
                   </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
+import { formatToEasternTime } from '../../../lib/utils';
 
 type ReportType = 'compliance' | 'expiring' | 'deficient' | 'contractors' | 'projects';
 
@@ -288,7 +289,7 @@ export default function AdminReportsPage() {
                       <span className="text-2xl">📊</span>
                       <div>
                         <p className="text-sm font-medium text-gray-900">Compliance Status Report</p>
-                        <p className="text-xs text-gray-600">Generated 2 hours ago</p>
+                        <p className="text-xs text-gray-600">Generated {formatToEasternTime(new Date(Date.now() - 2 * 60 * 60 * 1000))}</p>
                       </div>
                     </div>
                     <button className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
@@ -300,7 +301,7 @@ export default function AdminReportsPage() {
                       <span className="text-2xl">⏰</span>
                       <div>
                         <p className="text-sm font-medium text-gray-900">Expiring Policies Report</p>
-                        <p className="text-xs text-gray-600">Generated yesterday</p>
+                        <p className="text-xs text-gray-600">Generated {formatToEasternTime(new Date(Date.now() - 1 * 24 * 60 * 60 * 1000))}</p>
                       </div>
                     </div>
                     <button className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
@@ -312,7 +313,7 @@ export default function AdminReportsPage() {
                       <span className="text-2xl">👷</span>
                       <div>
                         <p className="text-sm font-medium text-gray-900">Contractors Summary</p>
-                        <p className="text-xs text-gray-600">Generated 3 days ago</p>
+                        <p className="text-xs text-gray-600">Generated {formatToEasternTime(new Date(Date.now() - 3 * 24 * 60 * 60 * 1000))}</p>
                       </div>
                     </div>
                     <button className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
