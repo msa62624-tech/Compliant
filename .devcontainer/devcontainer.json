@@ -60,7 +60,6 @@
     }
   },
   "containerEnv": {
-    // PostgreSQL credentials: user=postgres, password=postgres, host=postgres, port=5432, database=compliant_dev
     "DATABASE_URL": "postgresql://postgres:postgres@postgres:5432/compliant_dev"
   }
 }
