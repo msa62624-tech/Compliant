@@ -78,7 +78,7 @@ importers:
         specifier: ^1.3.2
         version: 1.3.5
       '@types/validator':
-        specifier: ^13.15.3
+        specifier: 13.15.3
         version: 13.15.3
       abort-controller:
         specifier: ^3.0.0
@@ -224,12 +224,12 @@ importers:
       kuler:
         specifier: ^2.0.0
         version: 2.0.0
+      libphonenumber-js:
+        specifier: 1.11.16
+        version: 1.11.16
       load-esm:
         specifier: ^1.0.3
         version: 1.0.3
-      libphonenumber-js:
-        specifier: ^1.11.1
-        version: 1.11.16
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -384,7 +384,7 @@ importers:
         specifier: ^11.0.0
         version: 11.1.0
       validator:
-        specifier: ^13.15.20
+        specifier: 13.15.20
         version: 13.15.20
       winston:
         specifier: ^3.19.0
@@ -3964,10 +3964,7 @@ packages:
     optional: true
 
   /@types/validator@13.15.3:
-    resolution: {integrity: sha512-T8L6i7wCuyoK8A/ZeLYt1+q0ty3Zb9+qbSSvrIVitzT3YjZqkTZ40IbRsPanlB4h1QB3JVL1SYCdR6ngtFYcuA==}
-
-  /@types/validator@13.15.10:
-    resolution: {integrity: sha512-T8L6i7wCuyoK8A/ZeLYt1+q0ty3Zb9+qbSSvrIVitzT3YjZqkTZ40IbRsPanlB4h1QB3JVL1SYCdR6ngtFYcuA==}
+    resolution: {integrity: sha512-7bcUmDyS6PN3EuD9SlGGOxM77F8WLVsrwkxyWxKnxzmXoequ6c7741QBrANq6htVRGOITJ7z72mTP6Z4XyuG+Q==}
 
   /@types/yargs-parser@21.0.3:
     resolution: {integrity: sha512-I4q9QU9MQv4oEOz4tAHJtNz1cwuLxn2F3xcc2iV5WdqLPpUnj30aUuxt1mAxYTG+oe8CZMV/+6rU4S4gRDzqtQ==}
@@ -5111,9 +5108,9 @@ packages:
   /class-validator@0.14.3:
     resolution: {integrity: sha512-rXXekcjofVN1LTOSw+u4u9WXVEUvNBVjORW154q/IdmYWy1nMbOU9aNtZB0t8m+FJQ9q91jlr2f9CwwUFdFMRA==}
     dependencies:
-      '@types/validator': 13.15.10
-      libphonenumber-js: 1.12.34
-      validator: 13.15.26
+      '@types/validator': 13.15.3
+      libphonenumber-js: 1.11.16
+      validator: 13.15.20
 
   /class-variance-authority@0.7.1:
     resolution: {integrity: sha512-Ka+9Trutv7G8M6WT6SeiRWz792K5qEqIGEGzXKhAE6xOWAY6pPH8U+9IY3oCMv6kqTmLsv7Xh/2w2RigkePMsg==}
@@ -7891,10 +7888,7 @@ packages:
     dev: true
 
   /libphonenumber-js@1.11.16:
-    resolution: {integrity: sha512-v/Ip8k8eYdp7bINpzqDh46V/PaQ8sK+qi97nMQgjZzFlb166YFqlR/HVI+MzsI9JqcyyVWCOipmmretiaSyQyw==}
-
-  /libphonenumber-js@1.12.34:
-    resolution: {integrity: sha512-v/Ip8k8eYdp7bINpzqDh46V/PaQ8sK+qi97nMQgjZzFlb166YFqlR/HVI+MzsI9JqcyyVWCOipmmretiaSyQyw==}
+    resolution: {integrity: sha512-Noyazmt0yOvnG0OeRY45Cd1ur8G7Z0HWVkuCuKe+yysGNxPQwBAODBQQ40j0AIagi9ZWurfmmZWNlpg4h4W+XQ==}
 
   /lilconfig@3.1.3:
     resolution: {integrity: sha512-/vlFKAoH5Cgt3Ie+JLhRbwOsCQePABiU3tJ1egGvyQ+33R/vcwM2Zl2QR/LzjsBeItPt3oSVXapn+m4nQDvpzw==}
@@ -10254,11 +10248,6 @@ packages:
     hasBin: true
     dev: false
 
-  /validator@13.15.20:
-    resolution: {integrity: sha512-7BAb9SfzdfLSs1JxBcVmkA+0QZHHVmNOH0Vb0Y/xfZUY5sEJMNxhWHxjKYoVPk07y8nS8NWUlYjDJiIgU2J1UA==}
-    engines: {node: '>= 0.10'}
-    dev: false
-
   /v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
     dev: true
@@ -10272,8 +10261,8 @@ packages:
       convert-source-map: 2.0.0
     dev: true
 
-  /validator@13.15.26:
-    resolution: {integrity: sha512-spH26xU080ydGggxRyR1Yhcbgx+j3y5jbNXk/8L+iRvdIEQ4uTRH2Sgf2dokud6Q4oAtsbNvJ1Ft+9xmm6IZcA==}
+  /validator@13.15.20:
+    resolution: {integrity: sha512-KxPOq3V2LmfQPP4eqf3Mq/zrT0Dqp2Vmx2Bn285LwVahLc+CsxOM0crBHczm8ijlcjZ0Q5Xd6LW3z3odTPnlrw==}
     engines: {node: '>= 0.10'}
 
   /vary@1.1.2:
