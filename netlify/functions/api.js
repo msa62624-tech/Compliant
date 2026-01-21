@@ -52,15 +52,18 @@ async function bootstrap() {
       }
       console.log('');
       
-      // In Netlify Functions, included_files are relative to the function
-      // Try multiple possible paths to handle different deployment structures
+      // In Netlify Functions, included_files paths are relative to the base directory
+      // Base is packages/frontend, included_files are ../backend/dist/**, etc.
+      // So files should be at backend/dist/** relative to function
       const possiblePaths = [
         process.env.BACKEND_DIST_PATH,
+        path.resolve(__dirname, 'backend', 'dist'),
+        path.join(__dirname, 'backend', 'dist'),
+        path.resolve(__dirname, '..', 'backend', 'dist'),
+        path.join(__dirname, '..', 'backend', 'dist'),
         path.resolve(__dirname, 'packages', 'backend', 'dist'),
         path.resolve(__dirname, '..', '..', 'packages', 'backend', 'dist'),
         path.join(__dirname, 'packages', 'backend', 'dist'),
-        path.join(__dirname, '..', 'packages', 'backend', 'dist'),
-        path.join(__dirname, 'backend', 'dist'),
         path.join(__dirname, 'dist'),
       ].filter(Boolean);
       
