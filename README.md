@@ -320,6 +320,15 @@ After running the seed script, you can log in with these accounts:
 
 ## 🚢 Deployment
 
+### Free Deployment Options
+
+#### 🆓 Netlify (Frontend) - Recommended Free Option
+- **Complete Guide**: [NETLIFY_DEPLOYMENT.md](./NETLIFY_DEPLOYMENT.md)
+- Deploy frontend to Netlify's free tier (100 GB bandwidth/month)
+- Includes step-by-step instructions for backend hosting options
+- Configuration file included: `netlify.toml`
+- One-click deployment ready
+
 ### AWS CodeBuild Setup
 
 This repository includes AWS CodeBuild configuration for CI/CD:
@@ -347,16 +356,19 @@ The IaC templates properly configure CodeBuild with the correct source version (
 
 ### Backend
 - Deploy to AWS ECS, Heroku, or similar
+- Or use free options: Render, Railway, Fly.io (see [NETLIFY_DEPLOYMENT.md](./NETLIFY_DEPLOYMENT.md))
 - Set environment variables
 - Run migrations before deployment
 
 ### Frontend
-- Deploy to Vercel (recommended)
+- Deploy to Netlify (free tier available - see [NETLIFY_DEPLOYMENT.md](./NETLIFY_DEPLOYMENT.md))
+- Deploy to Vercel (also recommended)
 - Or any Node.js hosting platform
 - Configure `NEXT_PUBLIC_API_URL` to production API
 
 ### Database
 - Use AWS RDS, Supabase, or managed PostgreSQL
+- Free options: Supabase, Neon, ElephantSQL (see [NETLIFY_DEPLOYMENT.md](./NETLIFY_DEPLOYMENT.md))
 - Run migrations: `npx prisma migrate deploy`
 
 ## 🔒 Security
