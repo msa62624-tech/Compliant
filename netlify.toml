@@ -19,17 +19,17 @@
 # MODE 1: Full-Stack Build (Frontend + Backend on Netlify)
 # ------------------------------------------------------------------------------
 [build]
-  base = "."
-  # Build both shared package, backend, and frontend
+  base = "packages/frontend"
+  # Build shared package, backend, and frontend from frontend directory
   # Install root dependencies first for Netlify Functions (serverless-http)
   command = """
-    pnpm install &&
+    cd ../../ && pnpm install &&
     cd packages/shared && pnpm install && pnpm build &&
     cd ../backend && pnpm install && pnpm build &&
     cd ../frontend && pnpm install && pnpm build
   """
-  publish = "packages/frontend/.next"
-  functions = "netlify/functions"
+  publish = ".next"
+  functions = "../../netlify/functions"
 
 # ------------------------------------------------------------------------------
 # MODE 2: Frontend Only Build (Uncomment to use)
