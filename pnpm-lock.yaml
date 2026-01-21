@@ -3963,6 +3963,9 @@ packages:
     dev: false
     optional: true
 
+  /@types/validator@13.15.3:
+    resolution: {integrity: sha512-T8L6i7wCuyoK8A/ZeLYt1+q0ty3Zb9+qbSSvrIVitzT3YjZqkTZ40IbRsPanlB4h1QB3JVL1SYCdR6ngtFYcuA==}
+
   /@types/validator@13.15.10:
     resolution: {integrity: sha512-T8L6i7wCuyoK8A/ZeLYt1+q0ty3Zb9+qbSSvrIVitzT3YjZqkTZ40IbRsPanlB4h1QB3JVL1SYCdR6ngtFYcuA==}
 
@@ -7887,6 +7890,9 @@ packages:
       type-check: 0.4.0
     dev: true
 
+  /libphonenumber-js@1.11.16:
+    resolution: {integrity: sha512-v/Ip8k8eYdp7bINpzqDh46V/PaQ8sK+qi97nMQgjZzFlb166YFqlR/HVI+MzsI9JqcyyVWCOipmmretiaSyQyw==}
+
   /libphonenumber-js@1.12.34:
     resolution: {integrity: sha512-v/Ip8k8eYdp7bINpzqDh46V/PaQ8sK+qi97nMQgjZzFlb166YFqlR/HVI+MzsI9JqcyyVWCOipmmretiaSyQyw==}
 
@@ -10246,6 +10252,11 @@ packages:
   /uuid@8.0.0:
     resolution: {integrity: sha512-jOXGuXZAWdsTH7eZLtyXMqUb9EcWMGZNbL9YcGBJl4MH4nrxHmZJhEHvyLFrkxo+28uLb/NYRcStH48fnD0Vzw==}
     hasBin: true
+    dev: false
+
+  /validator@13.15.20:
+    resolution: {integrity: sha512-7BAb9SfzdfLSs1JxBcVmkA+0QZHHVmNOH0Vb0Y/xfZUY5sEJMNxhWHxjKYoVPk07y8nS8NWUlYjDJiIgU2J1UA==}
+    engines: {node: '>= 0.10'}
     dev: false
 
   /v8-compile-cache-lib@3.0.1:

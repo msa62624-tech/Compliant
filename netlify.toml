@@ -96,6 +96,7 @@
     "node_modules/@so-ric/colorspace/**",
     "node_modules/@types/luxon/**",
     "node_modules/@types/triple-beam/**",
+    "node_modules/@types/validator/**",
     "node_modules/abort-controller/**",
     "node_modules/async/**",
     "node_modules/asynckit/**",
