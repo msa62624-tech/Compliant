@@ -109,7 +109,22 @@
     "node_modules/path-to-regexp/**",
     "node_modules/tslib/**",
     "node_modules/uid/**",
-    "node_modules/@nuxt/opencollective/**"
+    "node_modules/@nuxt/opencollective/**",
+    "node_modules/@anthropic-ai/sdk/**",
+    "node_modules/@sendgrid/mail/**",
+    "node_modules/aws-sdk/**",
+    "node_modules/bcrypt/**",
+    "node_modules/cookie-parser/**",
+    "node_modules/handlebars/**",
+    "node_modules/isomorphic-dompurify/**",
+    "node_modules/multer/**",
+    "node_modules/nest-winston/**",
+    "node_modules/nodemailer/**",
+    "node_modules/openai/**",
+    "node_modules/passport-jwt/**",
+    "node_modules/pdf-parse/**",
+    "node_modules/pdfkit/**",
+    "node_modules/winston/**"
   ]
   # External packages that should not be bundled - they need to be available at runtime
   # Prisma needs these as-is for database access
@@ -155,7 +170,22 @@
     "passport",
     "path-to-regexp",
     "tslib",
-    "uid"
+    "uid",
+    "@anthropic-ai/sdk",
+    "@sendgrid/mail",
+    "aws-sdk",
+    "bcrypt",
+    "cookie-parser",
+    "handlebars",
+    "isomorphic-dompurify",
+    "multer",
+    "nest-winston",
+    "nodemailer",
+    "openai",
+    "passport-jwt",
+    "pdf-parse",
+    "pdfkit",
+    "winston"
   ]
 
 # ------------------------------------------------------------------------------
