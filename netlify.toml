@@ -72,6 +72,17 @@
     "../backend/prisma/**",
     "../shared/dist/**"
   ]
+  # Exclude optional NestJS transport adapters (not used in this deployment)
+  # These are optional peer dependencies from @nestjs/microservices
+  external_node_modules = [
+    "@nestjs/platform-socket.io",
+    "@grpc/grpc-js",
+    "@grpc/proto-loader",
+    "amqplib",
+    "mqtt",
+    "kafkajs",
+    "nats"
+  ]
 
 # ------------------------------------------------------------------------------
 # Redirects and Rewrites
