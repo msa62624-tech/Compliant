@@ -79,7 +79,9 @@
     "@prisma/client",
     ".prisma",
     "@nestjs/microservices",
-    "@nestjs/websockets"
+    "@nestjs/microservices/microservices-module",
+    "@nestjs/websockets",
+    "@nestjs/websockets/socket-module"
   ]
 
 # ------------------------------------------------------------------------------
