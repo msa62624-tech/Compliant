@@ -10,6 +10,10 @@ overrides:
 importers:
 
   .:
+    dependencies:
+      serverless-http:
+        specifier: ^3.2.0
+        version: 3.2.0
     devDependencies:
       '@playwright/test':
         specifier: ^1.57.0
@@ -8768,6 +8772,10 @@ packages:
     dependencies:
       randombytes: 2.1.0
     dev: true
+
+  /serverless-http@3.2.0:
+    resolution: {integrity: sha512-QvYezRON5xry4ZI6XTahl6q531yCPQ0EV3FyQbiLC3vQAF/Vg/+gAA42XOBIX8oHl+zkm3hIX3LZHgCSe7AFYA==}
+    engines: {node: '>=10'}
 
   /serve-static@2.2.1:
     resolution: {integrity: sha512-xRXBn0pPqQTVQiC8wyQrKs2MOlX24zQ0POGaj0kultvoOCstBQM5yvOhAVSUwOMjQtTvsPWoNCHfPGwaaQJhTw==}
