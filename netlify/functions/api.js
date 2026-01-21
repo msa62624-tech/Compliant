@@ -2,6 +2,7 @@
 // This wraps the NestJS application to run as a serverless function
 const serverless = require('serverless-http');
 const path = require('path');
+const fs = require('fs');
 
 let cachedHandler;
 
@@ -10,12 +11,30 @@ async function bootstrap() {
   if (!cachedHandler) {
     try {
       // In Netlify Functions, included_files are relative to the function
-      // The function is deployed to /var/task, and included_files maintain repo structure
-      const backendPath = process.env.BACKEND_DIST_PATH || 
-        path.resolve(__dirname, 'packages', 'backend', 'dist');
+      // Try multiple possible paths to handle different deployment structures
+      const possiblePaths = [
+        process.env.BACKEND_DIST_PATH,
+        path.resolve(__dirname, 'packages', 'backend', 'dist'),
+        path.resolve(__dirname, '..', '..', 'packages', 'backend', 'dist'),
+        path.join(__dirname, 'packages', 'backend', 'dist'),
+      ].filter(Boolean);
       
-      console.log('Backend path:', backendPath);
-      console.log('__dirname:', __dirname);
+      let backendPath = null;
+      for (const testPath of possiblePaths) {
+        const appModulePath = path.join(testPath, 'app.module.js');
+        if (fs.existsSync(appModulePath)) {
+          backendPath = testPath;
+          console.log('Found backend at:', backendPath);
+          break;
+        }
+      }
+      
+      if (!backendPath) {
+        console.error('Could not find backend dist directory');
+        console.error('__dirname:', __dirname);
+        console.error('Tried paths:', possiblePaths);
+        throw new Error('Backend dist directory not found');
+      }
       
       const { NestFactory } = require('@nestjs/core');
       const { AppModule } = require(path.join(backendPath, 'app.module'));
