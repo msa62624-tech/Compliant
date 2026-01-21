@@ -31,12 +31,6 @@
   publish = "packages/frontend/.next"
   functions = "netlify/functions"
 
-# Disable automatic Next.js plugin to avoid conflicts with monorepo structure
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-  [plugins.inputs]
-    distDir = "packages/frontend/.next"
-
 # ------------------------------------------------------------------------------
 # MODE 2: Frontend Only Build (Uncomment to use)
 # ------------------------------------------------------------------------------
