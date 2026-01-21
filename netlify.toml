@@ -74,9 +74,12 @@
     "node_modules/@prisma/client/**"
   ]
   # External packages that should not be bundled (Prisma needs these as-is)
+  # Also exclude NestJS optional dependencies that are loaded dynamically
   external_node_modules = [
     "@prisma/client",
-    ".prisma"
+    ".prisma",
+    "@nestjs/microservices",
+    "@nestjs/websockets"
   ]
 
 # ------------------------------------------------------------------------------
