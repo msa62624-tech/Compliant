@@ -6,6 +6,18 @@ const fs = require('fs');
 
 let cachedHandler;
 
+// Set up NODE_PATH to include netlify/functions/node_modules
+// This allows the backend code to find dependencies
+const netlifyFunctionsNodeModules = path.join(__dirname, 'node_modules');
+if (fs.existsSync(netlifyFunctionsNodeModules)) {
+  const currentNodePath = process.env.NODE_PATH || '';
+  process.env.NODE_PATH = currentNodePath
+    ? `${netlifyFunctionsNodeModules}:${currentNodePath}`
+    : netlifyFunctionsNodeModules;
+  require('module').Module._initPaths();
+  console.log('✓ Added netlify/functions/node_modules to NODE_PATH');
+}
+
 // Helper function to recursively list directory contents
 function listDirectory(dir, prefix = '', maxDepth = 3, currentDepth = 0) {
   if (currentDepth >= maxDepth) return [];
