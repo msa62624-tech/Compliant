@@ -227,6 +227,12 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# Netlify Functions Install Plugin (automatically installs function dependencies)
+# This ensures dependencies referenced by @nestjs/core (like @nuxt/opencollective) 
+# are available during function bundling
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
+
 # ------------------------------------------------------------------------------
 # Optional Plugins (uncomment to enable)
 # ------------------------------------------------------------------------------
