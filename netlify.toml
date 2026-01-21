@@ -77,7 +77,9 @@
     "node_modules/@prisma/client/**"
   ]
   # External packages that should not be bundled (Prisma needs these as-is)
-  # Also exclude NestJS optional dependencies that are loaded dynamically
+  # Also exclude NestJS optional dependencies that are loaded dynamically via require()
+  # The specific subpaths (e.g., /microservices-module, /socket-module) are required
+  # because @nestjs/core uses these exact import paths in its dynamic requires
   external_node_modules = [
     "@prisma/client",
     ".prisma",
