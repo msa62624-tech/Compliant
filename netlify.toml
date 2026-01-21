@@ -96,6 +96,7 @@
     "node_modules/file-type/**",
     "node_modules/iterare/**",
     "node_modules/load-esm/**",
+    "node_modules/path-to-regexp/**",
     "node_modules/tslib/**",
     "node_modules/uid/**",
     "node_modules/@nuxt/opencollective/**"
@@ -132,6 +133,7 @@
     "file-type",
     "iterare",
     "load-esm",
+    "path-to-regexp",
     "tslib",
     "uid"
   ]

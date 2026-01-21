@@ -38,6 +38,9 @@ importers:
       load-esm:
         specifier: ^1.0.3
         version: 1.0.3
+      path-to-regexp:
+        specifier: ^8.3.0
+        version: 8.3.0
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
