@@ -79,6 +79,7 @@
     "@grpc/grpc-js",
     "@grpc/proto-loader",
     "amqplib",
+    "amqp-connection-manager",
     "mqtt",
     "kafkajs",
     "nats"
