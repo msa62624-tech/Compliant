@@ -75,6 +75,7 @@
   included_files = [
     "packages/backend/dist/**",
     "packages/shared/dist/**",
+    "node_modules/@compliant/**",
     "node_modules/.prisma/**",
     "node_modules/@anthropic-ai/sdk/**",
     "node_modules/@colors/colors/**",
