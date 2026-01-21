@@ -320,6 +320,31 @@ After running the seed script, you can log in with these accounts:
 
 ## 🚢 Deployment
 
+The Compliant platform is **cloud-agnostic** and can be deployed to multiple cloud providers:
+
+### ☁️ Cloud Platform Support
+
+- **✅ AWS** - Full support with CodeBuild, ECS, RDS
+- **✅ Azure** - Full support with App Service, AKS, PostgreSQL, Blob Storage
+- **✅ Google Cloud** - Compatible with Cloud Run, GKE, Cloud SQL
+- **✅ Vercel/Heroku** - Compatible for quick deployments
+- **✅ Docker** - Run anywhere with Docker/Kubernetes
+
+### Azure Deployment (NEW) 🔵
+
+**Comprehensive Azure deployment guide now available!**
+
+The application is fully compatible with Microsoft Azure cloud services:
+
+- **Azure App Service** - For web applications
+- **Azure Container Instances / AKS** - For containerized deployments
+- **Azure Database for PostgreSQL** - Managed PostgreSQL
+- **Azure Blob Storage** - For file storage (configured via `AZURE_STORAGE_CONNECTION_STRING`)
+- **Azure Cache for Redis** - For session management
+- **Azure Application Insights** - For monitoring
+
+📘 **[View Complete Azure Deployment Guide](./AZURE_DEPLOYMENT.md)** - Step-by-step instructions for deploying to Azure
+
 ### AWS CodeBuild Setup
 
 This repository includes AWS CodeBuild configuration for CI/CD:
@@ -345,19 +370,26 @@ This repository includes AWS CodeBuild configuration for CI/CD:
 
 The IaC templates properly configure CodeBuild with the correct source version (`refs/heads/main`) to avoid the "reference not found for primary source" error.
 
-### Backend
-- Deploy to AWS ECS, Heroku, or similar
-- Set environment variables
-- Run migrations before deployment
+### General Deployment Steps
 
-### Frontend
-- Deploy to Vercel (recommended)
-- Or any Node.js hosting platform
+#### Backend
+- Deploy to AWS ECS, Azure App Service, Heroku, or similar
+- Set environment variables (see `.env.example`)
+- Run migrations before deployment: `npx prisma migrate deploy`
+
+#### Frontend
+- Deploy to Vercel (recommended), Azure Static Web Apps, or any Node.js hosting platform
 - Configure `NEXT_PUBLIC_API_URL` to production API
 
-### Database
-- Use AWS RDS, Supabase, or managed PostgreSQL
+#### Database
+- Use AWS RDS, Azure Database for PostgreSQL, Supabase, or any managed PostgreSQL service
+- Ensure PostgreSQL version 15 or higher
 - Run migrations: `npx prisma migrate deploy`
+
+#### File Storage
+- **AWS S3**: Set `STORAGE_PROVIDER=s3` and configure AWS credentials
+- **Azure Blob Storage**: Set `STORAGE_PROVIDER=azure` and configure `AZURE_STORAGE_CONNECTION_STRING`
+- **Local Storage**: Set `STORAGE_PROVIDER=local` (for development only)
 
 ## 🔒 Security
 

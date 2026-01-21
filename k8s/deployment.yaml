@@ -1,0 +1,311 @@
+# Kubernetes Manifests for Azure AKS Deployment
+# These manifests deploy the Compliant Platform to Azure Kubernetes Service
+
+---
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: compliant
+  labels:
+    name: compliant
+
+---
+# ConfigMap for non-sensitive configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: compliant-config
+  namespace: compliant
+data:
+  NODE_ENV: "production"
+  PORT: "3001"
+  STORAGE_PROVIDER: "azure"
+  JWT_EXPIRATION: "15m"
+  JWT_REFRESH_EXPIRATION: "7d"
+  CORS_ORIGIN: "https://compliant.com"
+  EMAIL_PROVIDER: "sendgrid"
+  EMAIL_FROM: "noreply@compliant.com"
+
+---
+# Secret for sensitive data (base64 encoded)
+# Create this secret manually or via CI/CD pipeline
+# kubectl create secret generic compliant-secrets \
+#   --from-literal=database-url="postgresql://..." \
+#   --from-literal=redis-url="redis://..." \
+#   --from-literal=azure-storage-connection="..." \
+#   --from-literal=jwt-secret="..." \
+#   --from-literal=jwt-refresh-secret="..." \
+#   --namespace compliant
+apiVersion: v1
+kind: Secret
+metadata:
+  name: compliant-secrets
+  namespace: compliant
+type: Opaque
+# data:
+#   database-url: <base64-encoded-value>
+#   redis-url: <base64-encoded-value>
+#   azure-storage-connection: <base64-encoded-value>
+#   jwt-secret: <base64-encoded-value>
+#   jwt-refresh-secret: <base64-encoded-value>
+
+---
+# Backend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: compliant-backend
+  namespace: compliant
+  labels:
+    app: compliant-backend
+    version: v1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: compliant-backend
+  template:
+    metadata:
+      labels:
+        app: compliant-backend
+        version: v1
+    spec:
+      containers:
+      - name: backend
+        image: compliantacr.azurecr.io/compliant-backend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3001
+          name: http
+          protocol: TCP
+        env:
+        # Non-sensitive config from ConfigMap
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: compliant-config
+              key: NODE_ENV
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: compliant-config
+              key: PORT
+        - name: STORAGE_PROVIDER
+          valueFrom:
+            configMapKeyRef:
+              name: compliant-config
+              key: STORAGE_PROVIDER
+        - name: JWT_EXPIRATION
+          valueFrom:
+            configMapKeyRef:
+              name: compliant-config
+              key: JWT_EXPIRATION
+        - name: JWT_REFRESH_EXPIRATION
+          valueFrom:
+            configMapKeyRef:
+              name: compliant-config
+              key: JWT_REFRESH_EXPIRATION
+        - name: CORS_ORIGIN
+          valueFrom:
+            configMapKeyRef:
+              name: compliant-config
+              key: CORS_ORIGIN
+        - name: EMAIL_PROVIDER
+          valueFrom:
+            configMapKeyRef:
+              name: compliant-config
+              key: EMAIL_PROVIDER
+        - name: EMAIL_FROM
+          valueFrom:
+            configMapKeyRef:
+              name: compliant-config
+              key: EMAIL_FROM
+        # Sensitive data from Secret
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: compliant-secrets
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: compliant-secrets
+              key: redis-url
+        - name: AZURE_STORAGE_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: compliant-secrets
+              key: azure-storage-connection
+        - name: AZURE_STORAGE_CONTAINER
+          value: "documents"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: compliant-secrets
+              key: jwt-secret
+        - name: JWT_REFRESH_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: compliant-secrets
+              key: jwt-refresh-secret
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/health/liveness
+            port: 3001
+            httpHeaders:
+            - name: X-API-Version
+              value: "1"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/health/readiness
+            port: 3001
+            httpHeaders:
+            - name: X-API-Version
+              value: "1"
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      # Use Azure-managed identity or service principal for ACR access
+      # imagePullSecrets:
+      # - name: acr-secret
+
+---
+# Backend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: compliant-backend
+  namespace: compliant
+  labels:
+    app: compliant-backend
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 3001
+    protocol: TCP
+    name: http
+  selector:
+    app: compliant-backend
+
+---
+# Horizontal Pod Autoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: compliant-backend-hpa
+  namespace: compliant
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: compliant-backend
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+# Ingress for TLS and custom domain
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: compliant-ingress
+  namespace: compliant
+  annotations:
+    kubernetes.io/ingress.class: azure/application-gateway
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    appgw.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  tls:
+  - hosts:
+    - api.compliant.com
+    secretName: compliant-tls
+  rules:
+  - host: api.compliant.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: compliant-backend
+            port:
+              number: 80
+
+---
+# Network Policy for security
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: compliant-backend-netpol
+  namespace: compliant
+spec:
+  podSelector:
+    matchLabels:
+      app: compliant-backend
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 3001
+  egress:
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 5432  # PostgreSQL
+    - protocol: TCP
+      port: 6379  # Redis
+    - protocol: TCP
+      port: 6380  # Redis SSL
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 443  # HTTPS
+    - protocol: TCP
+      port: 80   # HTTP
+
+---
+# Pod Disruption Budget for high availability
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: compliant-backend-pdb
+  namespace: compliant
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: compliant-backend

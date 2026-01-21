@@ -1,0 +1,314 @@
+# Azure DevOps Pipeline for Compliant Platform
+# This pipeline builds, tests, and deploys the application to Azure
+
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+  paths:
+    exclude:
+      - '*.md'
+      - 'docs/**'
+
+pr:
+  branches:
+    include:
+      - main
+      - develop
+
+variables:
+  # Container Registry Configuration
+  containerRegistry: 'compliantacr.azurecr.io'
+  imageRepository: 'compliant-backend'
+  frontendImageRepository: 'compliant-frontend'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+  tag: '$(Build.BuildId)'
+  
+  # Node.js Configuration
+  nodeVersion: '20.x'
+  pnpmVersion: '8.15.0'
+  
+  # Test Configuration
+  databaseUrl: 'postgresql://postgres:postgres@localhost:5432/compliant_test'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- stage: Test
+  displayName: 'Test and Quality Checks'
+  jobs:
+  - job: Lint_and_Test
+    displayName: 'Lint, Build, and Test'
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: compliant_test
+        ports:
+          - 5432:5432
+    steps:
+    - task: NodeTool@0
+      displayName: 'Install Node.js'
+      inputs:
+        versionSpec: $(nodeVersion)
+    
+    - script: |
+        npm install -g pnpm@$(pnpmVersion)
+      displayName: 'Install pnpm'
+    
+    - task: Cache@2
+      displayName: 'Cache pnpm dependencies'
+      inputs:
+        key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
+        path: $(Pipeline.Workspace)/.pnpm-store
+    
+    - script: |
+        pnpm config set store-dir $(Pipeline.Workspace)/.pnpm-store
+        pnpm install --frozen-lockfile
+      displayName: 'Install dependencies'
+    
+    - script: |
+        cd packages/shared && pnpm build
+      displayName: 'Build shared package'
+    
+    - script: |
+        cd packages/backend && pnpm db:generate
+      displayName: 'Generate Prisma Client'
+      env:
+        DATABASE_URL: $(databaseUrl)
+    
+    - script: |
+        pnpm lint
+      displayName: 'Run linting'
+    
+    - script: |
+        pnpm build
+      displayName: 'Build all packages'
+    
+    - script: |
+        pnpm test
+      displayName: 'Run tests'
+      env:
+        DATABASE_URL: $(databaseUrl)
+        JWT_SECRET: test-jwt-secret-key-min-32-characters
+        JWT_REFRESH_SECRET: test-refresh-secret-key-min-32-characters
+        NODE_ENV: test
+    
+    - task: PublishTestResults@2
+      displayName: 'Publish test results'
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/test-results/*.xml'
+        failTaskOnFailedTests: true
+    
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish code coverage'
+      condition: succeededOrFailed()
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage/cobertura-coverage.xml'
+
+- stage: Build
+  displayName: 'Build Docker Images'
+  dependsOn: Test
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - job: Build_Images
+    displayName: 'Build and Push Docker Images'
+    steps:
+    - task: Docker@2
+      displayName: 'Build backend image'
+      inputs:
+        command: build
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(containerRegistry)
+        tags: |
+          $(tag)
+          latest
+    
+    - task: Docker@2
+      displayName: 'Push backend image'
+      inputs:
+        command: push
+        repository: $(imageRepository)
+        containerRegistry: $(containerRegistry)
+        tags: |
+          $(tag)
+          latest
+    
+    - task: CopyFiles@2
+      displayName: 'Copy Kubernetes manifests'
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)/k8s'
+        Contents: '**/*.yaml'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/k8s'
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+- stage: Deploy_Staging
+  displayName: 'Deploy to Staging'
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - deployment: Deploy_Staging
+    displayName: 'Deploy to Staging Environment'
+    environment: 'staging'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download artifacts'
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'drop'
+              downloadPath: '$(System.ArtifactsDirectory)'
+          
+          - task: AzureWebAppContainer@1
+            displayName: 'Deploy to Azure Web App - Staging'
+            inputs:
+              azureSubscription: 'Azure Service Connection'
+              appName: 'compliant-backend-staging'
+              containers: '$(containerRegistry)/$(imageRepository):$(tag)'
+          
+          - task: AzureCLI@2
+            displayName: 'Run database migrations'
+            inputs:
+              azureSubscription: 'Azure Service Connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                echo "Running database migrations..."
+                az webapp ssh --resource-group compliant-rg --name compliant-backend-staging <<EOF
+                cd packages/backend
+                npx prisma migrate deploy
+                EOF
+          
+          - task: AzureCLI@2
+            displayName: 'Run smoke tests'
+            inputs:
+              azureSubscription: 'Azure Service Connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                echo "Running smoke tests..."
+                STAGING_URL=$(az webapp show --name compliant-backend-staging --resource-group compliant-rg --query defaultHostName -o tsv)
+                
+                # Test health endpoint
+                HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://$STAGING_URL/api/health/liveness)
+                if [ $HTTP_STATUS -eq 200 ]; then
+                  echo "✅ Health check passed"
+                else
+                  echo "❌ Health check failed with status $HTTP_STATUS"
+                  exit 1
+                fi
+                
+                # Test database connectivity
+                HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://$STAGING_URL/api/health/readiness)
+                if [ $HTTP_STATUS -eq 200 ]; then
+                  echo "✅ Database connectivity check passed"
+                else
+                  echo "❌ Database connectivity check failed with status $HTTP_STATUS"
+                  exit 1
+                fi
+
+- stage: Deploy_Production
+  displayName: 'Deploy to Production'
+  dependsOn: Deploy_Staging
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - deployment: Deploy_Production
+    displayName: 'Deploy to Production Environment'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download artifacts'
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'drop'
+              downloadPath: '$(System.ArtifactsDirectory)'
+          
+          - task: AzureWebAppContainer@1
+            displayName: 'Deploy to Azure Web App - Production'
+            inputs:
+              azureSubscription: 'Azure Service Connection'
+              appName: 'compliant-backend-prod'
+              containers: '$(containerRegistry)/$(imageRepository):$(tag)'
+          
+          - task: AzureCLI@2
+            displayName: 'Run database migrations'
+            inputs:
+              azureSubscription: 'Azure Service Connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                echo "Running database migrations..."
+                az webapp ssh --resource-group compliant-rg --name compliant-backend-prod <<EOF
+                cd packages/backend
+                npx prisma migrate deploy
+                EOF
+          
+          - task: AzureCLI@2
+            displayName: 'Run smoke tests'
+            inputs:
+              azureSubscription: 'Azure Service Connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                echo "Running smoke tests..."
+                PROD_URL=$(az webapp show --name compliant-backend-prod --resource-group compliant-rg --query defaultHostName -o tsv)
+                
+                # Test health endpoint
+                HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://$PROD_URL/api/health/liveness)
+                if [ $HTTP_STATUS -eq 200 ]; then
+                  echo "✅ Health check passed"
+                else
+                  echo "❌ Health check failed with status $HTTP_STATUS"
+                  exit 1
+                fi
+                
+                # Test database connectivity
+                HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://$PROD_URL/api/health/readiness)
+                if [ $HTTP_STATUS -eq 200 ]; then
+                  echo "✅ Database connectivity check passed"
+                else
+                  echo "❌ Database connectivity check failed with status $HTTP_STATUS"
+                  exit 1
+                fi
+          
+          - task: AzureCLI@2
+            displayName: 'Send deployment notification'
+            condition: always()
+            inputs:
+              azureSubscription: 'Azure Service Connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                if [ "$(Agent.JobStatus)" == "Succeeded" ]; then
+                  echo "✅ Production deployment succeeded!"
+                  echo "Build: $(Build.BuildNumber)"
+                  echo "Tag: $(tag)"
+                  # Add notification logic here (e.g., Slack, Teams, email)
+                else
+                  echo "❌ Production deployment failed!"
+                  echo "Build: $(Build.BuildNumber)"
+                  # Add alert logic here
+                fi
