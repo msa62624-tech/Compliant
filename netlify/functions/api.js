@@ -3,38 +3,65 @@
 const serverless = require('serverless-http');
 const path = require('path');
 const fs = require('fs');
+const Module = require('module');
 
 let cachedHandler;
 
-// Set up NODE_PATH to include function's node_modules
+// Set up module resolution to include function's node_modules
 // The @netlify/plugin-functions-install-core plugin installs dependencies
 // from netlify/functions/package.json at deploy time
 // Try multiple possible locations for node_modules
 const possibleNodeModulesPaths = [
   path.join(__dirname, 'node_modules'),  // Same directory as function
-  path.join(__dirname, '..', 'node_modules'),  // Parent directory
-  path.join(__dirname, '..', '..', 'netlify', 'functions', 'node_modules')  // Explicit path
+  path.join(__dirname, '..', 'node_modules'),  // Parent directory  
+  path.join(__dirname, '..', '..', 'node_modules'),  // Two levels up
+  path.join(__dirname, '..', '..', 'netlify', 'functions', 'node_modules'),  // Explicit path
+  '/var/task/node_modules',  // Netlify runtime root
+  '/opt/nodejs/node_modules'  // Netlify layer location
 ];
 
-let foundNodeModules = null;
+console.log('=== MODULE RESOLUTION DEBUG ===');
+console.log('__dirname:', __dirname);
+console.log('process.cwd():', process.cwd());
+
+let foundNodeModules = [];
 for (const modulePath of possibleNodeModulesPaths) {
   if (fs.existsSync(modulePath)) {
-    foundNodeModules = modulePath;
+    foundNodeModules.push(modulePath);
     console.log(`✓ Found node_modules at: ${modulePath}`);
-    break;
+    
+    // Check for specific critical dependencies
+    const criticalDeps = ['@nestjs/common', '@nestjs/config', '@nestjs/core'];
+    for (const dep of criticalDeps) {
+      const depPath = path.join(modulePath, dep);
+      if (fs.existsSync(depPath)) {
+        console.log(`  ✓ Found ${dep}`);
+      }
+    }
   }
 }
 
-if (foundNodeModules) {
+if (foundNodeModules.length > 0) {
+  // Set NODE_PATH with all found node_modules directories
   const currentNodePath = process.env.NODE_PATH || '';
-  process.env.NODE_PATH = currentNodePath
-    ? `${foundNodeModules}:${currentNodePath}`
-    : foundNodeModules;
-  require('module').Module._initPaths();
-  console.log('✓ Added node_modules to NODE_PATH');
+  const allPaths = [...foundNodeModules, currentNodePath].filter(Boolean).join(':');
+  process.env.NODE_PATH = allPaths;
+  
+  // Reinitialize module paths
+  Module._initPaths();
+  
+  // Also add to Module.globalPaths for better compatibility
+  for (const modulePath of foundNodeModules) {
+    if (!Module.globalPaths.includes(modulePath)) {
+      Module.globalPaths.unshift(modulePath);
+    }
+  }
+  
+  console.log('✓ Added node_modules to NODE_PATH:', foundNodeModules.length, 'locations');
+  console.log('✓ Module.globalPaths updated');
 } else {
-  console.warn('⚠ No node_modules found in any expected location');
-  console.warn('Attempted paths:', possibleNodeModulesPaths);
+  console.error('✗ No node_modules found in any expected location');
+  console.error('Attempted paths:', possibleNodeModulesPaths);
 }
 
 // Helper function to recursively list directory contents
