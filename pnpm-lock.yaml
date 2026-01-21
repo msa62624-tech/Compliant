@@ -60,7 +60,7 @@ importers:
         specifier: ^6.5.0
         version: 6.5.0(@nestjs/common@11.1.12)(@nestjs/core@11.1.12)(reflect-metadata@0.2.2)
       '@nuxt/opencollective':
-        specifier: ^0.3.2
+        specifier: ^0.3.3
         version: 0.3.3
       '@prisma/client':
         specifier: ^5.22.0

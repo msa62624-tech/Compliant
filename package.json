@@ -43,7 +43,7 @@
     "@nestjs/swagger": "^11.2.5",
     "@nestjs/terminus": "^11.0.0",
     "@nestjs/throttler": "^6.5.0",
-    "@nuxt/opencollective": "^0.3.2",
+    "@nuxt/opencollective": "^0.3.3",
     "@prisma/client": "^5.22.0",
     "@sendgrid/mail": "^8.1.6",
     "@so-ric/colorspace": "^1.1.6",
