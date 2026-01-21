@@ -65,19 +65,13 @@
 [functions]
   # Disable bundling - NestJS dependencies don't work well with esbuild
   # node_bundler = "esbuild"  # Commented out - using raw node_modules instead
-  # Include backend build, shared build, and root node_modules with NestJS dependencies
-  # Note: NestJS dependencies installed at root level for Netlify function access
+  # Include backend build, shared build, and ALL node_modules from root and netlify/functions
+  # Note: ALL backend dependencies installed at root level AND netlify/functions for Netlify function access
   included_files = [
     "packages/backend/dist/**",
     "packages/shared/dist/**",
-    "../../node_modules/@nestjs/**",
-    "../../node_modules/@prisma/**",
-    "../../node_modules/@nuxt/**",
-    "../../node_modules/reflect-metadata/**",
-    "../../node_modules/rxjs/**",
-    "../../node_modules/class-transformer/**",
-    "../../node_modules/class-validator/**",
-    "../../node_modules/consola/**"
+    "../../node_modules/**",
+    "node_modules/**"
   ]
 
 # ------------------------------------------------------------------------------
