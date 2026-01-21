@@ -65,8 +65,8 @@
 [functions]
   # Use esbuild for faster bundling
   node_bundler = "esbuild"
-  # Include necessary files in function bundle
-  included_files = ["packages/backend/dist/**", "packages/backend/node_modules/**"]
+  # Include only built files and package.json (not node_modules to avoid 250MB limit)
+  included_files = ["packages/backend/dist/**", "packages/backend/package.json"]
 
 # ------------------------------------------------------------------------------
 # Redirects and Rewrites
