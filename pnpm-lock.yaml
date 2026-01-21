@@ -53,6 +53,12 @@ importers:
       '@prisma/client':
         specifier: ^5.22.0
         version: 5.22.0(prisma@5.22.0)
+      axios:
+        specifier: ^1.7.9
+        version: 1.13.2
+      bullmq:
+        specifier: ^5.32.7
+        version: 5.66.5
       cron:
         specifier: ^3.2.1
         version: 3.5.0
@@ -68,15 +74,24 @@ importers:
       file-type:
         specifier: ^21.3.0
         version: 21.3.0
+      ioredis:
+        specifier: ^5.4.2
+        version: 5.9.2
       iterare:
         specifier: ^1.2.1
         version: 1.2.1
+      jsonwebtoken:
+        specifier: ^9.0.2
+        version: 9.0.3
       load-esm:
         specifier: ^1.0.3
         version: 1.0.3
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
+      passport:
+        specifier: ^0.7.0
+        version: 0.7.0
       path-to-regexp:
         specifier: ^8.3.0
         version: 8.3.0
