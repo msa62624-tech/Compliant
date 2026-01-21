@@ -24,6 +24,7 @@
   # This ensures Netlify properly detects the Node.js monorepo setup
   command = """
     pnpm install &&
+    cd packages/backend && npx prisma generate && cd ../.. &&
     cd packages/shared && pnpm build &&
     cd ../backend && pnpm build &&
     cd ../frontend && pnpm build
