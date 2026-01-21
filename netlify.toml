@@ -65,15 +65,15 @@
 [functions]
   # Enable esbuild bundler to optimize function size and stay under 250 MB limit
   node_bundler = "esbuild"
-  # Include backend build, shared build, and specific dependencies
-  # esbuild will bundle only what's actually imported, significantly reducing size
+  # Prisma requires special handling - it cannot be bundled by esbuild
+  # Include Prisma's generated client and engines (they must be external)
   included_files = [
     "packages/backend/dist/**",
     "packages/shared/dist/**",
     "node_modules/.prisma/**",
     "node_modules/@prisma/client/**"
   ]
-  # External packages that should not be bundled (will be included from node_modules)
+  # External packages that should not be bundled (Prisma needs these as-is)
   external_node_modules = [
     "@prisma/client",
     ".prisma"
