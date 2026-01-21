@@ -64,17 +64,12 @@
 # Netlify Functions Configuration
 # ------------------------------------------------------------------------------
 [functions]
-  # Use esbuild to bundle the function with all dependencies
-  node_bundler = "esbuild"
   # Include backend dist files (needed for NestJS app) and Prisma schema
   included_files = [
     "../backend/dist/**",
     "../backend/prisma/**",
     "../shared/dist/**"
   ]
-  # Mark ALL node modules as external so they're installed but not bundled
-  # This allows pre-compiled backend code to require them
-  external_node_modules = ["*"]
 
 # ------------------------------------------------------------------------------
 # Redirects and Rewrites
