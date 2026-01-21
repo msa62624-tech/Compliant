@@ -98,6 +98,7 @@
     "node_modules/file-type/**",
     "node_modules/iterare/**",
     "node_modules/load-esm/**",
+    "node_modules/lodash/**",
     "node_modules/path-to-regexp/**",
     "node_modules/tslib/**",
     "node_modules/uid/**",
@@ -137,6 +138,7 @@
     "file-type",
     "iterare",
     "load-esm",
+    "lodash",
     "path-to-regexp",
     "tslib",
     "uid"
