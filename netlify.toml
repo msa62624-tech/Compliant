@@ -117,6 +117,7 @@
     "@nestjs/microservices/microservices-module",
     "@nestjs/websockets",
     "@nestjs/websockets/socket-module",
+    "@nuxt/opencollective",
     "reflect-metadata",
     "rxjs",
     "class-transformer",
