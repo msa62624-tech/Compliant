@@ -144,13 +144,33 @@
         
         <p style="margin-top: 20px;">Built with NestJS, Next.js 14, and PostgreSQL</p>
         
-        <a href="#" class="cta-button" onclick="window.location.href = window.location.protocol + '//' + window.location.hostname + ':3000'; return false;">Launch Application</a>
+        <a href="#" class="cta-button" id="launchApp">Launch Application</a>
         
         <div class="links">
-            <a href="https://github.com/hml-brokerage/Compliant-" target="_blank">GitHub</a>
-            <a href="#" onclick="window.location.href = window.location.protocol + '//' + window.location.hostname + ':3001/api/docs'; return false;">API Docs</a>
+            <a href="https://github.com/hml-brokerage/Compliant-" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="#" id="apiDocs">API Docs</a>
             <a href="./README.md">Documentation</a>
         </div>
     </div>
+    
+    <script>
+        // Environment-aware navigation for development and production
+        document.addEventListener('DOMContentLoaded', function() {
+            const hostname = window.location.hostname;
+            const protocol = window.location.protocol;
+            
+            // Launch Application button
+            document.getElementById('launchApp').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = protocol + '//' + hostname + ':3000';
+            });
+            
+            // API Documentation link
+            document.getElementById('apiDocs').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.open(protocol + '//' + hostname + ':3001/api/docs', '_blank', 'noopener,noreferrer');
+            });
+        });
+    </script>
 </body>
 </html>
