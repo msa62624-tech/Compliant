@@ -62,9 +62,11 @@
 # Netlify Functions Configuration
 # ------------------------------------------------------------------------------
 [functions]
-  # Explicitly disable bundling to prevent dependency analysis
-  # This avoids issues with @nestjs/core's optional opencollective dependency
-  node_bundler = "none"
+  # Use esbuild bundler with external modules to reduce size while avoiding dependency analysis issues
+  node_bundler = "esbuild"
+  
+  # Mark NestJS core and opencollective as external to prevent bundler from analyzing their optional dependencies
+  external_node_modules = ["@nestjs/core", "opencollective"]
   
   # Include backend build, shared build, and root node_modules with NestJS dependencies
   # Note: NestJS dependencies installed at root level for Netlify function access
