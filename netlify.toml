@@ -22,12 +22,7 @@
   base = "packages/frontend"
   # Build shared package, backend, and frontend from frontend directory
   # Install root dependencies first for Netlify Functions (serverless-http)
-  command = """
-    cd ../../ && pnpm install &&
-    cd packages/shared && pnpm install && pnpm build &&
-    cd ../backend && pnpm install && pnpm build &&
-    cd ../frontend && pnpm install && pnpm build
-  """
+  command = "cd ../../ && pnpm install && cd packages/shared && pnpm install && pnpm build && cd ../backend && pnpm install && pnpm build && cd ../frontend && pnpm install && pnpm build"
   publish = ".next"
   functions = "../../netlify/functions"
 
@@ -70,9 +65,9 @@
   included_files = [
     "packages/backend/dist/**",
     "packages/shared/dist/**",
+    "../../node_modules/@compliant/**",
     "../../node_modules/@nestjs/**",
     "../../node_modules/@prisma/**",
-    "../../node_modules/@nuxt/**",
     "../../node_modules/reflect-metadata/**",
     "../../node_modules/rxjs/**",
     "../../node_modules/class-transformer/**",
@@ -138,30 +133,15 @@
 
 # Deploy previews (PR builds)
 [context.deploy-preview]
-  command = """
-    cd ../../ && pnpm install &&
-    cd packages/shared && pnpm install && pnpm build &&
-    cd ../backend && pnpm install && pnpm build &&
-    cd ../frontend && pnpm install && pnpm build
-  """
+  command = "cd ../../ && pnpm install && cd packages/shared && pnpm install && pnpm build && cd ../backend && pnpm install && pnpm build && cd ../frontend && pnpm install && pnpm build"
 
 # Branch deploys
 [context.branch-deploy]
-  command = """
-    cd ../../ && pnpm install &&
-    cd packages/shared && pnpm install && pnpm build &&
-    cd ../backend && pnpm install && pnpm build &&
-    cd ../frontend && pnpm install && pnpm build
-  """
+  command = "cd ../../ && pnpm install && cd packages/shared && pnpm install && pnpm build && cd ../backend && pnpm install && pnpm build && cd ../frontend && pnpm install && pnpm build"
 
 # Production context
 [context.production]
-  command = """
-    cd ../../ && pnpm install &&
-    cd packages/shared && pnpm install && pnpm build &&
-    cd ../backend && pnpm install && pnpm build &&
-    cd ../frontend && pnpm install && pnpm build
-  """
+  command = "cd ../../ && pnpm install && cd packages/shared && pnpm install && pnpm build && cd ../backend && pnpm install && pnpm build && cd ../frontend && pnpm install && pnpm build"
 
 # ------------------------------------------------------------------------------
 # Optional Plugins (uncomment to enable)
