@@ -47,8 +47,11 @@ async function bootstrap() {
         }),
       );
       
-      // NOTE: Do NOT set globalPrefix here as the redirect already maps /api/* to this function
-      // The backend routes already have /api in them from the NestJS configuration
+      // CRITICAL: Set empty global prefix for Netlify
+      // Netlify redirect: /api/auth/login → /.netlify/functions/api/auth/login
+      // The redirect already includes /api, so we don't want backend to add it again
+      // This prevents the double /api/api prefix issue
+      app.setGlobalPrefix('');
       
       await app.init();
       
