@@ -35,28 +35,54 @@ async function bootstrap() {
       console.log('Process cwd:', process.cwd());
       
       // CRITICAL: Determine backend dist path based on Netlify structure
-      // In Netlify, included_files are copied relative to function directory
-      // Try multiple possible paths
+      // In Netlify Lambda: /var/task/ is the root
+      // included_files like "packages/backend/dist/**" are copied to /var/task/packages/backend/dist
       const possiblePaths = [
-        path.join(__dirname, '..', '..', 'packages', 'backend', 'dist'),
-        path.join(process.cwd(), 'packages', 'backend', 'dist'),
-        path.join(__dirname, '..', '..', '..', '..', 'packages', 'backend', 'dist'),
+        '/var/task/packages/backend/dist',                                      // Netlify Lambda standard path
+        path.join(process.cwd(), 'packages', 'backend', 'dist'),               // process.cwd() = /var/task
+        path.join(__dirname, '..', '..', 'packages', 'backend', 'dist'),       // From function dir: netlify/functions/
+        path.resolve(__dirname, '../../packages/backend/dist'),                // Explicit resolve
+        path.resolve(process.cwd(), 'packages/backend/dist'),                  // Explicit resolve from cwd
       ];
       
       let backendPath = null;
+      console.log('Searching for backend dist directory...');
       for (const testPath of possiblePaths) {
-        console.log('Testing path:', testPath);
+        console.log(`Testing path: ${testPath}`);
         if (fs.existsSync(testPath)) {
-          console.log('✓ Found backend dist at:', testPath);
-          backendPath = testPath;
-          break;
+          const hasAppModule = fs.existsSync(path.join(testPath, 'app.module.js'));
+          console.log(`  ✓ Path exists. Has app.module.js: ${hasAppModule}`);
+          if (hasAppModule) {
+            backendPath = testPath;
+            console.log(`  ✓✓ Using this path!`);
+            break;
+          }
         } else {
-          console.log('✗ Not found at:', testPath);
+          console.log(`  ✗ Path does not exist`);
         }
       }
       
       if (!backendPath) {
-        throw new Error(`Backend dist not found. Tried paths: ${possiblePaths.join(', ')}`);
+        // List what's actually in process.cwd()
+        console.error('=== DIRECTORY LISTING FOR DEBUGGING ===');
+        console.error('Contents of process.cwd():', process.cwd());
+        try {
+          const cwdContents = fs.readdirSync(process.cwd());
+          console.error('Files/dirs:', cwdContents);
+          
+          if (cwdContents.includes('packages')) {
+            const packagesPath = path.join(process.cwd(), 'packages');
+            console.error('Contents of packages:', fs.readdirSync(packagesPath));
+            
+            if (fs.existsSync(path.join(packagesPath, 'backend'))) {
+              console.error('Contents of packages/backend:', fs.readdirSync(path.join(packagesPath, 'backend')));
+            }
+          }
+        } catch (err) {
+          console.error('Error listing directories:', err.message);
+        }
+        
+        throw new Error(`Backend dist not found. Tried paths:\n${possiblePaths.map(p => `  - ${p}`).join('\n')}`);
       }
       
       console.log('Using backend path:', backendPath);
