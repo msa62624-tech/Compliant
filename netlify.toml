@@ -44,11 +44,21 @@
   
   # Set NODE_ENV to production for secure cookies
   NODE_ENV = "production"
-  
-  # Use simple authentication for Netlify (no database required)
-  USE_SIMPLE_AUTH = "true"
-  SIMPLE_AUTH_USERNAME = "admin"
-  SIMPLE_AUTH_PASSWORD = "admin123"
+
+# ==============================================================================
+# IMPORTANT: Runtime Environment Variables for Netlify Functions
+# ==============================================================================
+# These variables MUST also be set in Netlify Dashboard for runtime access:
+# Go to: Site settings → Build & deploy → Environment → Environment variables
+# Add the following variables:
+#   - USE_SIMPLE_AUTH = true
+#   - SIMPLE_AUTH_USERNAME = admin  
+#   - SIMPLE_AUTH_PASSWORD = admin123
+#   - NODE_ENV = production
+#   - JWT_SECRET = (copy from below)
+#   - JWT_REFRESH_SECRET = (copy from below)
+#   - FRONTEND_URL = (your Netlify site URL)
+# ==============================================================================
   
   # Disable opencollective postinstall script (prevents @nuxt/opencollective error)
   OPENCOLLECTIVE_HIDE = "1"

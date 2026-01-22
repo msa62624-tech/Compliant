@@ -68,21 +68,30 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) response: Response,
   ) {
-    // Use simple auth for Netlify, full auth for AWS
-    if (this.useSimpleAuth) {
-      // Accept either username or email for simple auth
-      const identifier = loginDto.username || loginDto.email || '';
-      const result = await this.simpleAuthService.login(
-        identifier,
-        loginDto.password,
-      );
-      
-      if (!result) {
-        throw new UnauthorizedException('Invalid credentials');
+    try {
+      // Use simple auth for Netlify, full auth for AWS
+      if (this.useSimpleAuth) {
+        console.log('[SimpleAuth] Processing login with identifier:', loginDto.email || loginDto.username);
+        
+        // Accept either username or email for simple auth
+        const identifier = loginDto.username || loginDto.email || '';
+        const result = await this.simpleAuthService.login(
+          identifier,
+          loginDto.password,
+        );
+        
+        if (!result) {
+          console.log('[SimpleAuth] Login failed - invalid credentials');
+          throw new UnauthorizedException('Invalid credentials');
+        }
+        
+        console.log('[SimpleAuth] Login successful for user:', result.user.email);
+        // For simple auth, just return user data (no real tokens)
+        return { user: result.user, message: 'Logged in successfully' };
       }
-      
-      // For simple auth, just return user data (no real tokens)
-      return { user: result.user, message: 'Logged in successfully' };
+    } catch (error) {
+      console.error('[Auth] Login error:', error.message, error.stack);
+      throw error;
     }
 
     // Full JWT authentication (AWS)
