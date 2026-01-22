@@ -47,12 +47,15 @@ const REFRESH_TOKEN_COOKIE = "refresh_token";
 @ApiTags("Authentication")
 @Controller("auth")
 export class AuthController {
-  private useSimpleAuth = process.env.USE_SIMPLE_AUTH === 'true';
-  
   constructor(
     private authService: AuthService,
     private simpleAuthService: SimpleAuthService,
   ) {}
+  
+  // Check environment variable at runtime, not at class initialization
+  private get useSimpleAuth(): boolean {
+    return process.env.USE_SIMPLE_AUTH === 'true' || process.env.USE_SIMPLE_AUTH === '1';
+  }
 
   @Post("login")
   @Throttle(AUTH_THROTTLE_CONFIG)
