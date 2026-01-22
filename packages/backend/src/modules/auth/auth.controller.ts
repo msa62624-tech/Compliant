@@ -90,7 +90,11 @@ export class AuthController {
         return { user: result.user, message: 'Logged in successfully' };
       }
     } catch (error) {
-      console.error('[Auth] Login error:', error.message, error.stack);
+      if (error instanceof Error) {
+        console.error('[Auth] Login error:', error.message, error.stack);
+      } else {
+        console.error('[Auth] Login error:', error);
+      }
       throw error;
     }
 
