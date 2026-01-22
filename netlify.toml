@@ -68,7 +68,6 @@
     "../../node_modules/@compliant/**",
     "../../node_modules/@nestjs/**",
     "../../node_modules/@prisma/**",
-    "../../node_modules/@nuxt/**",
     "../../node_modules/reflect-metadata/**",
     "../../node_modules/rxjs/**",
     "../../node_modules/class-transformer/**",
