@@ -41,6 +41,10 @@
   # PNPM version
   PNPM_VERSION = "8.15.0"
   
+  # Disable opencollective postinstall script (prevents @nuxt/opencollective error)
+  OPENCOLLECTIVE_HIDE = "1"
+  DISABLE_OPENCOLLECTIVE = "true"
+  
   # Important: Set environment variables in Netlify Dashboard UI
   # Site settings -> Build & deploy -> Environment variables
   #
