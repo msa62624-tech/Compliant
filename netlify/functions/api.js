@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-// Netlify Function for NestJS Backend
-// This wraps the NestJS application to run as a serverless function
-const serverless = require('serverless-http');
-const path = require('path');
-
-let cachedHandler;
-
-=======
 // Netlify Function for NestJS Backend (Source - will be bundled by esbuild)
 // This wraps the NestJS application to run as a serverless function
 const serverless = require('serverless-http');
@@ -43,17 +34,10 @@ function listDirectory(dir, prefix = '', maxDepth = 3, currentDepth = 0) {
   }
 }
 
->>>>>>> copilot/fix-module-not-found-error
 // Initialize the NestJS application
 async function bootstrap() {
   if (!cachedHandler) {
     try {
-<<<<<<< HEAD
-      // Use environment variable or default path for backend module
-      const backendPath = process.env.BACKEND_DIST_PATH || 
-        path.join(__dirname, '..', '..', 'packages', 'backend', 'dist');
-      
-=======
       console.log('=== Netlify Function Initialization Debug ===');
       console.log('__dirname:', __dirname);
       console.log('process.cwd():', process.cwd());
@@ -105,7 +89,6 @@ async function bootstrap() {
       }
       
       // With esbuild bundling, dependencies are included in the bundle
->>>>>>> copilot/fix-module-not-found-error
       const { NestFactory } = require('@nestjs/core');
       const { AppModule } = require(path.join(backendPath, 'app.module'));
       
@@ -125,22 +108,12 @@ async function bootstrap() {
         allowedHeaders: ['Content-Type', 'Authorization'],
       });
       
-<<<<<<< HEAD
-      // NOTE: Do NOT set globalPrefix here as the redirect already maps /api/* to this function
-      // The backend routes already have /api in them from the NestJS configuration
-      
-=======
->>>>>>> copilot/fix-module-not-found-error
       await app.init();
       
       const expressApp = app.getHttpAdapter().getInstance();
       cachedHandler = serverless(expressApp);
       
-<<<<<<< HEAD
-      console.log('NestJS app initialized successfully');
-=======
       console.log('✓ NestJS app initialized successfully');
->>>>>>> copilot/fix-module-not-found-error
     } catch (error) {
       console.error('Failed to initialize NestJS app:', error);
       throw error;
@@ -149,10 +122,7 @@ async function bootstrap() {
   return cachedHandler;
 }
 
-<<<<<<< HEAD
-=======
 
->>>>>>> copilot/fix-module-not-found-error
 // Netlify Function handler
 exports.handler = async (event, context) => {
   // Prevent function from timing out
