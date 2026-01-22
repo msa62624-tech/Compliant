@@ -9,6 +9,7 @@ import {
   Res,
   Req,
   UnauthorizedException,
+  Optional,
 } from "@nestjs/common";
 import { Throttle } from "@nestjs/throttler";
 import { Response, Request } from "express";
@@ -49,7 +50,7 @@ const REFRESH_TOKEN_COOKIE = "refresh_token";
 export class AuthController {
   constructor(
     private simpleAuthService: SimpleAuthService,
-    private authService?: AuthService,
+    @Optional() private authService: AuthService,
   ) {
     // Only log if authService is NOT injected (simple auth mode)
     if (!this.authService) {
