@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Optional , ServiceUnavailableException } from "@nestjs/common";
+import { Injectable, NotFoundException, Optional, ServiceUnavailableException } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { Prisma, ContractorType, User } from "@prisma/client";
@@ -265,7 +265,6 @@ export class ProjectsService {
 
     return projects;
   }
-}
 
   private ensurePrisma() {
     if (!this.prisma) {
@@ -274,3 +273,4 @@ export class ProjectsService {
       );
     }
   }
+}

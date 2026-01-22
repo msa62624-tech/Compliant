@@ -4,7 +4,7 @@ import {
   BadRequestException,
   Logger,
   Optional,
-, ServiceUnavailableException } from "@nestjs/common";
+  ServiceUnavailableException } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { HoldHarmlessStatus, HoldHarmless, Prisma } from "@prisma/client";
 import { randomBytes } from "crypto";
@@ -598,7 +598,6 @@ export class HoldHarmlessService {
       pendingTotal: pendingSubSignature + pendingGCSignature,
     };
   }
-}
 
   private ensurePrisma() {
     if (!this.prisma) {
@@ -607,3 +606,4 @@ export class HoldHarmlessService {
       );
     }
   }
+}

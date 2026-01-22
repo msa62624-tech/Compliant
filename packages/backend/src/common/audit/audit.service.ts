@@ -1,4 +1,4 @@
-import { Injectable, Logger, Optional , ServiceUnavailableException } from "@nestjs/common";
+import { Injectable, Logger, Optional, ServiceUnavailableException } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 
 export enum AuditAction {
@@ -250,7 +250,6 @@ export class AuditService {
     // Default to JSON
     return JSON.stringify(logs, null, 2);
   }
-}
 
   private ensurePrisma() {
     if (!this.prisma) {
@@ -259,3 +258,4 @@ export class AuditService {
       );
     }
   }
+}

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger, Optional , ServiceUnavailableException } from "@nestjs/common";
+import { Injectable, NotFoundException, Logger, Optional, ServiceUnavailableException } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { CacheService } from "../cache/cache.service";
 import { EmailService } from "../email/email.service";
@@ -670,7 +670,6 @@ export class ContractorsService {
 
     return { brokers };
   }
-}
 
   private ensurePrisma() {
     if (!this.prisma) {
@@ -679,3 +678,4 @@ export class ContractorsService {
       );
     }
   }
+}

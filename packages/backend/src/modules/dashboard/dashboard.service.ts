@@ -1,4 +1,4 @@
-import { Injectable, Logger, Optional , ServiceUnavailableException } from "@nestjs/common";
+import { Injectable, Logger, Optional, ServiceUnavailableException } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { User, UserRole } from "@prisma/client";
 
@@ -360,7 +360,6 @@ export class DashboardService {
       totalPages: Math.ceil(total / limit),
     };
   }
-}
 
   private ensurePrisma() {
     if (!this.prisma) {
@@ -369,3 +368,4 @@ export class DashboardService {
       );
     }
   }
+}

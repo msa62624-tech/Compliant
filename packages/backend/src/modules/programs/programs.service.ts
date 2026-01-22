@@ -3,7 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   Optional,
-, ServiceUnavailableException } from "@nestjs/common";
+  ServiceUnavailableException } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { CreateProgramDto } from "./dto/create-program.dto";
 import { UpdateProgramDto } from "./dto/update-program.dto";
@@ -296,7 +296,6 @@ export class ProgramsService {
       mostUsedPrograms,
     };
   }
-}
 
   private ensurePrisma() {
     if (!this.prisma) {
@@ -305,3 +304,4 @@ export class ProgramsService {
       );
     }
   }
+}

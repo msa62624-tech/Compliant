@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException, Optional , ServiceUnavailableException } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, Optional, ServiceUnavailableException } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { User } from "@prisma/client";
 import { EmailService } from "../email/email.service";
@@ -265,7 +265,6 @@ export class NotificationsService {
   private generateId(): string {
     return `notif_${Date.now()}_${Math.random().toString(36).substring(7)}`;
   }
-}
 
   private ensurePrisma() {
     if (!this.prisma) {
@@ -274,3 +273,4 @@ export class NotificationsService {
       );
     }
   }
+}

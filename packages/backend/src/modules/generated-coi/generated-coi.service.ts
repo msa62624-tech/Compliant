@@ -4,7 +4,7 @@ import {
   BadRequestException,
   Logger,
   Optional,
-, ServiceUnavailableException } from "@nestjs/common";
+  ServiceUnavailableException } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { CreateCOIDto } from "./dto/create-coi.dto";
 import { UpdateBrokerInfoDto } from "./dto/update-broker-info.dto";
@@ -634,7 +634,6 @@ export class GeneratedCOIService {
       },
     });
   }
-}
 
   private ensurePrisma() {
     if (!this.prisma) {
@@ -643,3 +642,4 @@ export class GeneratedCOIService {
       );
     }
   }
+}

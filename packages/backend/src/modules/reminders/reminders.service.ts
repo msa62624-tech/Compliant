@@ -1,4 +1,4 @@
-import { Injectable, Inject, LoggerService, Optional , ServiceUnavailableException } from "@nestjs/common";
+import { Injectable, Inject, LoggerService, Optional, ServiceUnavailableException } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { PrismaService } from "../../config/prisma.service";
@@ -540,7 +540,6 @@ This is an automated reminder from the Compliant Insurance Tracking Platform.
       byType: remindersByType,
     };
   }
-}
 
   private ensurePrisma() {
     if (!this.prisma) {
@@ -549,3 +548,4 @@ This is an automated reminder from the Compliant Insurance Tracking Platform.
       );
     }
   }
+}
