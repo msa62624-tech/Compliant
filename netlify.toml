@@ -67,8 +67,9 @@
   # Enable esbuild bundler to optimize function size and stay under 250 MB limit
   node_bundler = "esbuild"
 
-# Per-function configuration (applies to all functions via "*")
-[functions."*"]
+# Backend API Function Configuration (ONLY applies to netlify/functions/api.js)
+# This prevents bloating the Next.js server handler which doesn't need backend code
+[functions.api]
   # Prisma requires special handling - it cannot be bundled by esbuild
   # Include Prisma's generated client and engines (they must be external)
   # Also include NestJS packages for full backend functionality
