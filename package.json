@@ -32,6 +32,7 @@
     "@nestjs/core": "^11.1.12",
     "@nestjs/platform-express": "^11.1.12",
     "@prisma/client": "^5.22.0",
+    "cookie-parser": "^1.4.7",
     "opencollective": "^1.0.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",

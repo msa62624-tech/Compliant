@@ -72,16 +72,35 @@ exports.handler = async (event, context) => {
   // Prevent function from timing out
   context.callbackWaitsForEmptyEventLoop = false;
   
+  // DIAGNOSTIC: Log environment and request details
+  console.log('=== NETLIFY FUNCTION INVOKED ===');
+  console.log('Path:', event.path);
+  console.log('Method:', event.httpMethod);
+  console.log('Environment check:');
+  console.log('- USE_SIMPLE_AUTH:', process.env.USE_SIMPLE_AUTH);
+  console.log('- NETLIFY:', process.env.NETLIFY);
+  console.log('- NODE_ENV:', process.env.NODE_ENV);
+  console.log('- JWT_SECRET exists:', !!process.env.JWT_SECRET);
+  
   try {
     const handler = await bootstrap();
-    return await handler(event, context);
+    const result = await handler(event, context);
+    console.log('Function executed successfully, status:', result.statusCode);
+    return result;
   } catch (error) {
-    console.error('Function execution error:', error);
+    console.error('=== FUNCTION EXECUTION ERROR ===');
+    console.error('Error:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Error message:', error.message);
     return {
       statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         error: 'Internal Server Error',
         message: error.message,
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined,
       }),
     };
   }

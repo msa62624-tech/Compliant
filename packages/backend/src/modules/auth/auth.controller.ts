@@ -48,9 +48,14 @@ const REFRESH_TOKEN_COOKIE = "refresh_token";
 @Controller("auth")
 export class AuthController {
   constructor(
-    private authService: AuthService,
     private simpleAuthService: SimpleAuthService,
-  ) {}
+    private authService?: AuthService,
+  ) {
+    // Only log if authService is NOT injected (simple auth mode)
+    if (!this.authService) {
+      console.log('[AuthController] Running in SIMPLE AUTH mode - no database required');
+    }
+  }
   
   // Check environment variable at runtime, not at class initialization
   private get useSimpleAuth(): boolean {
@@ -103,6 +108,11 @@ export class AuthController {
     }
 
     // Full JWT authentication (AWS)
+    if (!this.authService) {
+      console.error('[Auth] AuthService not available in simple auth mode');
+      throw new UnauthorizedException('Full authentication not available');
+    }
+    
     const result = await this.authService.login(loginDto);
 
     // Set httpOnly cookies for tokens
@@ -158,6 +168,10 @@ export class AuthController {
       throw new UnauthorizedException("No refresh token provided");
     }
 
+    if (!this.authService) {
+      throw new UnauthorizedException('Authentication service not available');
+    }
+
     const result = await this.authService.refresh(refreshToken);
 
     // Set new httpOnly cookies
@@ -188,6 +202,10 @@ export class AuthController {
     // Simple auth doesn't need logout logic
     if (this.useSimpleAuth) {
       return { message: "Logged out successfully" };
+    }
+    
+    if (!this.authService) {
+      throw new UnauthorizedException('Authentication service not available');
     }
     
     await this.authService.logout(userId);

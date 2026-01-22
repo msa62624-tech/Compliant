@@ -8,10 +8,12 @@ import { SimpleAuthService } from "./simple-auth.service";
 import { AuthController } from "./auth.controller";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { UsersModule } from "../users/users.module";
+import { PrismaModule } from "../../config/prisma.module";
 
 @Module({
   imports: [
     UsersModule,
+    PrismaModule,
     PassportModule,
     JwtModule.registerAsync({
       useFactory: async (
@@ -28,7 +30,12 @@ import { UsersModule } from "../users/users.module";
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, SimpleAuthService, JwtStrategy],
+  providers: [
+    AuthService, 
+    SimpleAuthService, 
+    // Only register JwtStrategy if NOT using simple auth
+    ...(process.env.USE_SIMPLE_AUTH === 'true' ? [] : [JwtStrategy]),
+  ],
   controllers: [AuthController],
   exports: [AuthService, SimpleAuthService],
 })
