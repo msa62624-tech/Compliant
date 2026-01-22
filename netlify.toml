@@ -72,7 +72,14 @@
     "../../node_modules/rxjs/**",
     "../../node_modules/class-transformer/**",
     "../../node_modules/class-validator/**",
-    "../../node_modules/consola/**"
+    "../../node_modules/consola/**",
+    "../../node_modules/opencollective/**",
+    "../../node_modules/chalk/**",
+    "../../node_modules/inquirer/**",
+    "../../node_modules/minimist/**",
+    "../../node_modules/node-fetch/**",
+    "../../node_modules/babel-polyfill/**",
+    "../../node_modules/opn/**"
   ]
 
 # ------------------------------------------------------------------------------
