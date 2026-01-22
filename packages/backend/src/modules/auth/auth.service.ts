@@ -51,13 +51,16 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.validateUser(loginDto.email, loginDto.password);
+    // Use email if provided, otherwise use username as email (for simple auth)
+    const emailOrUsername = loginDto.email || loginDto.username || '';
+    
+    const user = await this.validateUser(emailOrUsername, loginDto.password);
     if (!user) {
       // Log failed login attempt
       this.logger.warn({
         message: "Failed login attempt",
         context: "Auth",
-        email: loginDto.email,
+        email: emailOrUsername,
       });
       throw new UnauthorizedException("Invalid credentials");
     }
