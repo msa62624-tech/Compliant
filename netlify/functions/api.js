@@ -5,22 +5,51 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 
 let cachedHandler;
+let initializationError = null;
+
+// Global error handlers to catch unhandled rejections/exceptions
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('=== UNHANDLED PROMISE REJECTION ===');
+  console.error('Reason:', reason);
+  console.error('Promise:', promise);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('=== UNCAUGHT EXCEPTION ===');
+  console.error('Error:', error);
+  console.error('Stack:', error.stack);
+});
 
 // Initialize the NestJS application
 async function bootstrap() {
+  if (initializationError) {
+    console.error('Previous initialization failed, throwing cached error');
+    throw initializationError;
+  }
+  
   if (!cachedHandler) {
     try {
+      console.log('=== STARTING NEST APP BOOTSTRAP ===');
+      
       // Use environment variable or default path for backend module
       const backendPath = process.env.BACKEND_DIST_PATH || 
         path.join(__dirname, '..', '..', 'packages', 'backend', 'dist');
       
+      console.log('Backend path:', backendPath);
+      console.log('Loading @nestjs/core...');
       const { NestFactory } = require('@nestjs/core');
+      console.log('Loading @nestjs/common...');
       const { ValidationPipe } = require('@nestjs/common');
+      console.log('Loading AppModule from:', path.join(backendPath, 'app.module'));
       const { AppModule } = require(path.join(backendPath, 'app.module'));
       
+      console.log('Creating NestJS application...');
       const app = await NestFactory.create(AppModule, {
-        logger: ['error', 'warn', 'log'],
+        logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+        abortOnError: false,
       });
+      
+      console.log('NestJS app created, adding middleware...');
       
       // CRITICAL: Enable cookie parser for JWT authentication
       app.use(cookieParser());
@@ -38,6 +67,8 @@ async function bootstrap() {
         exposedHeaders: ['Set-Cookie'],
       });
       
+      console.log('CORS enabled, adding validation pipe...');
+      
       // Global validation pipe
       app.useGlobalPipes(
         new ValidationPipe({
@@ -53,14 +84,33 @@ async function bootstrap() {
       // Controllers: @Controller("auth") creates /auth/* routes
       // This matches perfectly!
       
+      console.log('Initializing NestJS app...');
       await app.init();
       
+      console.log('Getting Express instance...');
       const expressApp = app.getHttpAdapter().getInstance();
-      cachedHandler = serverless(expressApp);
+      console.log('Creating serverless handler...');
+      cachedHandler = serverless(expressApp, {
+        basePath: '',
+        // Add request/response interceptors for debugging
+        request: (req) => {
+          console.log('Incoming request:', req.method, req.url);
+        },
+        response: (res) => {
+          console.log('Outgoing response:', res.statusCode);
+        }
+      });
       
-      console.log('NestJS app initialized successfully');
+      console.log('=== NEST APP BOOTSTRAP COMPLETE ===');
     } catch (error) {
-      console.error('Failed to initialize NestJS app:', error);
+      console.error('=== FAILED TO INITIALIZE NESTJS APP ===');
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      if (error.cause) {
+        console.error('Error cause:', error.cause);
+      }
+      initializationError = error;
       throw error;
     }
   }
