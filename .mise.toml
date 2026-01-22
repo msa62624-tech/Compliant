@@ -1,0 +1,6 @@
+# mise configuration for Compliant Platform
+# This file specifies the required tool versions for development and deployment
+
+[tools]
+python = "3.12.3"
+node = "20.0.0"
