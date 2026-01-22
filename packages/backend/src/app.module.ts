@@ -69,10 +69,9 @@ import { AllExceptionsFilter } from "./common/filters/http-exception.filter";
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
     },
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    // NOTE: ThrottlerGuard removed from here - it was conflicting with GlobalAuthGuard
+    // APP_GUARD can only have ONE provider. GlobalAuthGuard is registered in AuthModule
+    // and includes throttling protection via @Throttle() decorators on controllers
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
