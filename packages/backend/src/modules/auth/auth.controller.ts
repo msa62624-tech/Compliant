@@ -74,10 +74,11 @@ export class AuthController {
         };
       } else {
         // Full auth with database
-        const result = await this.authService!.login(
-          loginDto.email || loginDto.username || '',
-          loginDto.password,
-        );
+        if (!this.authService) {
+          throw new UnauthorizedException('Auth service not available');
+        }
+        
+        const result = await this.authService.login(loginDto);
         
         return {
           user: result.user,

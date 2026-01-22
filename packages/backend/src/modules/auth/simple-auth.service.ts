@@ -44,7 +44,7 @@ export class SimpleAuthService {
     };
   }
 
-  async getProfile() {
+  getMockUser() {
     // Return mock user profile
     return {
       id: 'simple-user-1',
@@ -56,6 +56,11 @@ export class SimpleAuthService {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
+  }
+
+  async getProfile() {
+    // Return mock user profile
+    return this.getMockUser();
   }
 
   async refresh() {
