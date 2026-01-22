@@ -67,8 +67,10 @@ export class AuthController {
   ) {
     // Use simple auth for Netlify, full auth for AWS
     if (this.useSimpleAuth) {
+      // Accept either username or email for simple auth
+      const identifier = loginDto.username || loginDto.email || '';
       const result = await this.simpleAuthService.login(
-        loginDto.username,
+        identifier,
         loginDto.password,
       );
       
