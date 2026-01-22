@@ -4,6 +4,7 @@ import { PassportModule } from "@nestjs/passport";
 import { ConfigService } from "@nestjs/config";
 import type * as ms from "ms";
 import { AuthService } from "./auth.service";
+import { SimpleAuthService } from "./simple-auth.service";
 import { AuthController } from "./auth.controller";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { UsersModule } from "../users/users.module";
@@ -27,8 +28,8 @@ import { UsersModule } from "../users/users.module";
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, SimpleAuthService, JwtStrategy],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, SimpleAuthService],
 })
 export class AuthModule {}

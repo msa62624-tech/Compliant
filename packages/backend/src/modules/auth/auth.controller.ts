@@ -13,6 +13,7 @@ import {
 import { Throttle } from "@nestjs/throttler";
 import { Response, Request } from "express";
 import { AuthService } from "./auth.service";
+import { SimpleAuthService } from "./simple-auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { ConditionalAuthGuard } from "./guards/jwt-auth.guard";
 import { GetUser } from "../../common/decorators/get-user.decorator";
@@ -46,7 +47,12 @@ const REFRESH_TOKEN_COOKIE = "refresh_token";
 @ApiTags("Authentication")
 @Controller("auth")
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  private useSimpleAuth = process.env.USE_SIMPLE_AUTH === 'true';
+  
+  constructor(
+    private authService: AuthService,
+    private simpleAuthService: SimpleAuthService,
+  ) {}
 
   @Post("login")
   @Throttle(AUTH_THROTTLE_CONFIG)
@@ -59,6 +65,22 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) response: Response,
   ) {
+    // Use simple auth for Netlify, full auth for AWS
+    if (this.useSimpleAuth) {
+      const result = await this.simpleAuthService.login(
+        loginDto.username,
+        loginDto.password,
+      );
+      
+      if (!result) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+      
+      // For simple auth, just return user data (no real tokens)
+      return { user: result.user, message: 'Logged in successfully' };
+    }
+
+    // Full JWT authentication (AWS)
     const result = await this.authService.login(loginDto);
 
     // Set httpOnly cookies for tokens
@@ -101,6 +123,11 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
     @Body() body?: { refreshToken?: string },
   ) {
+    // Simple auth doesn't need refresh
+    if (this.useSimpleAuth) {
+      return { success: true, message: 'Simple auth active' };
+    }
+    
     // Try to get refresh token from cookie first, fallback to body for backward compatibility
     const refreshToken =
       request.cookies[REFRESH_TOKEN_COOKIE] || body?.refreshToken;
@@ -136,6 +163,11 @@ export class AuthController {
     @GetUser("id") userId: string,
     @Res({ passthrough: true }) response: Response,
   ) {
+    // Simple auth doesn't need logout logic
+    if (this.useSimpleAuth) {
+      return { message: "Logged out successfully" };
+    }
+    
     await this.authService.logout(userId);
 
     // Clear httpOnly cookies
@@ -155,6 +187,11 @@ export class AuthController {
   async getProfile(
     @GetUser() user: { id: string; email: string; role: string },
   ) {
+    // Return mock profile for simple auth
+    if (this.useSimpleAuth) {
+      return await this.simpleAuthService.getProfile();
+    }
+    
     return user;
   }
 }
