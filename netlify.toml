@@ -148,19 +148,24 @@
 # ------------------------------------------------------------------------------
 # Redirects and Rewrites
 # ------------------------------------------------------------------------------
+# CRITICAL: Order matters! More specific routes MUST come before catch-all routes
+# Netlify processes redirects in order and stops at the first match
 
 # Redirect API calls to Netlify Functions (for MODE 1 - Full-Stack)
+# This MUST come before the catch-all /* redirect
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
   status = 200
-  force = false
+  force = true
 
 # Handle Next.js dynamic routes
+# This catch-all MUST come last to avoid shadowing other routes
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  conditions = {Role = ["user"]}  # Only match if not already handled by API redirect
 
 # ------------------------------------------------------------------------------
 # Security Headers
