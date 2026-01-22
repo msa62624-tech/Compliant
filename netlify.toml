@@ -65,8 +65,9 @@
   # Use esbuild bundler with external modules to reduce size while avoiding dependency analysis issues
   node_bundler = "esbuild"
   
-  # Mark NestJS core and opencollective as external to prevent bundler from analyzing their optional dependencies
-  external_node_modules = ["@nestjs/core", "opencollective"]
+  # Mark packages as external to prevent bundler from analyzing their optional dependencies
+  # and to ensure runtime dependencies are available from node_modules
+  external_node_modules = ["@nestjs/core", "opencollective", "serverless-http"]
   
   # Include backend build, shared build, and root node_modules with NestJS dependencies
   # Note: NestJS dependencies installed at root level for Netlify function access
@@ -81,6 +82,7 @@
     "../../node_modules/class-transformer/**",
     "../../node_modules/class-validator/**",
     "../../node_modules/consola/**",
+    "../../node_modules/serverless-http/**",
     "../../node_modules/opencollective/**",
     "../../node_modules/chalk/**",
     "../../node_modules/inquirer/**",
