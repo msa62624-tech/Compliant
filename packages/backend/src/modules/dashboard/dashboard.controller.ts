@@ -14,13 +14,13 @@ import {
   ApiQuery,
 } from "@nestjs/swagger";
 import { DashboardService } from "./dashboard.service";
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { ConditionalAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { GetUser } from "../../common/decorators/get-user.decorator";
 import { User } from "@prisma/client";
 
 @ApiTags("Dashboard")
 @ApiBearerAuth("JWT-auth")
-@UseGuards(JwtAuthGuard)
+@UseGuards(ConditionalAuthGuard)
 @Controller("dashboard")
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}

@@ -22,13 +22,13 @@ import {
   NotificationsService,
   ReplyToNotificationDto,
 } from "./notifications.service";
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { ConditionalAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { GetUser } from "../../common/decorators/get-user.decorator";
 import { User } from "@prisma/client";
 
 @ApiTags("Notifications")
 @ApiBearerAuth("JWT-auth")
-@UseGuards(JwtAuthGuard)
+@UseGuards(ConditionalAuthGuard)
 @Controller("notifications")
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}

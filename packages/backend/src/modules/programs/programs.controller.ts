@@ -22,7 +22,7 @@ import { ProgramsService } from "./programs.service";
 import { CreateProgramDto } from "./dto/create-program.dto";
 import { UpdateProgramDto } from "./dto/update-program.dto";
 import { AssignProgramDto } from "./dto/assign-program.dto";
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { ConditionalAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
 import { UserRole } from "@prisma/client";
@@ -30,7 +30,7 @@ import { UserRole } from "@prisma/client";
 @ApiTags("Insurance Programs")
 @ApiBearerAuth()
 @Controller("programs")
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(ConditionalAuthGuard, RolesGuard)
 export class ProgramsController {
   constructor(private readonly programsService: ProgramsService) {}
 

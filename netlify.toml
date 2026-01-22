@@ -45,8 +45,10 @@
   # Set NODE_ENV to production for secure cookies
   NODE_ENV = "production"
   
-  # Disable authentication for Netlify (open access)
-  DISABLE_AUTH = "true"
+  # Use simple authentication for Netlify (no database required)
+  USE_SIMPLE_AUTH = "true"
+  SIMPLE_AUTH_USERNAME = "admin"
+  SIMPLE_AUTH_PASSWORD = "admin123"
   
   # Disable opencollective postinstall script (prevents @nuxt/opencollective error)
   OPENCOLLECTIVE_HIDE = "1"

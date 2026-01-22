@@ -15,7 +15,7 @@ import { UpdateBrokerInfoDto } from "./dto/update-broker-info.dto";
 import { UploadPoliciesDto } from "./dto/upload-policies.dto";
 import { SignPoliciesDto } from "./dto/sign-policies.dto";
 import { ReviewCOIDto } from "./dto/review-coi.dto";
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { ConditionalAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
 import { UserRole } from "@prisma/client";
@@ -25,13 +25,13 @@ export class GeneratedCOIController {
   constructor(private readonly generatedCOIService: GeneratedCOIService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ConditionalAuthGuard)
   create(@Body() createCOIDto: CreateCOIDto, @Request() req: ExpressRequest) {
     return this.generatedCOIService.create(createCOIDto, req.user?.email);
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ConditionalAuthGuard)
   findAll(@Request() req: ExpressRequest) {
     const currentUser = {
       role: req.user!.role,
@@ -41,19 +41,19 @@ export class GeneratedCOIController {
   }
 
   @Get("expiring")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ConditionalAuthGuard)
   findExpiring() {
     return this.generatedCOIService.findExpiring(30);
   }
 
   @Get(":id")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ConditionalAuthGuard)
   findOne(@Param("id") id: string) {
     return this.generatedCOIService.findOne(id);
   }
 
   @Patch(":id/broker-info")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ConditionalAuthGuard)
   updateBrokerInfo(
     @Param("id") id: string,
     @Body() updateBrokerInfoDto: UpdateBrokerInfoDto,
@@ -62,7 +62,7 @@ export class GeneratedCOIController {
   }
 
   @Patch(":id/upload")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ConditionalAuthGuard)
   uploadPolicies(
     @Param("id") id: string,
     @Body() uploadPoliciesDto: UploadPoliciesDto,
@@ -71,7 +71,7 @@ export class GeneratedCOIController {
   }
 
   @Patch(":id/sign")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ConditionalAuthGuard)
   signPolicies(
     @Param("id") id: string,
     @Body() signPoliciesDto: SignPoliciesDto,
@@ -80,7 +80,7 @@ export class GeneratedCOIController {
   }
 
   @Patch(":id/review")
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(ConditionalAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER)
   reviewCOI(
     @Param("id") id: string,
@@ -95,13 +95,13 @@ export class GeneratedCOIController {
   }
 
   @Post(":id/renew")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ConditionalAuthGuard)
   renewCOI(@Param("id") id: string, @Request() req: ExpressRequest) {
     return this.generatedCOIService.renewCOI(id, req.user?.email);
   }
 
   @Patch(":id/resubmit")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ConditionalAuthGuard)
   resubmitDeficiency(@Param("id") id: string) {
     return this.generatedCOIService.resubmitDeficiency(id);
   }

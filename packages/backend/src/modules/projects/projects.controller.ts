@@ -12,11 +12,11 @@ import { Request as ExpressRequest } from "express";
 import { ApiTags, ApiOperation, ApiQuery } from "@nestjs/swagger";
 import { ProjectsService } from "./projects.service";
 import { CreateProjectDto } from "./dto/create-project.dto";
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { ConditionalAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 @ApiTags("Projects")
 @Controller("projects")
-@UseGuards(JwtAuthGuard)
+@UseGuards(ConditionalAuthGuard)
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 

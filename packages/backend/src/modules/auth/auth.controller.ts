@@ -14,7 +14,7 @@ import { Throttle } from "@nestjs/throttler";
 import { Response, Request } from "express";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
-import { JwtAuthGuard } from "./guards/jwt-auth.guard";
+import { ConditionalAuthGuard } from "./guards/jwt-auth.guard";
 import { GetUser } from "../../common/decorators/get-user.decorator";
 import {
   ApiTags,
@@ -126,7 +126,7 @@ export class AuthController {
   }
 
   @Post("logout")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ConditionalAuthGuard)
   @ApiBearerAuth("JWT-auth")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: "User logout" })
@@ -147,7 +147,7 @@ export class AuthController {
 
   @Get("me")
   @Throttle(ME_THROTTLE_CONFIG)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ConditionalAuthGuard)
   @ApiBearerAuth("JWT-auth")
   @ApiOperation({ summary: "Get current user" })
   @ApiResponse({ status: 200, description: "User retrieved" })

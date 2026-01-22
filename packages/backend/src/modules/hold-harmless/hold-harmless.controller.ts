@@ -15,7 +15,7 @@ import {
   ApiQuery,
 } from "@nestjs/swagger";
 import { HoldHarmlessService } from "./hold-harmless.service";
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { ConditionalAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
 import { UserRole, HoldHarmlessStatus } from "@prisma/client";
@@ -26,7 +26,7 @@ export class HoldHarmlessController {
   constructor(private readonly holdHarmlessService: HoldHarmlessService) {}
 
   @Post("auto-generate/:coiId")
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(ConditionalAuthGuard, RolesGuard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({
@@ -41,7 +41,7 @@ export class HoldHarmlessController {
   }
 
   @Get(":id")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ConditionalAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get hold harmless by ID (authenticated)" })
   @ApiResponse({
@@ -53,7 +53,7 @@ export class HoldHarmlessController {
   }
 
   @Post(":id/sign/subcontractor")
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(ConditionalAuthGuard, RolesGuard)
   @Roles(UserRole.SUBCONTRACTOR, UserRole.SUPER_ADMIN, UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Process subcontractor signature (authenticated)" })
@@ -72,7 +72,7 @@ export class HoldHarmlessController {
   }
 
   @Post(":id/sign/gc")
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(ConditionalAuthGuard, RolesGuard)
   @Roles(UserRole.CONTRACTOR, UserRole.SUPER_ADMIN, UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Process GC signature (authenticated)" })
@@ -93,7 +93,7 @@ export class HoldHarmlessController {
   }
 
   @Get("coi/:coiId")
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(ConditionalAuthGuard, RolesGuard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get hold harmless agreement for a COI" })
@@ -103,7 +103,7 @@ export class HoldHarmlessController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(ConditionalAuthGuard, RolesGuard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get all hold harmless agreements" })
@@ -124,7 +124,7 @@ export class HoldHarmlessController {
   }
 
   @Post(":id/resend/:party")
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(ConditionalAuthGuard, RolesGuard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Resend signature link to SUB or GC" })
@@ -137,7 +137,7 @@ export class HoldHarmlessController {
   }
 
   @Get("stats")
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(ConditionalAuthGuard, RolesGuard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get hold harmless statistics" })

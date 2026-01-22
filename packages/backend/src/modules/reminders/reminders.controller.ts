@@ -6,14 +6,14 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { RemindersService } from "./reminders.service";
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { ConditionalAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
 import { UserRole } from "@prisma/client";
 
 @ApiTags("reminders")
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(ConditionalAuthGuard, RolesGuard)
 @Controller("reminders")
 export class RemindersController {
   constructor(private readonly remindersService: RemindersService) {}

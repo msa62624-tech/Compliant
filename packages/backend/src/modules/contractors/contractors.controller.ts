@@ -20,13 +20,13 @@ import {
 import { ContractorsService } from "./contractors.service";
 import { CreateContractorDto } from "./dto/create-contractor.dto";
 import { UpdateContractorDto } from "./dto/update-contractor.dto";
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { ConditionalAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { GetUser } from "../../common/decorators/get-user.decorator";
 import { User } from "@prisma/client";
 
 @ApiTags("Contractors")
 @ApiBearerAuth("JWT-auth")
-@UseGuards(JwtAuthGuard)
+@UseGuards(ConditionalAuthGuard)
 @Controller("contractors")
 export class ContractorsController {
   constructor(private readonly contractorsService: ContractorsService) {}

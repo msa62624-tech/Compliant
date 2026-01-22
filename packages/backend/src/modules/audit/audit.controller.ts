@@ -7,13 +7,13 @@ import {
   ApiQuery,
 } from "@nestjs/swagger";
 import { AuditService, AuditAction, AuditResource } from "./audit.service";
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { ConditionalAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
 import { RolesGuard } from "../../common/guards/roles.guard";
 
 @ApiTags("Audit")
 @Controller("audit")
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(ConditionalAuthGuard, RolesGuard)
 @ApiBearerAuth("JWT-auth")
 export class AuditController {
   constructor(private auditService: AuditService) {}
