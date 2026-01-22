@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
   Optional,
+  ServiceUnavailableException,
 } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import { PrismaService } from "../../config/prisma.service";
@@ -13,8 +14,16 @@ import { UpdateUserDto} from "./dto/update-user.dto";
 export class UsersService {
   constructor(@Optional() private prisma: PrismaService) {}
 
+  private ensurePrisma() {
+    if (!this.prisma) {
+      throw new ServiceUnavailableException(
+        'Database not available in simple auth mode'
+      );
+    }
+  }
+
   async create(createUserDto: CreateUserDto) {
-    const existingUser = await this.prisma.user.findUnique({
+    const existingUser = await this.prisma!.user.findUnique({
       where: { email: createUserDto.email },
     });
 
@@ -24,7 +33,7 @@ export class UsersService {
 
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
-    const user = await this.prisma.user.create({
+    const user = await this.prisma!.user.create({
       data: {
         ...createUserDto,
         password: hashedPassword,
@@ -40,7 +49,7 @@ export class UsersService {
     const skip = (page - 1) * limit;
 
     const [users, total] = await Promise.all([
-      this.prisma.user.findMany({
+      this.prisma!.user.findMany({
         skip,
         take: limit,
         select: {
@@ -54,7 +63,7 @@ export class UsersService {
           updatedAt: true,
         },
       }),
-      this.prisma.user.count(),
+      this.prisma!.user.count(),
     ]);
 
     return {
@@ -67,7 +76,7 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma!.user.findUnique({
       where: { id },
       select: {
         id: true,
@@ -89,7 +98,7 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
-    return this.prisma.user.findUnique({
+    return this.prisma!.user.findUnique({
       where: { email },
     });
   }
@@ -97,7 +106,7 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto) {
     await this.findOne(id);
 
-    const user = await this.prisma.user.update({
+    const user = await this.prisma!.user.update({
       where: { id },
       data: updateUserDto,
       select: {
@@ -118,7 +127,7 @@ export class UsersService {
   async remove(id: string) {
     await this.findOne(id);
 
-    await this.prisma.user.delete({
+    await this.prisma!.user.delete({
       where: { id },
     });
 

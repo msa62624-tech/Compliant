@@ -1,4 +1,4 @@
-import { Injectable, Logger, Optional } from "@nestjs/common";
+import { Injectable, Logger, Optional , ServiceUnavailableException } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { User, UserRole } from "@prisma/client";
 
@@ -112,12 +112,12 @@ export class DashboardService {
     _user: User,
   ): Promise<DashboardStats> {
     // Count total projects with correct field name
-    const totalProjects = await this.prisma.project.count({
+    const totalProjects = await this.prisma!.project.count({
       where: filter,
     });
 
     // Count active projects using correct status enum field
-    const activeProjects = await this.prisma.project.count({
+    const activeProjects = await this.prisma!.project.count({
       where: {
         ...filter,
         status: "ACTIVE",
@@ -125,12 +125,12 @@ export class DashboardService {
     });
 
     // Count total contractors
-    const totalContractors = await this.prisma.contractor.count({
+    const totalContractors = await this.prisma!.contractor.count({
       where: filter,
     });
 
     // Count compliant contractors using correct insuranceStatus field
-    const compliantContractors = await this.prisma.contractor.count({
+    const compliantContractors = await this.prisma!.contractor.count({
       where: {
         ...filter,
         insuranceStatus: "COMPLIANT",
@@ -138,7 +138,7 @@ export class DashboardService {
     });
 
     // Count pending COIs using correct status field
-    const pendingCOIs = await this.prisma.generatedCOI.count({
+    const pendingCOIs = await this.prisma!.generatedCOI.count({
       where: {
         status: "AWAITING_BROKER_INFO",
       },
@@ -148,7 +148,7 @@ export class DashboardService {
     const thirtyDaysFromNow = new Date();
     thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
-    const expiringSoon = await this.prisma.generatedCOI.count({
+    const expiringSoon = await this.prisma!.generatedCOI.count({
       where: {
         glExpirationDate: {
           lte: thirtyDaysFromNow,
@@ -174,7 +174,7 @@ export class DashboardService {
     filter: Record<string, unknown>,
     _user: User,
   ): Promise<Project[]> {
-    return this.prisma.project.findMany({
+    return this.prisma!.project.findMany({
       where: filter,
       orderBy: { createdAt: "desc" },
       take: 10,
@@ -196,7 +196,7 @@ export class DashboardService {
     filter: Record<string, unknown>,
     _user: User,
   ): Promise<Contractor[]> {
-    return this.prisma.contractor.findMany({
+    return this.prisma!.contractor.findMany({
       where: filter,
       orderBy: { createdAt: "desc" },
       take: 10,
@@ -221,7 +221,7 @@ export class DashboardService {
     _filter: Record<string, unknown>,
     _user: User,
   ): Promise<GeneratedCOI[]> {
-    return this.prisma.generatedCOI.findMany({
+    return this.prisma!.generatedCOI.findMany({
       orderBy: { createdAt: "desc" },
       take: 10,
       select: {
@@ -267,7 +267,7 @@ export class DashboardService {
     }
 
     const [projects, total] = await Promise.all([
-      this.prisma.project.findMany({
+      this.prisma!.project.findMany({
         where,
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * limit,
@@ -283,7 +283,7 @@ export class DashboardService {
           createdAt: true,
         },
       }),
-      this.prisma.project.count({ where }),
+      this.prisma!.project.count({ where }),
     ]);
 
     return {
@@ -332,7 +332,7 @@ export class DashboardService {
     }
 
     const [contractors, total] = await Promise.all([
-      this.prisma.contractor.findMany({
+      this.prisma!.contractor.findMany({
         where,
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * limit,
@@ -349,7 +349,7 @@ export class DashboardService {
           createdAt: true,
         },
       }),
-      this.prisma.contractor.count({ where }),
+      this.prisma!.contractor.count({ where }),
     ]);
 
     return {
@@ -361,3 +361,11 @@ export class DashboardService {
     };
   }
 }
+
+  private ensurePrisma() {
+    if (!this.prisma) {
+      throw new ServiceUnavailableException(
+        "Database not available in simple auth mode"
+      );
+    }
+  }

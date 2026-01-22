@@ -4,6 +4,7 @@ import {
   Inject,
   LoggerService,
   Optional,
+  ServiceUnavailableException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
@@ -32,11 +33,20 @@ export class AuthService {
     private readonly logger: LoggerService,
   ) {}
 
+  private ensureDependencies() {
+    if (!this.prisma || !this.usersService || !this.jwtService) {
+      throw new ServiceUnavailableException(
+        'Full auth not available in simple auth mode'
+      );
+    }
+  }
+
   async validateUser(
     email: string,
     password: string,
   ): Promise<Omit<User, "password"> | null> {
-    const user = await this.usersService.findByEmail(email);
+    this.ensureDependencies();
+    const user = await this.usersService!.findByEmail(email);
     if (!user) {
       return null;
     }
@@ -52,6 +62,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
+    this.ensureDependencies();
     // Use email if provided, otherwise use username as email (for simple auth)
     const emailOrUsername = loginDto.email || loginDto.username || '';
     
@@ -67,7 +78,7 @@ export class AuthService {
     }
 
     const payload = { email: user.email, sub: user.id, role: user.role };
-    const accessToken = this.jwtService.sign(payload);
+    const accessToken = this.jwtService!.sign(payload);
 
     // Generate refresh token using selector/verifier pattern
     // Selector: 16 bytes (32 hex chars) - used for O(1) database lookup
@@ -83,7 +94,7 @@ export class AuthService {
     expiresAt.setDate(expiresAt.getDate() + REFRESH_TOKEN_EXPIRATION_DAYS);
 
     // Store refresh token in separate table with indexed selector
-    await this.prisma.refreshToken.create({
+    await this.prisma!.refreshToken.create({
       data: {
         userId: user.id,
         selector: selector,
@@ -111,6 +122,7 @@ export class AuthService {
   }
 
   async refresh(refreshTokenString: string) {
+    this.ensureDependencies();
     try {
       // Parse the refresh token: selector:verifier
       // Using indexOf to ensure exactly one colon separator
@@ -136,7 +148,7 @@ export class AuthService {
       }
 
       // O(1) lookup using indexed selector - no timing attack vulnerability
-      const tokenRecord = await this.prisma.refreshToken.findUnique({
+      const tokenRecord = await this.prisma!.refreshToken.findUnique({
         where: {
           selector: selector,
         },
@@ -161,7 +173,7 @@ export class AuthService {
 
       const user = tokenRecord.user;
       const newPayload = { email: user.email, sub: user.id, role: user.role };
-      const accessToken = this.jwtService.sign(newPayload);
+      const accessToken = this.jwtService!.sign(newPayload);
 
       // Generate new refresh token with new selector and verifier
       const newSelector = crypto.randomBytes(16).toString("hex");
@@ -177,8 +189,8 @@ export class AuthService {
 
       // Use transaction to ensure atomicity: create new token first, then delete old
       // This order prevents user logout if create fails after delete
-      await this.prisma.$transaction([
-        this.prisma.refreshToken.create({
+      await this.prisma!.$transaction([
+        this.prisma!.refreshToken.create({
           data: {
             userId: user.id,
             selector: newSelector,
@@ -186,7 +198,7 @@ export class AuthService {
             expiresAt: newExpiresAt,
           },
         }),
-        this.prisma.refreshToken.delete({
+        this.prisma!.refreshToken.delete({
           where: { id: tokenRecord.id },
         }),
       ]);
@@ -217,8 +229,9 @@ export class AuthService {
   }
 
   async logout(userId: string) {
+    this.ensureDependencies();
     // Delete all refresh tokens for the user
-    await this.prisma.refreshToken.deleteMany({
+    await this.prisma!.refreshToken.deleteMany({
       where: { userId },
     });
 
@@ -245,8 +258,9 @@ export class AuthService {
    * @returns Number of tokens deleted
    */
   async cleanupExpiredTokens(batchSize: number = 1000): Promise<number> {
+    this.ensureDependencies();
     // Find expired tokens with limit (Prisma deleteMany doesn't support take)
-    const expiredTokens = await this.prisma.refreshToken.findMany({
+    const expiredTokens = await this.prisma!.refreshToken.findMany({
       where: {
         expiresAt: { lt: new Date() },
       },
@@ -259,7 +273,7 @@ export class AuthService {
     }
 
     // Delete the batch of expired tokens
-    const result = await this.prisma.refreshToken.deleteMany({
+    const result = await this.prisma!.refreshToken.deleteMany({
       where: {
         id: { in: expiredTokens.map((t) => t.id) },
       },

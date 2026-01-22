@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger, Optional } from "@nestjs/common";
+import { Injectable, NotFoundException, Logger, Optional , ServiceUnavailableException } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { CacheService } from "../cache/cache.service";
 import { EmailService } from "../email/email.service";
@@ -77,7 +77,7 @@ export class ContractorsService {
   ): Promise<{ email: string; password: string; created: boolean }> {
     try {
       // Check if user already exists
-      const existingUser = await this.prisma.user.findUnique({
+      const existingUser = await this.prisma!.user.findUnique({
         where: { email },
       });
 
@@ -104,7 +104,7 @@ export class ContractorsService {
       const lastName = nameParts.slice(1).join(" ") || "Account";
 
       // Create user account with PERMANENT password
-      await this.prisma.user.create({
+      await this.prisma!.user.create({
         data: {
           email,
           password: hashedPassword,
@@ -173,7 +173,7 @@ export class ContractorsService {
         : "SUBCONTRACTOR";
 
     // Create contractor record
-    const contractor = await this.prisma.contractor.create({
+    const contractor = await this.prisma!.contractor.create({
       data: {
         ...createContractorDto,
         contractorType,
@@ -331,7 +331,7 @@ export class ContractorsService {
     const skip = (page - 1) * limit;
 
     const [contractors, total] = await Promise.all([
-      this.prisma.contractor.findMany({
+      this.prisma!.contractor.findMany({
         where,
         skip,
         take: limit,
@@ -357,7 +357,7 @@ export class ContractorsService {
           createdAt: "desc",
         },
       }),
-      this.prisma.contractor.count({ where }),
+      this.prisma!.contractor.count({ where }),
     ]);
 
     const result = {
@@ -537,7 +537,7 @@ export class ContractorsService {
     policyType: string = "GLOBAL",
     limit = 10,
   ) {
-    const contractors = await this.prisma.contractor.findMany({
+    const contractors = await this.prisma!.contractor.findMany({
       where: {
         OR: [
           // Global broker search
@@ -671,3 +671,11 @@ export class ContractorsService {
     return { brokers };
   }
 }
+
+  private ensurePrisma() {
+    if (!this.prisma) {
+      throw new ServiceUnavailableException(
+        "Database not available in simple auth mode"
+      );
+    }
+  }

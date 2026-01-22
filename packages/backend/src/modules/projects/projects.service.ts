@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Optional } from "@nestjs/common";
+import { Injectable, NotFoundException, Optional , ServiceUnavailableException } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { Prisma, ContractorType, User } from "@prisma/client";
@@ -40,7 +40,7 @@ export class ProjectsService {
 
     // If gcId is provided, create the project-contractor relationship
     if (createProjectDto.gcId) {
-      await this.prisma.projectContractor.create({
+      await this.prisma!.projectContractor.create({
         data: {
           projectId: project.id,
           contractorId: createProjectDto.gcId,
@@ -98,7 +98,7 @@ export class ProjectsService {
 
             if (contractor) {
               const projectContractors =
-                await this.prisma.projectContractor.findMany({
+                await this.prisma!.projectContractor.findMany({
                   where: { contractorId: contractor.id },
                   select: { projectId: true },
                 });
@@ -115,7 +115,7 @@ export class ProjectsService {
           // Broker sees projects where their contractors are assigned
           if (user.email) {
             // Find contractors served by this broker
-            const contractors = await this.prisma.contractor.findMany({
+            const contractors = await this.prisma!.contractor.findMany({
               where: {
                 OR: [
                   { brokerEmail: user.email },
@@ -131,7 +131,7 @@ export class ProjectsService {
             if (contractors.length > 0) {
               const contractorIds = contractors.map((c) => c.id);
               const projectContractors =
-                await this.prisma.projectContractor.findMany({
+                await this.prisma!.projectContractor.findMany({
                   where: { contractorId: { in: contractorIds } },
                   select: { projectId: true },
                 });
@@ -179,7 +179,7 @@ export class ProjectsService {
       where.status = status as Prisma.EnumProjectStatusFilter;
     }
 
-    return this.prisma.project.findMany({
+    return this.prisma!.project.findMany({
       where,
       include: {
         createdBy: {
@@ -266,3 +266,11 @@ export class ProjectsService {
     return projects;
   }
 }
+
+  private ensurePrisma() {
+    if (!this.prisma) {
+      throw new ServiceUnavailableException(
+        "Database not available in simple auth mode"
+      );
+    }
+  }

@@ -1,4 +1,4 @@
-import { Injectable, Logger, Optional } from "@nestjs/common";
+import { Injectable, Logger, Optional , ServiceUnavailableException } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 
 export enum AuditAction {
@@ -251,3 +251,11 @@ export class AuditService {
     return JSON.stringify(logs, null, 2);
   }
 }
+
+  private ensurePrisma() {
+    if (!this.prisma) {
+      throw new ServiceUnavailableException(
+        "Database not available in simple auth mode"
+      );
+    }
+  }

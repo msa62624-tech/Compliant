@@ -4,7 +4,7 @@ import {
   BadRequestException,
   Logger,
   Optional,
-} from "@nestjs/common";
+, ServiceUnavailableException } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { CreateCOIDto } from "./dto/create-coi.dto";
 import { UpdateBrokerInfoDto } from "./dto/update-broker-info.dto";
@@ -55,7 +55,7 @@ export class GeneratedCOIService {
   ): Promise<{ email: string; password: string; created: boolean }> {
     try {
       // Check if user already exists
-      const existingUser = await this.prisma.user.findUnique({
+      const existingUser = await this.prisma!.user.findUnique({
         where: { email },
       });
 
@@ -76,7 +76,7 @@ export class GeneratedCOIService {
       const lastName = nameParts.slice(1).join(" ") || "User";
 
       // Create broker user account with PERMANENT password
-      const brokerUser = await this.prisma.user.create({
+      const brokerUser = await this.prisma!.user.create({
         data: {
           email,
           password: hashedPassword,
@@ -97,7 +97,7 @@ export class GeneratedCOIService {
         const resetTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
         // Store the reset token in the database
-        await this.prisma.user.update({
+        await this.prisma!.user.update({
           where: { id: brokerUser.id },
           data: {
             resetToken,
@@ -106,7 +106,7 @@ export class GeneratedCOIService {
         });
 
         // Get the subcontractor name for context by finding the contractor with this broker email
-        const subcontractor = await this.prisma.contractor.findFirst({
+        const subcontractor = await this.prisma!.contractor.findFirst({
           where: {
             contractorType: "SUBCONTRACTOR",
             brokerEmail: email,
@@ -195,7 +195,7 @@ export class GeneratedCOIService {
 
     // Check if subcontractor already has an ACTIVE COI from FIRST project
     // This is the MASTER ACORD 25 template that all future COIs will follow
-    const firstCOI = await this.prisma.generatedCOI.findFirst({
+    const firstCOI = await this.prisma!.generatedCOI.findFirst({
       where: {
         subcontractorId: createCOIDto.subcontractorId,
         status: COIStatus.ACTIVE,
@@ -215,7 +215,7 @@ export class GeneratedCOIService {
         `Found first ACORD 25 (ID: ${firstCOI.id}) - copying all data except additional insureds and location`,
       );
 
-      return this.prisma.generatedCOI.create({
+      return this.prisma!.generatedCOI.create({
         data: {
           projectId: createCOIDto.projectId,
           subcontractorId: createCOIDto.subcontractorId,
@@ -281,7 +281,7 @@ export class GeneratedCOIService {
       `No existing ACORD 25 found - creating FIRST (master) ACORD 25 for subcontractor`,
     );
 
-    return this.prisma.generatedCOI.create({
+    return this.prisma!.generatedCOI.create({
       data: {
         projectId: createCOIDto.projectId,
         subcontractorId: createCOIDto.subcontractorId,
@@ -475,7 +475,7 @@ export class GeneratedCOIService {
       ? COIStatus.ACTIVE
       : COIStatus.DEFICIENCY_PENDING;
 
-    const updatedCOI = await this.prisma.generatedCOI.update({
+    const updatedCOI = await this.prisma!.generatedCOI.update({
       where: { id },
       data: {
         status: newStatus,
@@ -507,7 +507,7 @@ export class GeneratedCOIService {
 
         const rollbackMessage =
           "Auto-rollback: Hold harmless generation failed - please retry approval.";
-        await this.prisma.generatedCOI.update({
+        await this.prisma!.generatedCOI.update({
           where: { id },
           data: {
             status: COIStatus.AWAITING_ADMIN_REVIEW,
@@ -635,3 +635,11 @@ export class GeneratedCOIService {
     });
   }
 }
+
+  private ensurePrisma() {
+    if (!this.prisma) {
+      throw new ServiceUnavailableException(
+        "Database not available in simple auth mode"
+      );
+    }
+  }

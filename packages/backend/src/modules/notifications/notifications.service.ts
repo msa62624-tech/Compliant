@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException, Optional } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, Optional , ServiceUnavailableException } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { User } from "@prisma/client";
 import { EmailService } from "../email/email.service";
@@ -194,11 +194,11 @@ export class NotificationsService {
     projectId: string,
     contractorId: string,
   ): Promise<void> {
-    const project = await this.prisma.project.findUnique({
+    const project = await this.prisma!.project.findUnique({
       where: { id: projectId },
     });
 
-    const contractor = await this.prisma.contractor.findUnique({
+    const contractor = await this.prisma!.contractor.findUnique({
       where: { id: contractorId },
     });
 
@@ -207,7 +207,7 @@ export class NotificationsService {
     }
 
     // Find the contractor's user account
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma!.user.findUnique({
       where: { email: contractor.email },
     });
 
@@ -233,7 +233,7 @@ export class NotificationsService {
     coiId: string,
     status: string,
   ): Promise<void> {
-    const coi = await this.prisma.generatedCOI.findUnique({
+    const coi = await this.prisma!.generatedCOI.findUnique({
       where: { id: coiId },
       include: {
         subcontractor: true,
@@ -245,7 +245,7 @@ export class NotificationsService {
     }
 
     // Find the subcontractor's user account
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma!.user.findUnique({
       where: { email: coi.subcontractor.email },
     });
 
@@ -266,3 +266,11 @@ export class NotificationsService {
     return `notif_${Date.now()}_${Math.random().toString(36).substring(7)}`;
   }
 }
+
+  private ensurePrisma() {
+    if (!this.prisma) {
+      throw new ServiceUnavailableException(
+        "Database not available in simple auth mode"
+      );
+    }
+  }

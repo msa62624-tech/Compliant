@@ -3,7 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   Optional,
-} from "@nestjs/common";
+, ServiceUnavailableException } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { CreateProgramDto } from "./dto/create-program.dto";
 import { UpdateProgramDto } from "./dto/update-program.dto";
@@ -141,7 +141,7 @@ export class ProgramsService {
       }),
     };
 
-    return this.prisma.insuranceProgram.update({
+    return this.prisma!.insuranceProgram.update({
       where: { id },
       data: updateData,
     });
@@ -165,7 +165,7 @@ export class ProgramsService {
       );
     }
 
-    return this.prisma.insuranceProgram.delete({
+    return this.prisma!.insuranceProgram.delete({
       where: { id },
     });
   }
@@ -175,7 +175,7 @@ export class ProgramsService {
     assignProgramDto: AssignProgramDto,
     userId: string,
   ) {
-    const program = await this.prisma.insuranceProgram.findUnique({
+    const program = await this.prisma!.insuranceProgram.findUnique({
       where: { id: programId },
     });
 
@@ -185,7 +185,7 @@ export class ProgramsService {
       );
     }
 
-    const project = await this.prisma.project.findUnique({
+    const project = await this.prisma!.project.findUnique({
       where: { id: assignProgramDto.projectId },
     });
 
@@ -195,7 +195,7 @@ export class ProgramsService {
       );
     }
 
-    const existingAssignment = await this.prisma.projectProgram.findUnique({
+    const existingAssignment = await this.prisma!.projectProgram.findUnique({
       where: {
         projectId_programId: {
           projectId: assignProgramDto.projectId,
@@ -210,7 +210,7 @@ export class ProgramsService {
       );
     }
 
-    return this.prisma.projectProgram.create({
+    return this.prisma!.projectProgram.create({
       data: {
         projectId: assignProgramDto.projectId,
         programId: programId,
@@ -241,7 +241,7 @@ export class ProgramsService {
       throw new NotFoundException(`Project with ID ${projectId} not found`);
     }
 
-    return this.prisma.projectProgram.findMany({
+    return this.prisma!.projectProgram.findMany({
       where: { projectId },
       include: {
         program: true,
@@ -259,10 +259,10 @@ export class ProgramsService {
       customPrograms,
       programsWithProjects,
     ] = await Promise.all([
-      this.prisma.insuranceProgram.count(),
+      this.prisma!.insuranceProgram.count(),
       this.prisma.insuranceProgram.count({ where: { isTemplate: true } }),
-      this.prisma.insuranceProgram.count({ where: { isTemplate: false } }),
-      this.prisma.insuranceProgram.findMany({
+      this.prisma!.insuranceProgram.count({ where: { isTemplate: false } }),
+      this.prisma!.insuranceProgram.findMany({
         include: {
           _count: {
             select: { projects: true },
@@ -297,3 +297,11 @@ export class ProgramsService {
     };
   }
 }
+
+  private ensurePrisma() {
+    if (!this.prisma) {
+      throw new ServiceUnavailableException(
+        "Database not available in simple auth mode"
+      );
+    }
+  }

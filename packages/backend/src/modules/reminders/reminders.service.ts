@@ -1,4 +1,4 @@
-import { Injectable, Inject, LoggerService, Optional } from "@nestjs/common";
+import { Injectable, Inject, LoggerService, Optional , ServiceUnavailableException } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { PrismaService } from "../../config/prisma.service";
@@ -238,7 +238,7 @@ export class RemindersService {
     }
 
     // Check if we already sent this reminder today
-    const existingReminder = await this.prisma.expirationReminder.findFirst({
+    const existingReminder = await this.prisma!.expirationReminder.findFirst({
       where: {
         coiId,
         policyType,
@@ -274,7 +274,7 @@ export class RemindersService {
     );
 
     // Record the reminder in database
-    await this.prisma.expirationReminder.create({
+    await this.prisma!.expirationReminder.create({
       data: {
         coiId,
         policyType,
@@ -520,15 +520,15 @@ This is an automated reminder from the Compliant Insurance Tracking Platform.
    * Get reminder statistics
    */
   async getReminderStats() {
-    const totalReminders = await this.prisma.expirationReminder.count();
+    const totalReminders = await this.prisma!.expirationReminder.count();
     const acknowledgedReminders = await this.prisma.expirationReminder.count({
       where: { acknowledged: true },
     });
-    const pendingReminders = await this.prisma.expirationReminder.count({
+    const pendingReminders = await this.prisma!.expirationReminder.count({
       where: { acknowledged: false },
     });
 
-    const remindersByType = await this.prisma.expirationReminder.groupBy({
+    const remindersByType = await this.prisma!.expirationReminder.groupBy({
       by: ["reminderType"],
       _count: true,
     });
@@ -541,3 +541,11 @@ This is an automated reminder from the Compliant Insurance Tracking Platform.
     };
   }
 }
+
+  private ensurePrisma() {
+    if (!this.prisma) {
+      throw new ServiceUnavailableException(
+        "Database not available in simple auth mode"
+      );
+    }
+  }

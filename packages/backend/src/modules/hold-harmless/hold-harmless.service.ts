@@ -4,7 +4,7 @@ import {
   BadRequestException,
   Logger,
   Optional,
-} from "@nestjs/common";
+, ServiceUnavailableException } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { HoldHarmlessStatus, HoldHarmless, Prisma } from "@prisma/client";
 import { randomBytes } from "crypto";
@@ -56,7 +56,7 @@ export class HoldHarmlessService {
     }
 
     // Check if hold harmless already exists
-    const existing = await this.prisma.holdHarmless.findUnique({
+    const existing = await this.prisma!.holdHarmless.findUnique({
       where: { coiId },
     });
 
@@ -87,7 +87,7 @@ export class HoldHarmlessService {
     const subSignatureToken = this.generateSignatureToken();
 
     // Create hold harmless with auto-filled data
-    const holdHarmless = await this.prisma.holdHarmless.create({
+    const holdHarmless = await this.prisma!.holdHarmless.create({
       data: {
         coiId,
         programId: program.id,
@@ -109,7 +109,7 @@ export class HoldHarmlessService {
     });
 
     // Update COI status
-    await this.prisma.generatedCOI.update({
+    await this.prisma!.generatedCOI.update({
       where: { id: coiId },
       data: {
         holdHarmlessStatus: HoldHarmlessStatus.PENDING_SUB_SIGNATURE,
@@ -191,7 +191,7 @@ export class HoldHarmlessService {
       );
     }
 
-    await this.prisma.holdHarmless.update({
+    await this.prisma!.holdHarmless.update({
       where: { id: holdHarmless.id },
       data: {
         subSignatureLinkSentAt: new Date(),
@@ -229,7 +229,7 @@ export class HoldHarmlessService {
     id: string,
     signatureData: { signatureUrl: string; signedBy: string },
   ) {
-    const holdHarmless = await this.prisma.holdHarmless.findUnique({
+    const holdHarmless = await this.prisma!.holdHarmless.findUnique({
       where: { id },
     });
 
@@ -244,7 +244,7 @@ export class HoldHarmlessService {
     }
 
     // Update with sub signature and move to GC signature pending
-    const updated = await this.prisma.holdHarmless.update({
+    const updated = await this.prisma!.holdHarmless.update({
       where: { id: holdHarmless.id },
       data: {
         subSignatureUrl: signatureData.signatureUrl,
@@ -255,7 +255,7 @@ export class HoldHarmlessService {
     });
 
     // Update COI status
-    await this.prisma.generatedCOI.update({
+    await this.prisma!.generatedCOI.update({
       where: { id: holdHarmless.coiId },
       data: {
         holdHarmlessStatus: HoldHarmlessStatus.PENDING_GC_SIGNATURE,
@@ -304,7 +304,7 @@ export class HoldHarmlessService {
       );
     }
 
-    await this.prisma.holdHarmless.update({
+    await this.prisma!.holdHarmless.update({
       where: { id: holdHarmless.id },
       data: {
         gcSignatureLinkSentAt: new Date(),
@@ -323,7 +323,7 @@ export class HoldHarmlessService {
       finalDocUrl: string;
     },
   ) {
-    const holdHarmless = await this.prisma.holdHarmless.findUnique({
+    const holdHarmless = await this.prisma!.holdHarmless.findUnique({
       where: { id },
       include: {
         coi: {
@@ -346,7 +346,7 @@ export class HoldHarmlessService {
     }
 
     // Update with GC signature and mark as completed
-    const updated = await this.prisma.holdHarmless.update({
+    const updated = await this.prisma!.holdHarmless.update({
       where: { id: holdHarmless.id },
       data: {
         gcSignatureUrl: signatureData.signatureUrl,
@@ -359,7 +359,7 @@ export class HoldHarmlessService {
     });
 
     // Update COI status
-    await this.prisma.generatedCOI.update({
+    await this.prisma!.generatedCOI.update({
       where: { id: holdHarmless.coiId },
       data: {
         holdHarmlessStatus: HoldHarmlessStatus.COMPLETED,
@@ -423,7 +423,7 @@ export class HoldHarmlessService {
     }
 
     // Only update notification records if email was successfully sent
-    await this.prisma.holdHarmless.update({
+    await this.prisma!.holdHarmless.update({
       where: { id: holdHarmless.id },
       data: {
         notificationsSent: recipients,
@@ -575,17 +575,17 @@ export class HoldHarmlessService {
    * Get hold harmless statistics
    */
   async getStatistics() {
-    const total = await this.prisma.holdHarmless.count();
+    const total = await this.prisma!.holdHarmless.count();
     const pendingSubSignature = await this.prisma.holdHarmless.count({
       where: { status: HoldHarmlessStatus.PENDING_SUB_SIGNATURE },
     });
-    const pendingGCSignature = await this.prisma.holdHarmless.count({
+    const pendingGCSignature = await this.prisma!.holdHarmless.count({
       where: { status: HoldHarmlessStatus.PENDING_GC_SIGNATURE },
     });
-    const completed = await this.prisma.holdHarmless.count({
+    const completed = await this.prisma!.holdHarmless.count({
       where: { status: HoldHarmlessStatus.COMPLETED },
     });
-    const rejected = await this.prisma.holdHarmless.count({
+    const rejected = await this.prisma!.holdHarmless.count({
       where: { status: HoldHarmlessStatus.REJECTED },
     });
 
@@ -599,3 +599,11 @@ export class HoldHarmlessService {
     };
   }
 }
+
+  private ensurePrisma() {
+    if (!this.prisma) {
+      throw new ServiceUnavailableException(
+        "Database not available in simple auth mode"
+      );
+    }
+  }

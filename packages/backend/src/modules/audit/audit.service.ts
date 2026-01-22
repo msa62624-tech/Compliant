@@ -1,4 +1,4 @@
-import { Injectable, Inject, LoggerService, Optional } from "@nestjs/common";
+import { Injectable, Inject, LoggerService, Optional , ServiceUnavailableException } from "@nestjs/common";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "../../config/prisma.service";
@@ -139,7 +139,7 @@ export class AuditService {
       take?: number;
     },
   ) {
-    return this.prisma.auditLog.findMany({
+    return this.prisma!.auditLog.findMany({
       where: {
         resource,
         resourceId,
@@ -173,7 +173,7 @@ export class AuditService {
       take?: number;
     },
   ) {
-    return this.prisma.auditLog.findMany({
+    return this.prisma!.auditLog.findMany({
       where: {
         userId,
       },
@@ -229,3 +229,11 @@ export class AuditService {
     });
   }
 }
+
+  private ensurePrisma() {
+    if (!this.prisma) {
+      throw new ServiceUnavailableException(
+        "Database not available in simple auth mode"
+      );
+    }
+  }
