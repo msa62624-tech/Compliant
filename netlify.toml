@@ -67,7 +67,7 @@
   
   # Mark packages as external to prevent bundler from analyzing their optional dependencies
   # and to ensure runtime dependencies are available from node_modules
-  external_node_modules = ["@nestjs/core", "opencollective", "serverless-http"]
+  external_node_modules = ["@nestjs/core", "opencollective", "serverless-http", "cookie-parser"]
   
   # Include backend build, shared build, and root node_modules with NestJS dependencies
   # Note: NestJS dependencies installed at root level for Netlify function access
@@ -83,6 +83,7 @@
     "../../node_modules/class-validator/**",
     "../../node_modules/consola/**",
     "../../node_modules/serverless-http/**",
+    "../../node_modules/cookie-parser/**",
     "../../node_modules/opencollective/**",
     "../../node_modules/chalk/**",
     "../../node_modules/inquirer/**",
