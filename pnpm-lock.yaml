@@ -11,6 +11,9 @@ importers:
 
   .:
     dependencies:
+      '@compliant/shared':
+        specifier: workspace:*
+        version: link:packages/shared
       '@nestjs/common':
         specifier: ^11.1.12
         version: 11.1.12(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -60,6 +63,9 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^0.71.2
         version: 0.71.2
+      '@compliant/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@nestjs/axios':
         specifier: ^4.0.1
         version: 4.0.1(@nestjs/common@11.1.12)(axios@1.13.2)(rxjs@7.8.2)
@@ -166,9 +172,6 @@ importers:
         specifier: ^3.19.0
         version: 3.19.0
     devDependencies:
-      '@compliant/shared':
-        specifier: workspace:*
-        version: link:../shared
       '@nestjs/cli':
         specifier: ^11.0.16
         version: 11.0.16(@types/node@25.0.9)

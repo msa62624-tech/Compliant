@@ -27,6 +27,7 @@
     "frontend": "cd packages/frontend && pnpm dev"
   },
   "dependencies": {
+    "@compliant/shared": "workspace:*",
     "serverless-http": "^3.2.0",
     "@nestjs/common": "^11.1.12",
     "@nestjs/core": "^11.1.12",
