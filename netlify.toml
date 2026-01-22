@@ -22,7 +22,7 @@
   base = "packages/frontend"
   # Build shared package, backend, and frontend from frontend directory
   # Install root dependencies first for Netlify Functions (serverless-http)
-  command = "cd ../../ && pnpm install && cd packages/shared && pnpm install && pnpm build && cd ../backend && pnpm install && pnpm build && cd ../frontend && pnpm install && pnpm build"
+  command = "cd ../../ && pnpm install && cd packages/shared && pnpm build && cd ../backend && pnpm build && cd ../frontend && pnpm build"
   publish = ".next"
   functions = "../../netlify/functions"
 
@@ -133,15 +133,15 @@
 
 # Deploy previews (PR builds)
 [context.deploy-preview]
-  command = "cd ../../ && pnpm install && cd packages/shared && pnpm install && pnpm build && cd ../backend && pnpm install && pnpm build && cd ../frontend && pnpm install && pnpm build"
+  command = "cd ../../ && pnpm install && cd packages/shared && pnpm build && cd ../backend && pnpm build && cd ../frontend && pnpm build"
 
 # Branch deploys
 [context.branch-deploy]
-  command = "cd ../../ && pnpm install && cd packages/shared && pnpm install && pnpm build && cd ../backend && pnpm install && pnpm build && cd ../frontend && pnpm install && pnpm build"
+  command = "cd ../../ && pnpm install && cd packages/shared && pnpm build && cd ../backend && pnpm build && cd ../frontend && pnpm build"
 
 # Production context
 [context.production]
-  command = "cd ../../ && pnpm install && cd packages/shared && pnpm install && pnpm build && cd ../backend && pnpm install && pnpm build && cd ../frontend && pnpm install && pnpm build"
+  command = "cd ../../ && pnpm install && cd packages/shared && pnpm build && cd ../backend && pnpm build && cd ../frontend && pnpm build"
 
 # ------------------------------------------------------------------------------
 # Optional Plugins (uncomment to enable)
