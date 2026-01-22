@@ -64,6 +64,9 @@
 # Netlify Functions Configuration
 # ------------------------------------------------------------------------------
 [functions]
+  # Enable esbuild bundler to optimize function size and stay under 250 MB limit
+  node_bundler = "esbuild"
+  
   # Include backend dist files (needed for NestJS app) and Prisma schema
   included_files = [
     "../backend/dist/**",
