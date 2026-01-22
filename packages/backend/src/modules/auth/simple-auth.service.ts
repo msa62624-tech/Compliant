@@ -30,10 +30,10 @@ export class SimpleAuthService {
       return null;
     }
 
-    // Return mock tokens for simple auth
+    // Return mock tokens for simple auth (camelCase to match AuthService)
     return {
-      access_token: 'simple-access-token',
-      refresh_token: 'simple-refresh-token',
+      accessToken: 'simple-access-token',
+      refreshToken: 'simple-refresh-token',
       user,
     };
   }
@@ -53,10 +53,10 @@ export class SimpleAuthService {
   }
 
   async refresh() {
-    // Return mock refreshed tokens
+    // Return mock refreshed tokens (camelCase to match AuthService)
     return {
-      access_token: 'simple-access-token-refreshed',
-      refresh_token: 'simple-refresh-token-refreshed',
+      accessToken: 'simple-access-token-refreshed',
+      refreshToken: 'simple-refresh-token-refreshed',
     };
   }
 
