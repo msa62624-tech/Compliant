@@ -22,16 +22,20 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Check if this is a 401 error and we haven't already tried to refresh for this request
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        // Attempt to refresh token - cookies are sent automatically
-        // Use apiClient to ensure X-API-Version header is included
-        // Set _retry flag to prevent infinite loop if refresh fails
-        await apiClient.post('/auth/refresh', {}, { _retry: true } as AxiosRequestConfig & { _retry: boolean });
+        // Attempt to refresh token - cookies are sent automatically from the axios instance
+        // Mark the refresh request itself with _retry to prevent infinite loop if refresh also fails
+        const refreshConfig: AxiosRequestConfig & { _retry?: boolean } = {
+          _retry: true,
+        };
+        await apiClient.post('/auth/refresh', {}, refreshConfig);
 
-        // Retry the original request
+        // Token refreshed successfully, retry the original request
+        // Keep the _retry flag to prevent trying again if this retry also fails
         return apiClient(originalRequest);
       } catch (refreshError) {
         // Redirect to login on refresh failure
