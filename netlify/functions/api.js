@@ -88,7 +88,7 @@ async function bootstrap() {
         throw new Error('Backend dist directory not found. Check Netlify function logs for directory structure.');
       }
       
-      // With esbuild bundling, dependencies are included in the bundle
+      // Dependencies are available via netlify/functions/package.json and node_modules
       const { NestFactory } = require('@nestjs/core');
       const { AppModule } = require(path.join(backendPath, 'app.module'));
       
