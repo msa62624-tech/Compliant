@@ -9,7 +9,6 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "scripts": {
-    "postinstall": "prisma generate",
     "build": "prisma generate && nest build",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "nest start",
