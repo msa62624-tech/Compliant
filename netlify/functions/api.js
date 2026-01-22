@@ -2,6 +2,7 @@
 // This wraps the NestJS application to run as a serverless function
 const serverless = require('serverless-http');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 
 let cachedHandler;
 
@@ -14,11 +15,15 @@ async function bootstrap() {
         path.join(__dirname, '..', '..', 'packages', 'backend', 'dist');
       
       const { NestFactory } = require('@nestjs/core');
+      const { ValidationPipe } = require('@nestjs/common');
       const { AppModule } = require(path.join(backendPath, 'app.module'));
       
       const app = await NestFactory.create(AppModule, {
         logger: ['error', 'warn', 'log'],
       });
+      
+      // CRITICAL: Enable cookie parser for JWT authentication
+      app.use(cookieParser());
       
       // Enable CORS for Netlify frontend
       app.enableCors({
@@ -31,6 +36,15 @@ async function bootstrap() {
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
       });
+      
+      // Global validation pipe
+      app.useGlobalPipes(
+        new ValidationPipe({
+          whitelist: true,
+          forbidNonWhitelisted: true,
+          transform: true,
+        }),
+      );
       
       // NOTE: Do NOT set globalPrefix here as the redirect already maps /api/* to this function
       // The backend routes already have /api in them from the NestJS configuration
