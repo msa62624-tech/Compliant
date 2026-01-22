@@ -60,3 +60,7 @@ prisma/*.db-journal
 # Uploads
 uploads/
 *.upload
+
+# Netlify build artifacts
+.netlify/
+**/netlify/functions-internal/

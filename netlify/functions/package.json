@@ -1,9 +1,8 @@
 {
   "name": "netlify-functions",
   "version": "1.0.0",
-  "private": true,
-  "description": "Netlify Functions for Compliant Platform backend",
+  "description": "Netlify Functions for Compliant Platform",
   "dependencies": {
-    "serverless-http": "^3.2.0"
+    "@nuxt/opencollective": "^0.3.3"
   }
 }
