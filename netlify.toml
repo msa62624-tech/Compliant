@@ -62,8 +62,10 @@
 # Netlify Functions Configuration
 # ------------------------------------------------------------------------------
 [functions]
-  # Disable bundling - NestJS dependencies don't work well with esbuild
-  # node_bundler = "esbuild"  # Commented out - using raw node_modules instead
+  # Explicitly disable bundling to prevent dependency analysis
+  # This avoids issues with @nestjs/core's optional opencollective dependency
+  node_bundler = "none"
+  
   # Include backend build, shared build, and root node_modules with NestJS dependencies
   # Note: NestJS dependencies installed at root level for Netlify function access
   included_files = [
