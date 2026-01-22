@@ -109,11 +109,11 @@
   
   # Mark packages as external to prevent bundler from analyzing their optional dependencies
   # and to ensure runtime dependencies are available from node_modules
+  # NOTE: cookie-parser removed - should be bundled, not external
   external_node_modules = [
     "@nestjs/core",
     "opencollective",
     "serverless-http",
-    "cookie-parser",
     "nest-winston",
     "winston"
   ]
