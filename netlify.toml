@@ -41,6 +41,9 @@
   # PNPM version
   PNPM_VERSION = "8.15.0"
   
+  # Set NODE_ENV to production for secure cookies
+  NODE_ENV = "production"
+  
   # Disable opencollective postinstall script (prevents @nuxt/opencollective error)
   OPENCOLLECTIVE_HIDE = "1"
   DISABLE_OPENCOLLECTIVE = "true"
