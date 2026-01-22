@@ -122,27 +122,24 @@
   # Note: NestJS dependencies installed at root level for Netlify function access
   included_files = [
     "packages/backend/dist/**",
+    "packages/backend/dist/**",
     "packages/shared/dist/**",
-    "../../node_modules/@compliant/**",
-    "../../node_modules/@nestjs/**",
-    "../../node_modules/@prisma/**",
-    "../../node_modules/reflect-metadata/**",
-    "../../node_modules/rxjs/**",
-    "../../node_modules/class-transformer/**",
-    "../../node_modules/class-validator/**",
-    "../../node_modules/consola/**",
-    "../../node_modules/serverless-http/**",
-    "../../node_modules/cookie-parser/**",
-    "../../node_modules/opencollective/**",
-    "../../node_modules/chalk/**",
-    "../../node_modules/inquirer/**",
-    "../../node_modules/minimist/**",
-    "../../node_modules/node-fetch/**",
-    "../../node_modules/babel-polyfill/**",
-    "../../node_modules/opn/**",
-    "../../node_modules/nest-winston/**",
-    "../../node_modules/winston/**",
-    "../../node_modules/prisma/dist/**"
+    "node_modules/@compliant/**",
+    "node_modules/@nestjs/**",
+    "node_modules/@prisma/**",
+    "node_modules/reflect-metadata/**",
+    "node_modules/rxjs/**",
+    "node_modules/class-transformer/**",
+    "node_modules/class-validator/**",
+    "node_modules/consola/**",
+    "node_modules/serverless-http/**",
+    "node_modules/cookie-parser/**",
+    "node_modules/opencollective/**",
+    "node_modules/chalk/**",
+    "node_modules/nest-winston/**",
+    "node_modules/winston/**",
+    "node_modules/prisma/**",
+    "node_modules/express/**"
   ]
 
 # ------------------------------------------------------------------------------
@@ -160,12 +157,12 @@
   force = true
 
 # Handle Next.js dynamic routes
-# This catch-all MUST come last to avoid shadowing other routes
+# This catch-all MUST come last and use force=false to allow API redirect to take precedence
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-  conditions = {Role = ["user"]}  # Only match if not already handled by API redirect
+  force = false  # Allow API redirect with force=true to override this
 
 # ------------------------------------------------------------------------------
 # Security Headers

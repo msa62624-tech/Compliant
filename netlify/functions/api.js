@@ -2,6 +2,7 @@
 // This wraps the NestJS application to run as a serverless function
 const serverless = require('serverless-http');
 const path = require('path');
+const fs = require('fs');
 const cookieParser = require('cookie-parser');
 
 let cachedHandler;
@@ -30,23 +31,61 @@ async function bootstrap() {
   if (!cachedHandler) {
     try {
       console.log('=== STARTING NEST APP BOOTSTRAP ===');
+      console.log('Current directory:', __dirname);
+      console.log('Process cwd:', process.cwd());
       
-      // Use environment variable or default path for backend module
-      const backendPath = process.env.BACKEND_DIST_PATH || 
-        path.join(__dirname, '..', '..', 'packages', 'backend', 'dist');
+      // CRITICAL: Determine backend dist path based on Netlify structure
+      // In Netlify, included_files are copied relative to function directory
+      // Try multiple possible paths
+      const possiblePaths = [
+        path.join(__dirname, '..', '..', 'packages', 'backend', 'dist'),
+        path.join(process.cwd(), 'packages', 'backend', 'dist'),
+        path.join(__dirname, '..', '..', '..', '..', 'packages', 'backend', 'dist'),
+      ];
       
-      console.log('Backend path:', backendPath);
+      let backendPath = null;
+      for (const testPath of possiblePaths) {
+        console.log('Testing path:', testPath);
+        if (fs.existsSync(testPath)) {
+          console.log('✓ Found backend dist at:', testPath);
+          backendPath = testPath;
+          break;
+        } else {
+          console.log('✗ Not found at:', testPath);
+        }
+      }
+      
+      if (!backendPath) {
+        throw new Error(`Backend dist not found. Tried paths: ${possiblePaths.join(', ')}`);
+      }
+      
+      console.log('Using backend path:', backendPath);
       console.log('Loading @nestjs/core...');
       const { NestFactory } = require('@nestjs/core');
+      console.log('✓ @nestjs/core loaded');
       console.log('Loading @nestjs/common...');
       const { ValidationPipe } = require('@nestjs/common');
-      console.log('Loading AppModule from:', path.join(backendPath, 'app.module'));
-      const { AppModule } = require(path.join(backendPath, 'app.module'));
+      console.log('✓ @nestjs/common loaded');
+      
+      // Check if app.module exists before requiring
+      const appModulePath = path.join(backendPath, 'app.module');
+      console.log('Looking for AppModule at:', appModulePath + '.js');
+      if (!fs.existsSync(appModulePath + '.js')) {
+        console.error('AppModule not found at:', appModulePath + '.js');
+        console.error('Directory contents:', fs.readdirSync(backendPath));
+        throw new Error(`AppModule not found at: ${appModulePath}.js`);
+      }
+      
+      console.log('Loading AppModule from:', appModulePath);
+      const { AppModule } = require(appModulePath);
+      console.log('✓ AppModule loaded');
       
       console.log('Creating NestJS application...');
+      // CRITICAL: Create app without Winston to avoid initialization issues in serverless
+      // Winston is configured in AppModule, not here
       const app = await NestFactory.create(AppModule, {
-        logger: ['error', 'warn', 'log', 'debug', 'verbose'],
-        abortOnError: false,
+        logger: ['error', 'warn', 'log'],  // Simple console logger for serverless
+        abortOnError: false,  // Don't crash on init errors, log them
       });
       
       console.log('NestJS app created, adding middleware...');
