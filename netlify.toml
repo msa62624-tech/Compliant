@@ -51,23 +51,16 @@
   # Frontend URL for CORS
   FRONTEND_URL = "https://compliantteam.netlify.app"
   
-  # IMPORTANT: Set these sensitive environment variables in Netlify Dashboard UI
-  # (Site settings -> Build & deploy -> Environment variables)
-  # DO NOT commit secrets to the repository!
-  #
-  # Required variables to set in Netlify Dashboard:
-  # 1. DATABASE_URL - PostgreSQL connection string
-  #    Format: postgresql://username:password@hostname:5432/database_name?schema=public
-  #    Get from: Supabase, Neon, Railway, Render, or your own PostgreSQL server
-  #
-  # 2. JWT_SECRET - JWT signing secret (minimum 32 characters)
-  #    Generate with: openssl rand -base64 48
-  #
-  # 3. JWT_REFRESH_SECRET - Refresh token secret (minimum 32 characters, different from JWT_SECRET)
-  #    Generate with: openssl rand -base64 48
-  #
-  # For Frontend Only Mode (MODE 2):
-  # - NEXT_PUBLIC_API_URL = "https://your-backend-api.com/api"
+  # JWT Secrets (testing site - generated securely)
+  JWT_SECRET = "EAnp5/MjwCSSQhAvkrlzaLMEycHi+Nm/vRJlgB5EADb3k6KmIBlm8e5ZiCItEgHM"
+  JWT_REFRESH_SECRET = "XmonvNlnMD6gaAPLdTPCtaXJac6+Gopdu4lfdyJoWZephNluxbLsluhjKn2+lcHr"
+  
+  # Database URL - REQUIRED: Set up PostgreSQL database and add connection string
+  # You still need to:
+  # 1. Create a PostgreSQL database (Supabase/Neon/Railway/Render)
+  # 2. Replace this placeholder with your actual DATABASE_URL
+  # Format: postgresql://username:password@hostname:5432/database_name?schema=public
+  DATABASE_URL = "postgresql://placeholder:placeholder@localhost:5432/compliant?schema=public"
 
 # ------------------------------------------------------------------------------
 # Netlify Functions Configuration
