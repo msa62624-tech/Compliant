@@ -9,6 +9,7 @@ import {
   Req,
   UnauthorizedException,
   Optional,
+  ServiceUnavailableException,
 } from "@nestjs/common";
 import { Throttle } from "@nestjs/throttler";
 import { Response, Request } from "express";
@@ -25,6 +26,7 @@ import {
 
 // Rate limiting configuration
 const AUTH_THROTTLE_CONFIG = { default: { limit: 10, ttl: 60000 } };
+const LOGIN_THROTTLE_CONFIG = { default: { limit: 10, ttl: 60000 } };
 const REFRESH_THROTTLE_CONFIG = { default: { limit: 20, ttl: 60000 } };
 const ME_THROTTLE_CONFIG = { default: { limit: 100, ttl: 60000 } };
 

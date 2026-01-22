@@ -2,6 +2,7 @@ import { Injectable, ExecutionContext, UnauthorizedException, CanActivate } from
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { Observable, isObservable, lastValueFrom } from 'rxjs';
 
 /**
  * Global Auth Guard - FIXED VERSION
@@ -37,7 +38,14 @@ export class GlobalAuthGuard implements CanActivate {
     // Full auth mode: dynamically instantiate JWT guard only when needed
     try {
       const jwtGuard = new (AuthGuard('jwt'))();
-      return (await jwtGuard.canActivate(context)) as Promise<boolean>;
+      const result = jwtGuard.canActivate(context);
+      
+      // Handle both Observable and Promise return types
+      if (isObservable(result)) {
+        return await lastValueFrom(result as Observable<boolean>);
+      }
+      
+      return result as boolean;
     } catch (error) {
       console.error('[GlobalAuthGuard] JWT validation error:', error);
       throw new UnauthorizedException('JWT validation failed');
