@@ -22,8 +22,8 @@
   base = "packages/frontend"
   # Build shared package, backend, and frontend from frontend directory
   # Install root dependencies first for Netlify Functions (serverless-http)
-  # Run Prisma migrations after backend build to set up database tables
-  command = "cd ../../ && pnpm install && cd packages/shared && pnpm build && cd ../backend && pnpm build && npx prisma migrate deploy && cd ../frontend && pnpm build"
+  # Note: Database migrations must be run separately (build env cannot reach database)
+  command = "cd ../../ && pnpm install && cd packages/shared && pnpm build && cd ../backend && pnpm build && cd ../frontend && pnpm build"
   publish = ".next"
   functions = "../../netlify/functions"
 
@@ -152,15 +152,15 @@
 
 # Deploy previews (PR builds)
 [context.deploy-preview]
-  command = "cd ../../ && pnpm install && cd packages/shared && pnpm build && cd ../backend && pnpm build && npx prisma migrate deploy && cd ../frontend && pnpm build"
+  command = "cd ../../ && pnpm install && cd packages/shared && pnpm build && cd ../backend && pnpm build && cd ../frontend && pnpm build"
 
 # Branch deploys
 [context.branch-deploy]
-  command = "cd ../../ && pnpm install && cd packages/shared && pnpm build && cd ../backend && pnpm build && npx prisma migrate deploy && cd ../frontend && pnpm build"
+  command = "cd ../../ && pnpm install && cd packages/shared && pnpm build && cd ../backend && pnpm build && cd ../frontend && pnpm build"
 
 # Production context
 [context.production]
-  command = "cd ../../ && pnpm install && cd packages/shared && pnpm build && cd ../backend && pnpm build && npx prisma migrate deploy && cd ../frontend && pnpm build"
+  command = "cd ../../ && pnpm install && cd packages/shared && pnpm build && cd ../backend && pnpm build && cd ../frontend && pnpm build"
 
 # ------------------------------------------------------------------------------
 # Optional Plugins (uncomment to enable)
