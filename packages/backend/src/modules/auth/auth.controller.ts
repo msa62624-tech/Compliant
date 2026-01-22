@@ -86,8 +86,12 @@ export class AuthController {
         }
         
         console.log('[SimpleAuth] Login successful for user:', result.user.email);
-        // For simple auth, just return user data (no real tokens)
-        return { user: result.user, message: 'Logged in successfully' };
+        // For simple auth, return tokens and user data (same format as full auth)
+        return {
+          user: result.user,
+          accessToken: result.accessToken,
+          refreshToken: result.refreshToken,
+        };
       }
     } catch (error) {
       if (error instanceof Error) {
