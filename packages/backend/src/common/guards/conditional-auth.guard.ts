@@ -1,5 +1,4 @@
-import { Injectable, ExecutionContext, UnauthorizedException, CanActivate } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Injectable, ExecutionContext, CanActivate } from '@nestjs/common';
 import { SimpleAuthGuard } from './simple-auth.guard';
 
 /**
@@ -13,15 +12,16 @@ export class ConditionalAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     // Check if using simple auth (Netlify)
-    const useSimpleAuth = process.env.USE_SIMPLE_AUTH === 'true';
+    const useSimpleAuth = process.env.USE_SIMPLE_AUTH === 'true' || process.env.NETLIFY === 'true';
     
     if (useSimpleAuth) {
-      // Netlify: Use simple authentication (always returns true)
+      // Netlify: Use simple authentication (always returns true for all requests)
       return this.simpleAuthGuard.canActivate(context);
     }
     
     // AWS: Use full JWT authentication
-    // Create JWT guard dynamically only when needed
+    // Lazy load AuthGuard ONLY when not in simple auth mode to avoid loading Passport/JWT strategy
+    const { AuthGuard } = await import('@nestjs/passport');
     const jwtGuard = new (AuthGuard('jwt'))();
     const result = await jwtGuard.canActivate(context);
     return result as boolean;

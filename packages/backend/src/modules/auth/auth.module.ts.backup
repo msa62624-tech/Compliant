@@ -2,7 +2,6 @@ import { Module } from "@nestjs/common";
 import { JwtModule, JwtModuleOptions } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { ConfigService } from "@nestjs/config";
-import { APP_GUARD } from "@nestjs/core";
 import type * as ms from "ms";
 import { AuthService } from "./auth.service";
 import { SimpleAuthService } from "./simple-auth.service";
@@ -10,7 +9,6 @@ import { AuthController } from "./auth.controller";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { UsersModule } from "../users/users.module";
 import { PrismaModule } from "../../config/prisma.module";
-import { GlobalAuthGuard } from "../../common/guards/auth.guard";
 
 @Module({
   imports: [
@@ -34,14 +32,9 @@ import { GlobalAuthGuard } from "../../common/guards/auth.guard";
   ],
   providers: [
     AuthService, 
-    SimpleAuthService,
-    // Register global auth guard for ALL routes
-    {
-      provide: APP_GUARD,
-      useClass: GlobalAuthGuard,
-    },
+    SimpleAuthService, 
     // Only register JwtStrategy if NOT using simple auth
-    ...(process.env.USE_SIMPLE_AUTH === 'true' || process.env.NETLIFY === 'true' ? [] : [JwtStrategy]),
+    ...(process.env.USE_SIMPLE_AUTH === 'true' ? [] : [JwtStrategy]),
   ],
   controllers: [AuthController],
   exports: [AuthService, SimpleAuthService],
