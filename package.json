@@ -27,7 +27,6 @@
     "frontend": "cd packages/frontend && pnpm dev"
   },
   "dependencies": {
-    "serverless-http": "^3.2.0",
     "@anthropic-ai/sdk": "^0.71.2",
     "@nestjs/common": "^11.1.12",
     "@nestjs/core": "^11.1.12",
