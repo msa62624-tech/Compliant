@@ -53,9 +53,14 @@ async function bootstrap() {
   //   defaultVersion: "1",
   // });
 
-  // API prefix (removed version from path since we use header-based versioning)
-  // NOTE: Controllers already have full paths, so this adds the /api prefix
-  app.setGlobalPrefix("api");
+  // API prefix configuration
+  // For Netlify: Don't set prefix here - the Netlify redirect already handles /api -> /.netlify/functions/api
+  // For AWS/Docker: Set prefix to match standard REST API convention
+  // Check if running in Netlify (serverless) vs standard deployment
+  const isNetlify = process.env.NETLIFY === 'true' || process.env.USE_SIMPLE_AUTH === 'true';
+  if (!isNetlify) {
+    app.setGlobalPrefix("api");
+  }
 
   // Swagger documentation
   const config = new DocumentBuilder()
@@ -74,7 +79,8 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api/docs", app, document);
+  const swaggerPath = isNetlify ? 'docs' : 'api/docs';
+  SwaggerModule.setup(swaggerPath, app, document);
 
   const port = process.env.PORT || 3001;
   await app.listen(port);
@@ -83,9 +89,12 @@ async function bootstrap() {
   const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
   logger.log("");
   logger.log("🚀 Backend server is running!");
-  logger.log(`📍 API: http://localhost:${port}/api`);
-  logger.log(`📚 Swagger Docs: http://localhost:${port}/api/docs`);
+  logger.log(`📍 API: http://localhost:${port}${isNetlify ? '' : '/api'}`);
+  logger.log(`📚 Swagger Docs: http://localhost:${port}/${swaggerPath}`);
   logger.log(`💡 Tip: Use 'X-API-Version' header for versioning (default: 1)`);
+  if (isNetlify) {
+    logger.log(`🌐 Netlify Mode: Routes at root (no /api prefix)`);
+  }
   logger.log("");
 }
 

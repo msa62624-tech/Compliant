@@ -44,6 +44,9 @@
   
   # Set NODE_ENV to production for secure cookies
   NODE_ENV = "production"
+  
+  # Netlify detection flag
+  NETLIFY = "true"
 
 # ==============================================================================
 # IMPORTANT: Runtime Environment Variables for Netlify Functions
@@ -51,13 +54,36 @@
 # These variables MUST also be set in Netlify Dashboard for runtime access:
 # Go to: Site settings → Build & deploy → Environment → Environment variables
 # Add the following variables:
+#
+# AUTHENTICATION (REQUIRED):
 #   - USE_SIMPLE_AUTH = true
 #   - SIMPLE_AUTH_USERNAME = admin  
 #   - SIMPLE_AUTH_PASSWORD = admin123
-#   - NODE_ENV = production
 #   - JWT_SECRET = (copy from below)
 #   - JWT_REFRESH_SECRET = (copy from below)
-#   - FRONTEND_URL = (your Netlify site URL)
+#
+# APPLICATION (REQUIRED):
+#   - NODE_ENV = production
+#   - NETLIFY = true
+#   - FRONTEND_URL = https://compliantteam.netlify.app
+#   - PORT = 3001
+#
+# EMAIL/SMTP (OPTIONAL - for notifications):
+#   - EMAIL_PROVIDER = smtp
+#   - SMTP_HOST = smtp.office365.com
+#   - SMTP_PORT = 587
+#   - SMTP_USER = (your Microsoft 365 email)
+#   - SMTP_PASS = (your Microsoft 365 app password)
+#   - EMAIL_FROM = (sender email, defaults to SMTP_USER)
+#
+# CORS (OPTIONAL):
+#   - CORS_ORIGIN = https://compliantteam.netlify.app
+#
+# ADMIN (OPTIONAL):
+#   - ADMIN_EMAIL = admin@compliant.com
+#
+# DATABASE (NOT NEEDED for simple auth):
+#   - DATABASE_URL = (only if you want to use full auth later)
 # ==============================================================================
   
   # Disable opencollective postinstall script (prevents @nuxt/opencollective error)

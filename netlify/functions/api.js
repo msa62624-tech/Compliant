@@ -47,11 +47,11 @@ async function bootstrap() {
         }),
       );
       
-      // CRITICAL: Set empty global prefix for Netlify
+      // Don't set global prefix for Netlify - routes are already compiled without prefix
       // Netlify redirect: /api/auth/login → /.netlify/functions/api/auth/login
-      // The redirect already includes /api, so we don't want backend to add it again
-      // This prevents the double /api/api prefix issue
-      app.setGlobalPrefix('');
+      // serverless-http receives: /auth/login
+      // Controllers: @Controller("auth") creates /auth/* routes
+      // This matches perfectly!
       
       await app.init();
       
