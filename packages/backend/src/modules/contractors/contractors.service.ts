@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger } from "@nestjs/common";
+import { Injectable, NotFoundException, Logger, Optional } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { CacheService } from "../cache/cache.service";
 import { EmailService } from "../email/email.service";
@@ -42,9 +42,9 @@ export class ContractorsService {
   private readonly CACHE_PREFIX = "contractor:";
 
   constructor(
-    private prisma: PrismaService,
-    private cacheService: CacheService,
-    private emailService: EmailService,
+    @Optional() private prisma: PrismaService,
+    @Optional() private cacheService: CacheService,
+    @Optional() private emailService: EmailService,
   ) {}
 
   /**

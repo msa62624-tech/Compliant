@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Optional,
 } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { CreateProgramDto } from "./dto/create-program.dto";
@@ -11,7 +12,7 @@ import { Prisma } from "@prisma/client";
 
 @Injectable()
 export class ProgramsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(@Optional() private prisma: PrismaService) {}
 
   async create(createProgramDto: CreateProgramDto, userId: string) {
     const programData: Prisma.InsuranceProgramCreateInput = {

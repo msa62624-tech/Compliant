@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, Optional } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 
 export enum AuditAction {
@@ -63,7 +63,7 @@ export interface AuditLogEntry {
 export class AuditService {
   private readonly logger = new Logger(AuditService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(@Optional() private prisma: PrismaService) {}
 
   /**
    * Log an audit event

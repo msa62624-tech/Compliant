@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   Inject,
   LoggerService,
+  Optional,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
@@ -23,10 +24,10 @@ const REFRESH_TOKEN_SALT_ROUNDS = 10;
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
+    @Optional() private usersService: UsersService,
+    @Optional() private jwtService: JwtService,
     private configService: ConfigService,
-    private prisma: PrismaService,
+    @Optional() private prisma: PrismaService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
   ) {}

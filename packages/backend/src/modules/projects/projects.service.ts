@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, Optional } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { Prisma, ContractorType, User } from "@prisma/client";
 
 @Injectable()
 export class ProjectsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(@Optional() private prisma: PrismaService) {}
 
   async create(createProjectDto: CreateProjectDto, userId: string) {
     const projectData: Prisma.ProjectCreateInput = {

@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   Logger,
+  Optional,
 } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { HoldHarmlessStatus, HoldHarmless, Prisma } from "@prisma/client";
@@ -24,8 +25,8 @@ export class HoldHarmlessService {
   private readonly logger = new Logger(HoldHarmlessService.name);
 
   constructor(
-    private prisma: PrismaService,
-    private emailService: EmailService,
+    @Optional() private prisma: PrismaService,
+    @Optional() private emailService: EmailService,
   ) {}
 
   /**

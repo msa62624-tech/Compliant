@@ -1,4 +1,4 @@
-import { Injectable, Inject, LoggerService } from "@nestjs/common";
+import { Injectable, Inject, LoggerService, Optional } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { PrismaService } from "../../config/prisma.service";
@@ -39,8 +39,8 @@ export class RemindersService {
     process.env.ADMIN_EMAIL || "admin@compliant.com";
 
   constructor(
-    private prisma: PrismaService,
-    private emailService: EmailService,
+    @Optional() private prisma: PrismaService,
+    @Optional() private emailService: EmailService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
   ) {}

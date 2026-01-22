@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   Logger,
+  Optional,
 } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { CreateCOIDto } from "./dto/create-coi.dto";
@@ -21,9 +22,9 @@ export class GeneratedCOIService {
   private readonly logger = new Logger(GeneratedCOIService.name);
 
   constructor(
-    private prisma: PrismaService,
-    private holdHarmlessService: HoldHarmlessService,
-    private emailService: EmailService,
+    @Optional() private prisma: PrismaService,
+    @Optional() private holdHarmlessService: HoldHarmlessService,
+    @Optional() private emailService: EmailService,
   ) {}
 
   /**

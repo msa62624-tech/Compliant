@@ -1,4 +1,4 @@
-import { Injectable, Inject, LoggerService } from "@nestjs/common";
+import { Injectable, Inject, LoggerService, Optional } from "@nestjs/common";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "../../config/prisma.service";
@@ -50,7 +50,7 @@ interface AuditLogFilters {
 @Injectable()
 export class AuditService {
   constructor(
-    private prisma: PrismaService,
+    @Optional() private prisma: PrismaService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
   ) {}

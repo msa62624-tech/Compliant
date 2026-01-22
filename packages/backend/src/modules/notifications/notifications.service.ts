@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, Optional } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { User } from "@prisma/client";
 import { EmailService } from "../email/email.service";
@@ -38,8 +38,8 @@ export class NotificationsService {
   private notifications: Map<string, Notification> = new Map();
 
   constructor(
-    private prisma: PrismaService,
-    private emailService: EmailService,
+    @Optional() private prisma: PrismaService,
+    @Optional() private emailService: EmailService,
   ) {}
 
   /**

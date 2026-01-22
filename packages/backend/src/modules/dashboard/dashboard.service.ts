@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, Optional } from "@nestjs/common";
 import { PrismaService } from "../../config/prisma.service";
 import { User, UserRole } from "@prisma/client";
 
@@ -52,7 +52,7 @@ export interface GeneratedCOI {
 export class DashboardService {
   private readonly logger = new Logger(DashboardService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(@Optional() private prisma: PrismaService) {}
 
   /**
    * Get dashboard data for the current user based on their role

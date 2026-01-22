@@ -1,4 +1,4 @@
-import { Injectable, Inject, LoggerService } from "@nestjs/common";
+import { Injectable, Inject, LoggerService, Optional } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { AuthService } from "../auth/auth.service";
@@ -14,7 +14,7 @@ export class TasksService {
   private readonly BATCH_DELAY_MS = 1000; // 1 second between batches
 
   constructor(
-    private authService: AuthService,
+    @Optional() private authService: AuthService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
   ) {}

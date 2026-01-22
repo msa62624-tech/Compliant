@@ -2,15 +2,16 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  Optional,
 } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import { PrismaService } from "../../config/prisma.service";
 import { CreateUserDto } from "./dto/create-user.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
+import { UpdateUserDto} from "./dto/update-user.dto";
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(@Optional() private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
     const existingUser = await this.prisma.user.findUnique({
