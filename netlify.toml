@@ -119,27 +119,28 @@
   ]
   
   # Include backend build, shared build, and root node_modules with NestJS dependencies
-  # Note: NestJS dependencies installed at root level for Netlify function access
+  # CRITICAL: Paths are relative to base directory (packages/frontend)
+  # So "../backend/dist/**" resolves to packages/backend/dist from frontend
+  # Root node_modules resolved from "../../node_modules" 
   included_files = [
-    "packages/backend/dist/**",
-    "packages/backend/dist/**",
-    "packages/shared/dist/**",
-    "node_modules/@compliant/**",
-    "node_modules/@nestjs/**",
-    "node_modules/@prisma/**",
-    "node_modules/reflect-metadata/**",
-    "node_modules/rxjs/**",
-    "node_modules/class-transformer/**",
-    "node_modules/class-validator/**",
-    "node_modules/consola/**",
-    "node_modules/serverless-http/**",
-    "node_modules/cookie-parser/**",
-    "node_modules/opencollective/**",
-    "node_modules/chalk/**",
-    "node_modules/nest-winston/**",
-    "node_modules/winston/**",
-    "node_modules/prisma/**",
-    "node_modules/express/**"
+    "../backend/dist/**",                      # Backend build (sibling to frontend)
+    "../shared/dist/**",                       # Shared package build
+    "../../node_modules/@compliant/**",        # Root node_modules
+    "../../node_modules/@nestjs/**",
+    "../../node_modules/@prisma/**",
+    "../../node_modules/reflect-metadata/**",
+    "../../node_modules/rxjs/**",
+    "../../node_modules/class-transformer/**",
+    "../../node_modules/class-validator/**",
+    "../../node_modules/consola/**",
+    "../../node_modules/serverless-http/**",
+    "../../node_modules/cookie-parser/**",
+    "../../node_modules/opencollective/**",
+    "../../node_modules/chalk/**",
+    "../../node_modules/nest-winston/**",
+    "../../node_modules/winston/**",
+    "../../node_modules/prisma/**",
+    "../../node_modules/express/**"
   ]
 
 # ------------------------------------------------------------------------------

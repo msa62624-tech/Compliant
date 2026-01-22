@@ -35,14 +35,24 @@ async function bootstrap() {
       console.log('Process cwd:', process.cwd());
       
       // CRITICAL: Determine backend dist path based on Netlify structure
-      // In Netlify Lambda: /var/task/ is the root
-      // included_files like "packages/backend/dist/**" are copied to /var/task/packages/backend/dist
+      // Netlify has base = "packages/frontend" in netlify.toml
+      // So /var/task is actually the frontend package directory!
+      // Backend dist gets copied relative to that: /var/task/../backend/dist
       const possiblePaths = [
-        '/var/task/packages/backend/dist',                                      // Netlify Lambda standard path
-        path.join(process.cwd(), 'packages', 'backend', 'dist'),               // process.cwd() = /var/task
-        path.join(__dirname, '..', '..', 'packages', 'backend', 'dist'),       // From function dir: netlify/functions/
-        path.resolve(__dirname, '../../packages/backend/dist'),                // Explicit resolve
-        path.resolve(process.cwd(), 'packages/backend/dist'),                  // Explicit resolve from cwd
+        // Most likely: Backend is sibling to frontend base directory
+        path.join(process.cwd(), '..', 'backend', 'dist'),                      // /var/task/../backend/dist
+        path.resolve(process.cwd(), '../backend/dist'),                         // Explicit resolve
+        
+        // Alternative: If Netlify copies to flat structure
+        path.join(process.cwd(), 'backend', 'dist'),                            // /var/task/backend/dist
+        
+        // Legacy paths (less likely but test anyway)
+        '/var/task/packages/backend/dist',                                      // Absolute from root
+        path.join(process.cwd(), 'packages', 'backend', 'dist'),               // /var/task/packages/backend/dist
+        
+        // From function directory (netlify/functions)
+        path.join(__dirname, '..', '..', 'packages', 'backend', 'dist'),       // From function dir
+        path.resolve(__dirname, '../../../packages/backend/dist'),              // Up 3 levels
       ];
       
       let backendPath = null;
