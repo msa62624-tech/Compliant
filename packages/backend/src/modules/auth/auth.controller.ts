@@ -109,4 +109,51 @@ export class AuthController {
       return user;
     }
   }
+
+  @Post("refresh")
+  @Public()
+  @Throttle(LOGIN_THROTTLE_CONFIG)
+  @ApiOperation({ summary: "Refresh access token" })
+  @ApiResponse({ status: 200, description: "Token refreshed successfully" })
+  async refresh(@Body() body: { refreshToken: string }) {
+    if (this.useSimpleAuth) {
+      // Simple auth mode - generate new tokens
+      return this.simpleAuthService.refresh();
+    } else {
+      // Full auth mode with database
+      if (!this.authService) {
+        throw new ServiceUnavailableException(
+          'AuthService not available in simple auth mode',
+        );
+      }
+      return this.authService.refresh(body.refreshToken);
+    }
+  }
+
+  @Post("logout")
+  @Throttle(LOGIN_THROTTLE_CONFIG)
+  @ApiOperation({ summary: "Logout user" })
+  @ApiResponse({ status: 200, description: "Logged out successfully" })
+  async logout(@Req() req: Request) {
+    if (this.useSimpleAuth) {
+      // Simple auth mode - no-op logout
+      return this.simpleAuthService.logout();
+    } else {
+      // Full auth mode with database
+      if (!this.authService) {
+        throw new ServiceUnavailableException(
+          'AuthService not available in simple auth mode',
+        );
+      }
+      
+      // Get userId from JWT
+      const user = (req as any).user;
+      const userId = user?.userId || user?.sub;
+      if (!userId) {
+        throw new UnauthorizedException('User ID not found');
+      }
+      
+      return this.authService.logout(userId);
+    }
+  }
 }

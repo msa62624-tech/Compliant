@@ -109,7 +109,14 @@
   
   # Mark packages as external to prevent bundler from analyzing their optional dependencies
   # and to ensure runtime dependencies are available from node_modules
-  external_node_modules = ["@nestjs/core", "opencollective", "serverless-http", "cookie-parser"]
+  external_node_modules = [
+    "@nestjs/core",
+    "opencollective",
+    "serverless-http",
+    "cookie-parser",
+    "nest-winston",
+    "winston"
+  ]
   
   # Include backend build, shared build, and root node_modules with NestJS dependencies
   # Note: NestJS dependencies installed at root level for Netlify function access
@@ -132,7 +139,10 @@
     "../../node_modules/minimist/**",
     "../../node_modules/node-fetch/**",
     "../../node_modules/babel-polyfill/**",
-    "../../node_modules/opn/**"
+    "../../node_modules/opn/**",
+    "../../node_modules/nest-winston/**",
+    "../../node_modules/winston/**",
+    "../../node_modules/prisma/dist/**"
   ]
 
 # ------------------------------------------------------------------------------
