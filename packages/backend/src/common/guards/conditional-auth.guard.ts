@@ -24,7 +24,7 @@ export class ConditionalAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  handleRequest(err, user, info, context) {
+  handleRequest(err: any, user: any, info: any, context: ExecutionContext) {
     // Check if using simple auth (Netlify)
     const useSimpleAuth = process.env.USE_SIMPLE_AUTH === 'true';
     
