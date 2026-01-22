@@ -55,12 +55,8 @@
   JWT_SECRET = "EAnp5/MjwCSSQhAvkrlzaLMEycHi+Nm/vRJlgB5EADb3k6KmIBlm8e5ZiCItEgHM"
   JWT_REFRESH_SECRET = "XmonvNlnMD6gaAPLdTPCtaXJac6+Gopdu4lfdyJoWZephNluxbLsluhjKn2+lcHr"
   
-  # Database URL - REQUIRED: Set up PostgreSQL database and add connection string
-  # You still need to:
-  # 1. Create a PostgreSQL database (Supabase/Neon/Railway/Render)
-  # 2. Replace this placeholder with your actual DATABASE_URL
-  # Format: postgresql://username:password@hostname:5432/database_name?schema=public
-  DATABASE_URL = "postgresql://placeholder:placeholder@localhost:5432/compliant?schema=public"
+  # Database URL - Neon PostgreSQL
+  DATABASE_URL = "postgresql://neondb_owner:npg_DEsBN3AKmS6X@ep-noisy-silence-ahdd5vdo-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require"
 
 # ------------------------------------------------------------------------------
 # Netlify Functions Configuration
