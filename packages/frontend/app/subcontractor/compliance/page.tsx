@@ -94,7 +94,28 @@ export default function SubcontractorCompliancePage() {
     }
   };
 
-  const renderPolicyCard = (title: string, policy: PolicyStatus) => {
+  const renderPolicyCard = (title: string, policy: PolicyStatus | undefined) => {
+    if (!policy) {
+      return (
+        <div className="bg-white rounded-lg shadow border-l-4 border-gray-300 p-6">
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex items-center gap-3">
+              <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              </svg>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+                <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600 mt-1">
+                  No Data
+                </span>
+              </div>
+            </div>
+          </div>
+          <p className="text-sm text-gray-500">Policy information not available</p>
+        </div>
+      );
+    }
+    
     const color = getStatusColor(policy.status);
     return (
       <div className={`bg-white rounded-lg shadow border-l-4 border-${color}-500 p-6`}>
@@ -239,10 +260,10 @@ export default function SubcontractorCompliancePage() {
               <div className="mb-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Insurance Policies</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {renderPolicyCard('General Liability', compliance.policies.generalLiability)}
-                  {renderPolicyCard('Auto Liability', compliance.policies.autoLiability)}
-                  {renderPolicyCard('Umbrella Policy', compliance.policies.umbrella)}
-                  {renderPolicyCard('Workers Compensation', compliance.policies.workersComp)}
+                  {renderPolicyCard('General Liability', compliance.policies?.generalLiability)}
+                  {renderPolicyCard('Auto Liability', compliance.policies?.autoLiability)}
+                  {renderPolicyCard('Umbrella Policy', compliance.policies?.umbrella)}
+                  {renderPolicyCard('Workers Compensation', compliance.policies?.workersComp)}
                 </div>
               </div>
 

@@ -171,7 +171,7 @@ export default function BrokerSignPage() {
                 </p>
               </div>
 
-              {Object.entries(coi.policies).map(([policyType, policy]) => {
+              {coi.policies && Object.entries(coi.policies).map(([policyType, policy]) => {
                 const policyNames: Record<string, string> = {
                   generalLiability: 'General Liability',
                   autoLiability: 'Auto Liability',
