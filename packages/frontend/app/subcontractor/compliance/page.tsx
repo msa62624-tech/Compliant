@@ -239,10 +239,10 @@ export default function SubcontractorCompliancePage() {
               <div className="mb-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Insurance Policies</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {renderPolicyCard('General Liability', compliance.policies.generalLiability)}
-                  {renderPolicyCard('Auto Liability', compliance.policies.autoLiability)}
-                  {renderPolicyCard('Umbrella Policy', compliance.policies.umbrella)}
-                  {renderPolicyCard('Workers Compensation', compliance.policies.workersComp)}
+                  {compliance.policies?.generalLiability && renderPolicyCard('General Liability', compliance.policies.generalLiability)}
+                  {compliance.policies?.autoLiability && renderPolicyCard('Auto Liability', compliance.policies.autoLiability)}
+                  {compliance.policies?.umbrella && renderPolicyCard('Umbrella Policy', compliance.policies.umbrella)}
+                  {compliance.policies?.workersComp && renderPolicyCard('Workers Compensation', compliance.policies.workersComp)}
                 </div>
               </div>
 
